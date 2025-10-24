@@ -7,7 +7,7 @@ services:
     environment:
       - discovery.type=single-node
       - plugins.security.disabled=true
-      - OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g
+      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g   # Heap más bajo para Docker Desktop
     ulimits:
       memlock: { soft: -1, hard: -1 }
       nofile:  { soft: 65536, hard: 65536 }
@@ -21,7 +21,7 @@ services:
       retries: 30
     networks: [ ragnet ]
     volumes:
-      - ./storage/os:/usr/share/opensearch/data
+      - osdata:/usr/share/opensearch/data   # Volumen nombrado (estable en Windows)
 
   dashboards:
     image: opensearchproject/opensearch-dashboards:${OPENSEARCH_VERSION}
@@ -45,7 +45,7 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     command: --default-authentication-plugin=mysql_native_password
     ports:
-      - "3306:3306"
+      - "3306:3306"   # Si ya usas 3306 en host, cámbialo por "13306:3306"
     volumes:
       - ./storage/mysql:/var/lib/mysql
     healthcheck:
@@ -58,6 +58,7 @@ services:
   api:
     build:
       context: .
+      dockerfile: Dockerfile
     container_name: rag-api
     environment:
       # OpenSearch
@@ -88,6 +89,9 @@ services:
       timeout: 5s
       retries: 60
     networks: [ ragnet ]
+    # Volúmenes útiles si estás desarrollando en vivo:
+    volumes:
+      - ./app:/app/app
 
   ui:
     build:
@@ -102,6 +106,8 @@ services:
     ports:
       - "8501:8501"
     networks: [ ragnet ]
+    volumes:
+      - ./ui:/app/ui
 
   toolbox:
     build:
@@ -114,7 +120,12 @@ services:
     networks: [ ragnet ]
     environment:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    # Útil para ejecutar diagnósticos y scripts dentro de la red del compose
+    command: ["bash", "-lc", "echo 'toolbox listo. Ejecuta: docker exec -it toolbox bash' && sleep infinity"]
 
 networks:
   ragnet:
     driver: bridge
+
+volumes:
+  osdata:
