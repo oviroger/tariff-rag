@@ -1,0 +1,9 @@
+FROM debian:bookworm-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash curl jq iputils-ping ca-certificates less nano \
+    default-mysql-client httpie \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /admin
+CMD ["bash"]

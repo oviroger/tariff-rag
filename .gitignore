@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Entornos / secretos
+.env
+.env.*
+
+# Datos persistentes
+storage/
+!storage/.gitkeep
+data/
+!data/.gitkeep
+
+# Streamlit / logs
+.ui_cache/
+.streamlit/
+*.log
+logs/
+storage/logs/
+
+# IDEs y SO
+.vscode/
+*.code-workspace
+.idea/
+.DS_Store
+Thumbs.db
