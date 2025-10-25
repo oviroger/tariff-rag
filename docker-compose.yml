@@ -1,0 +1,87 @@
+﻿services:
+  opensearch:
+    image: opensearchproject/opensearch:${OPENSEARCH_VERSION}
+    container_name: opensearch
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true           # <- desactiva Security Plugin (dev)
+      - DISABLE_INSTALL_DEMO_CONFIG=true       # <- evita el instalador del plugin
+      - OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile:  { soft: 65536, hard: 65536 }
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - ./storage/os:/usr/share/opensearch/data
+    networks: [ragnet]
+
+  dashboards:
+    image: opensearchproject/opensearch-dashboards:${OPENSEARCH_VERSION}
+    container_name: os-dashboards
+    environment:
+      - OPENSEARCH_HOSTS=["http://opensearch:9200"]
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true   # <- alinea con nodo sin seguridad
+      - SERVER_HOST=0.0.0.0
+    depends_on: [opensearch]
+    ports:
+      - "5601:5601"
+    networks: [ragnet]
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./storage/mysql:/var/lib/mysql
+    networks: [ragnet]
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rag-api
+    environment:
+      # OpenSearch
+      - OPENSEARCH_HOST=${OPENSEARCH_HOST}
+      - OPENSEARCH_INDEX=${OPENSEARCH_INDEX}
+      - OPENSEARCH_KNN_SPACE=${OPENSEARCH_KNN_SPACE}
+      - OPENSEARCH_EMB_DIM=${OPENSEARCH_EMB_DIM}
+      # MySQL (nombres compatibles con tu config.py)
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DB=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      # Gemini/Azure (compat con tu config.py)
+      - GEMINI_API_KEY=${GOOGLE_API_KEY}
+      - GEMINI_EMBED_MODEL=${GEMINI_EMBED_MODEL}
+      - GEMINI_MODEL=${GEMINI_GEN_MODEL}
+      - AZURE_FORMREC_ENDPOINT=${AZURE_FR_ENDPOINT}
+      - AZURE_FORMREC_KEY=${AZURE_FR_KEY}
+      # App
+      - FINAL_PASAGES=${FINAL_PASAGES}
+      - MIN_EVIDENCE=${MIN_EVIDENCE}
+      - MIN_SCORE=${MIN_SCORE}
+    volumes:
+      - ./app:/app/app
+      - ./scripts:/app/scripts
+      - ./data:/app/data
+      - ./storage:/app/storage
+    depends_on: [opensearch, mysql]
+    ports:
+      - "${PORT_API}:8000"
+    command: python -m uvicorn app.api:app --host 0.0.0.0 --port 8000 --reload
+    networks: [ragnet]
+
+networks:
+  ragnet:
+    driver: bridge

@@ -1,13 +1,11 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-*.so
 *.egg-info/
 .eggs/
-.build/
-.dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 # Envs
 .env
@@ -15,17 +13,24 @@ __pycache__/
 .venv/
 venv/
 
-# Tools & IDEs
+# IDE/OS
 .vscode/
 .idea/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.ipynb_checkpoints/
-
-# OS
 .DS_Store
 Thumbs.db
 
 # Logs
 *.log
+# Envs
+.env
+.env.local
+
+# Local data
+data/
+storage/
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
