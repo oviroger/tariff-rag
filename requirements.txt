@@ -1,7 +1,0 @@
-fastapi==0.115.0
-uvicorn==0.30.6
-opensearch-py==2.6.0
-SQLAlchemy==2.0.35
-mysql-connector-python==9.0.0
-google-generativeai==0.7.2
-requests==2.32.3

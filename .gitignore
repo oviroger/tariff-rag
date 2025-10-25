@@ -1,29 +1,31 @@
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+.build/
+.dist/
+
+# Envs
+.env
+.env.local
 .venv/
 venv/
 
-# Entornos / secretos
-.env
-.env.*
-
-# Datos persistentes
-storage/
-!storage/.gitkeep
-data/
-!data/.gitkeep
-
-# Streamlit / logs
-.ui_cache/
-.streamlit/
-*.log
-logs/
-storage/logs/
-
-# IDEs y SO
+# Tools & IDEs
 .vscode/
-*.code-workspace
 .idea/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
