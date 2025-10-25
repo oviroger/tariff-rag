@@ -27,3 +27,5 @@ tenacity==9.0.0
 
 # UI (Gradio)
 gradio>=4.0.0,<5
+google-genai
+azure-ai-documentintelligence
