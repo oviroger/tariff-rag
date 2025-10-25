@@ -1,0 +1,29 @@
+﻿fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+requests==2.32.3
+httpx==0.27.2
+tqdm==4.66.5
+
+# LLM + embeddings (Gemini)
+google-generativeai==0.8.3
+
+# OpenSearch
+opensearch-py==2.7.1
+
+# Azure OCR
+azure-ai-formrecognizer==3.3.3
+azure-core==1.30.2
+
+# Data & DB
+SQLAlchemy==2.0.36
+PyMySQL==1.1.1
+pandas==2.2.3
+
+# Utils
+tenacity==9.0.0
+
+# UI (Gradio)
+gradio>=4.0.0,<5
