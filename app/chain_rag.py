@@ -87,19 +87,15 @@ def classify(
     
     # === 2. Recuperación ===
     try:
-        from app.os_retrieval import retrieve
-        from app.embedder_gemini import GeminiEmbedder
-        
-        embedder = GeminiEmbedder()
-        query_vector = embedder.embed_query(text)
-        
-        # Recupera documentos (BM25 + kNN fusionados)
-        docs = retrieve(query_vector=query_vector, query_text=text, top_k=top_k * 2)
-        
+        from app.os_retrieval import retrieve_fragments  # FIXED: was retrieve
+
+        # Recupera documentos (retrieve_fragments handles embedding internally)
+        docs = retrieve_fragments(query_text=text, top_k=top_k * 2)
+
         if debug_info is not None:
             debug_info["retrieved_count"] = len(docs)
             debug_info["top_scores"] = [d.get("_score", 0.0) for d in docs[:5]]
-        
+
     except Exception as e:
         logger.error(f"Recuperación falló: {e}")
         return ClassifyResponse(
@@ -131,35 +127,40 @@ def classify(
             debug_info=debug_info
         )
     
-    # === 4. Generación (stub con fallback) ===
+    # === 4. Generación con Gemini ===
     try:
-        # Aquí iría la llamada real a Gemini con structured output
-        # from app.generator_gemini import generate_label
-        # result = generate_label(text, valid_docs[:top_k])
+        from app.generator_gemini import generate_label
         
-        # STUB: respuesta de ejemplo
-        result = {
-            "top_candidates": [
-                {"code": "3907.30.00", "description": "Resinas epoxi", "confidence": 0.85, "level": "subheading"},
-                {"code": "3907.30.10", "description": "Resinas epoxi líquidas", "confidence": 0.72, "level": "item"}
-            ],
-            "applied_rgi": ["RGI 1", "RGI 3(b)"],
-            "inclusions": ["resinas sintéticas", "productos de policondensación"],
-            "exclusions": ["preparaciones de pintura"],
-            "missing_fields": []
-        }
+        # Llamada REAL a Gemini con structured output
+        result = generate_label(text, valid_docs[:top_k], max_candidates=3)
+        
+        # Si Gemini no devuelve missing_fields, usar detector local
+        if not result.get("missing_fields"):
+            try:
+                from app.missing_fields_detector import detect_missing_fields
+                result["missing_fields"] = detect_missing_fields(text, valid_docs)
+            except:
+                result["missing_fields"] = []
         
     except Exception as e:
-        logger.error(f"Generación falló: {e}")
-        return ClassifyResponse(
-            evidence=[
-                Citation(fragment_id=d.get("_id", ""), score=d.get("_score", 0.0))
-                for d in valid_docs[:3]
+        logger.error(f"Generación con Gemini falló: {e}")
+        
+        # FALLBACK a detector local + stub
+        try:
+            from app.missing_fields_detector import detect_missing_fields
+            detected_missing = detect_missing_fields(text, valid_docs)
+        except:
+            detected_missing = ["información del producto incompleta"]
+        
+        result = {
+            "top_candidates": [
+                {"code": "0000.00.00", "description": "Clasificación no disponible (generador offline)", "confidence": 0.0, "level": "chapter"}
             ],
-            warnings=[f"Error en generación: {str(e)}"],
-            applied_rgi=["RGI 1"],
-            debug_info=debug_info
-        )
+            "applied_rgi": ["RGI 1"],
+            "inclusions": [],
+            "exclusions": [],
+            "missing_fields": detected_missing
+        }
     
     # === 5. Validación de salida ===
     try:
