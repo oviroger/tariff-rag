@@ -1,7 +1,22 @@
-﻿from typing import List, Optional
+﻿from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, HttpUrl, Field
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# --- Fragment schema para OCR/ingesta ---
+class Fragment(BaseModel):
+    fragment_id: str
+    source: str  # "DOC" | "DB" | etc.
+    doc_id: str
+    chapter: Optional[str] = None
+    heading: Optional[str] = None
+    subheading: Optional[str] = None
+    unit: Optional[str] = None  # "ARTICLE", "SECTION", "DB_ROW", etc.
+    text: str
+    edition: Optional[str] = None
+    validity_from: Optional[str] = None
+    validity_to: Optional[str] = None
+    metadata: Dict[str, Any] = {}
 
 class ClassifyRequest(BaseModel):
     text: Optional[str] = None
