@@ -5,39 +5,42 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # --- Fragment schema para OCR/ingesta ---
 class Fragment(BaseModel):
+    """Fragmento de texto para ingesta en OpenSearch"""
     fragment_id: str
-    source: str  # "DOC" | "DB" | etc.
-    doc_id: str
-    chapter: Optional[str] = None
-    heading: Optional[str] = None
-    subheading: Optional[str] = None
-    unit: Optional[str] = None  # "ARTICLE", "SECTION", "DB_ROW", etc.
     text: str
-    edition: Optional[str] = None
-    validity_from: Optional[str] = None
-    validity_to: Optional[str] = None
-    metadata: Dict[str, Any] = {}
-
-class ClassifyRequest(BaseModel):
-    text: Optional[str] = None
-    file_url: Optional[HttpUrl] = None
-    top_k: int = Field(default=5, ge=1, le=20)
-    debug: bool = False
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    embedding: Optional[List[float]] = None
 
 class Citation(BaseModel):
-    id: str
-    score: float
-    snippet: str
+    """Evidencia recuperada del retriever"""
+    fragment_id: str = Field(..., description="ID del fragmento recuperado")
+    score: float = Field(..., ge=0.0, description="Score de similaridad")
+    text: Optional[str] = Field(None, description="Texto del fragmento (opcional)")
+    reason: Optional[str] = Field(None, description="Razón de relevancia")
+
+class Candidate(BaseModel):
+    """Candidato de clasificación arancelaria"""
+    code: str = Field(..., description="Código arancelario (ej: 3907.30.00)")
+    description: Optional[str] = Field(None, description="Descripción del código")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Confianza [0-1]")
+    level: Optional[str] = Field(None, description="Nivel: heading/subheading/item")
 
 class ClassifyResponse(BaseModel):
-    label: str
-    score: float
-    reasons: List[str] = []
-    citations: List[Citation] = []
-    debug: Optional[dict] = None
+    """Respuesta del endpoint /classify"""
+    top_candidates: List[Candidate] = Field(default_factory=list)
+    evidence: List[Citation] = Field(default_factory=list)
+    applied_rgi: List[str] = Field(default_factory=list, description="RGI aplicadas")
+    inclusions: List[str] = Field(default_factory=list)
+    exclusions: List[str] = Field(default_factory=list)
+    missing_fields: List[str] = Field(default_factory=list)
+    warnings: List[str] = Field(default_factory=list)
+    versions: Dict[str, str] = Field(default_factory=dict)
+    debug_info: Optional[Dict[str, Any]] = None
 
 class HealthResponse(BaseModel):
-    status: str = "ok"
+    """Respuesta del health check"""
+    status: str = Field(..., description="ok | degraded | fail")
+    services: Dict[str, Any] = Field(default_factory=dict)
 
 class Settings(BaseSettings):
     # CORS / App
