@@ -16,6 +16,12 @@
     volumes:
       - ./storage/os:/usr/share/opensearch/data
     networks: [ragnet]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:9200/_cluster/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
 
   dashboards:
     image: opensearchproject/opensearch-dashboards:${OPENSEARCH_VERSION}
@@ -43,6 +49,12 @@
     volumes:
       - ./storage/mysql:/var/lib/mysql
     networks: [ragnet]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
   api:
     build:
@@ -74,13 +86,25 @@
     volumes:
       - ./app:/app/app
       - ./scripts:/app/scripts
+      - ./tests:/app/tests
       - ./data:/app/data
       - ./storage:/app/storage
-    depends_on: [opensearch, mysql]
     ports:
       - "${PORT_API}:8000"
     command: python -m uvicorn app.api:app --host 0.0.0.0 --port 8000 --reload
     networks: [ragnet]
+    healthcheck:
+      # Usa Python en vez de curl (python:3.11-slim no trae curl)
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0) if urllib.request.urlopen('http://localhost:8000/health', timeout=5).status==200 else sys.exit(1)\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    depends_on:
+      opensearch:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
 
   ui:
     image: python:3.11-slim
@@ -95,7 +119,8 @@
       - ./requirements.ui.txt:/app/requirements.ui.txt
     command: /bin/sh -lc "pip install --no-cache-dir -r requirements.ui.txt && python ui/gradio_app.py"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     ports:
       - "7860:7860"
     networks: [ragnet]
