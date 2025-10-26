@@ -82,6 +82,24 @@
     command: python -m uvicorn app.api:app --host 0.0.0.0 --port 8000 --reload
     networks: [ragnet]
 
+  ui:
+    image: python:3.11-slim
+    container_name: rag-ui
+    working_dir: /app
+    environment:
+      - RAG_API_URL=http://api:8000
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_SERVER_PORT=7860
+    volumes:
+      - ./ui:/app/ui
+      - ./requirements.ui.txt:/app/requirements.ui.txt
+    command: /bin/sh -lc "pip install --no-cache-dir -r requirements.ui.txt && python ui/gradio_app.py"
+    depends_on:
+      - api
+    ports:
+      - "7860:7860"
+    networks: [ragnet]
+
 networks:
   ragnet:
     driver: bridge
