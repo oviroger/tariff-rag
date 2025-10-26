@@ -1,5 +1,6 @@
 from app.os_index import os_client
 from app.config import SET
+from app.metrics import RETRIEVAL_K
 from heapq import nlargest
 
 def bm25_search(query: str, size=20) -> list[dict]:
@@ -46,3 +47,9 @@ def rrf_fusion(list_a: list[dict], list_b: list[dict], k=60, topn=24) -> list[di
     # materializa docs
     idx = {d["_id"]:d for d in list_a + list_b}
     return [idx[i] for i in top_ids]
+
+# ... dentro de tu función retrieve(...) después de obtener listas:
+# bm = resultados BM25, kn = resultados kNN, fused = lista final fusionada (RRF)
+RETRIEVAL_K.labels("bm25").set(len(bm) if 'bm' in locals() else 0)
+RETRIEVAL_K.labels("knn").set(len(kn) if 'kn' in locals() else 0)
+RETRIEVAL_K.labels("rrf").set(len(fused) if 'fused' in locals() else 0)

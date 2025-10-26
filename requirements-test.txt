@@ -14,3 +14,5 @@ httpx>=0.28.1,<1.0.0
 websockets>=13.0
 pytest==8.4.2
 pytest-cov==7.0.0
+prometheus-client==0.20.0
+ir-measures==0.3.4
