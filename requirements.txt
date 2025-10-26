@@ -4,7 +4,6 @@ pydantic==2.9.2
 pydantic-settings==2.6.1
 python-dotenv==1.0.1
 requests==2.32.3
-httpx==0.27.2
 tqdm==4.66.5
 
 # LLM + embeddings (Gemini)
@@ -26,6 +25,11 @@ pandas==2.2.3
 tenacity==9.0.0
 
 # UI (Gradio)
-gradio>=4.0.0,<5
 google-genai
 azure-ai-documentintelligence
+
+# Metricas y observabilidad
+prometheus-client==0.20.0
+ir-measures==0.3.4
+# pytrec_eval es opcional; requiere toolchain para compilar en algunos entornos
+# pytrec_eval==0.5

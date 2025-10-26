@@ -89,6 +89,7 @@
       - ./tests:/app/tests
       - ./data:/app/data
       - ./storage:/app/storage
+      - ./requirements-test.txt:/app/requirements-test.txt
     ports:
       - "${PORT_API}:8000"
     command: python -m uvicorn app.api:app --host 0.0.0.0 --port 8000 --reload

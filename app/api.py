@@ -1,13 +1,17 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 from contextlib import asynccontextmanager
 from typing import Optional
 import os
+from time import perf_counter
+
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
 from app.config import get_settings
 from app.schemas import ClassifyResponse, HealthResponse
 from app.chain_rag import classify
+from app.metrics import REQUESTS, LATENCY
 
 # Lifespan para inicializar/liberar recursos
 @asynccontextmanager
@@ -123,14 +127,8 @@ def health_check():
 
 @app.post("/classify", response_model=ClassifyResponse, tags=["Classification"])
 def classify_endpoint(request: ClassifyRequest):
-    """
-    Clasifica un producto según descripción usando RAG híbrido.
-    
-    - Valida entrada (longitud, formato)
-    - Recupera evidencia de OpenSearch (BM25 + kNN)
-    - Genera clasificación con Gemini
-    - Aplica guardrails y validación de salida
-    """
+    t0 = perf_counter()
+    status_code = 200
     try:
         result = classify(
             text=request.text,
@@ -140,8 +138,16 @@ def classify_endpoint(request: ClassifyRequest):
         )
         return result
     except ValueError as ve:
-        # Errores de validación o guardrails
+        status_code = 400
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        # Errores internos
+        status_code = 500
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+    finally:
+        LATENCY.labels("/classify", "POST").observe(perf_counter() - t0)
+        REQUESTS.labels("/classify", "POST", str(status_code)).inc()
+
+@app.get("/metrics", include_in_schema=False)
+def metrics():
+    data = generate_latest()
+    return Response(content=data, media_type=CONTENT_TYPE_LATEST)
