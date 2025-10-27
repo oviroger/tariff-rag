@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from contextlib import asynccontextmanager
 from typing import Optional
 import os
@@ -40,19 +40,15 @@ app.add_middleware(
 
 # === REQUEST MODEL CON VALIDACIONES ===
 class ClassifyRequest(BaseModel):
-    text: str = Field(..., min_length=10, max_length=4000, description="Descripción del producto")
-    file_url: Optional[str] = Field(None, description="URL opcional de PDF para OCR")
-    versions: dict = Field(default_factory=lambda: {"hs_edition": "HS_2022"})
-    top_k: int = Field(default=5, ge=1, le=20, description="Número de candidatos a retornar")
-    debug: bool = Field(default=False)
+    text: str = Field(None, description="Query text (legacy)")
+    query: str = Field(None, description="Query text (preferred)")
+    top_k: int = Field(default=5, ge=1, le=50)
+    file_url: str = Field(None, description="Optional file URL for context")
+    debug: bool = Field(default=False, description="Enable debug mode")
 
-    @field_validator('text')
-    @classmethod
-    def text_not_empty(cls, v: str) -> str:
-        v = v.strip()
-        if not v or len(v) < 10:
-            raise ValueError("El texto debe tener al menos 10 caracteres")
-        return v
+    def get_query_text(self) -> str:
+        """Return query or text, preferring query if both provided."""
+        return self.query or self.text or ""
 
 # === ENDPOINTS ===
 @app.get("/", tags=["Root"])
@@ -130,8 +126,12 @@ def classify_endpoint(request: ClassifyRequest):
     t0 = perf_counter()
     status_code = 200
     try:
+        query_text = request.get_query_text()
+        if not query_text:
+            raise HTTPException(400, "Either 'text' or 'query' field required")
+
         result = classify(
-            text=request.text,
+            text=query_text,  # Usar query_text en lugar de request.text
             file_url=request.file_url,
             top_k=request.top_k,
             debug=request.debug

@@ -23,12 +23,14 @@ def test_health_check():
         assert "gemini" in data["services"]
 
 def test_classify_validation_min_length():
-    """Test validación de longitud mínima"""
+    """Test que el endpoint procesa textos cortos con fallback"""
     with TestClient(app) as client:
-        response = client.post("/classify", json={"text": "corto"})
-        assert response.status_code == 422  # Validation error
+        response = client.post("/classify", json={"text": "steel"})
+        assert response.status_code == 200
         data = response.json()
-        assert "detail" in data
+        assert "top_candidates" in data
+        # Puede tener warning de evidencia insuficiente
+        assert "warnings" in data or "evidence" in data
 
 def test_classify_validation_required():
     """Test campo text requerido"""
