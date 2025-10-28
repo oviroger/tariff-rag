@@ -1,36 +1,30 @@
 ﻿# Python
 __pycache__/
 *.py[cod]
-*.egg-info/
-.eggs/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-# Envs
-.env
-.env.local
+*.pyo
+*.pyd
+*.so
 .venv/
 venv/
-
-# IDE/OS
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-# Envs
 .env
-.env.local
+.pytest_cache/
+.mypy_cache/
 
-# Local data
-data/
-storage/
-
-# IDE/OS
-.vscode/
-.idea/
+# Editors/OS
 .DS_Store
-Thumbs.db
+.idea/
+.vscode/
+
+# Logs/Artifacts
+*.log
+
+# Local volumes and large data (do NOT push)
+storage/
+data/finales/
+data/originales/
+
+# Optional: if the full corpus is large, consider ignoring it too
+# data/corpus/
+
+# Runs and temporary files
+runs/
