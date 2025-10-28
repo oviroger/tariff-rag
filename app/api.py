@@ -1,26 +1,65 @@
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import Optional, Any, Dict
 import os
 from time import perf_counter
-
+import logging
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from opensearchpy import OpenSearch
 
 from app.config import get_settings
 from app.schemas import ClassifyResponse, HealthResponse
-from app.chain_rag import classify
 from app.metrics import REQUESTS, LATENCY
+from app.generator_gemini import generate_label, generate_followup_answer
+from app.os_retrieval import retrieve_support_for_code  # si implementaste esta función
+from app.os_retrieval import hybrid_search_with_fallback
+
+# Configuración del logger
+logger = logging.getLogger("tariff_rag.api")
+if not logger.handlers:
+    # No toques el nivel si ya tienes configuración global; si no la tienes, lo dejamos INFO.
+    logging.basicConfig(level=logging.INFO)
 
 # Lifespan para inicializar/liberar recursos
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Pre-carga de recursos (clientes, conexiones pool) aquí si es necesario
     settings = get_settings()
-    print(f"[Startup] API iniciada. OpenSearch: {settings.opensearch_host}")
-    yield
-    print("[Shutdown] Liberando recursos...")
+    logger.info(f"[Startup] API iniciada. OpenSearch host: {settings.opensearch_host}")
+
+    # Inicializar OpenSearch y guardarlo en app.state
+    try:
+        client = OpenSearch(
+            hosts=[settings.opensearch_host],
+            http_auth=None,           # agrega auth si la defines en Settings
+            verify_certs=False,
+            timeout=10,
+        )
+        # Chequeo liviano
+        try:
+            health = client.cluster.health()
+            logger.info(f"OpenSearch OK: {health.get('status')} (nodes={health.get('number_of_nodes')})")
+        except Exception as e:
+            logger.exception("OpenSearch health check failed: %s", e)
+        app.state.os_client = client
+        app.state.index_name = settings.opensearch_index
+    except Exception as e:
+        logger.exception("Error inicializando OpenSearch: %s", e)
+        app.state.os_client = None
+        app.state.index_name = None
+
+    # Lifespan activo
+    try:
+        yield
+    finally:
+        # Liberar recursos si aplica
+        try:
+            if getattr(app.state, "os_client", None):
+                app.state.os_client.close()
+        except Exception:
+            pass
+        logger.info("[Shutdown] Liberando recursos...")
 
 app = FastAPI(
     title="Tariff RAG API",
@@ -49,6 +88,13 @@ class ClassifyRequest(BaseModel):
     def get_query_text(self) -> str:
         """Return query or text, preferring query if both provided."""
         return self.query or self.text or ""
+
+class ChatRequest(BaseModel):
+    question: str
+    previous_result: Dict[str, Any]
+
+class ChatResponse(BaseModel):
+    answer: str
 
 # === ENDPOINTS ===
 @app.get("/", tags=["Root"])
@@ -121,31 +167,66 @@ def health_check():
 
     return status
 
-@app.post("/classify", response_model=ClassifyResponse, tags=["Classification"])
-def classify_endpoint(request: ClassifyRequest):
-    t0 = perf_counter()
-    status_code = 200
+@app.post("/classify", response_model=ClassifyResponse)
+def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
     try:
-        query_text = request.get_query_text()
-        if not query_text:
-            raise HTTPException(400, "Either 'text' or 'query' field required")
+        os_client = getattr(fastapi_request.app.state, "os_client", None)
+        index_name = getattr(fastapi_request.app.state, "index_name", None)
+        if os_client is None or index_name is None:
+            raise HTTPException(status_code=503, detail="Search backend not ready")
 
-        result = classify(
-            text=query_text,  # Usar query_text en lugar de request.text
-            file_url=request.file_url,
-            top_k=request.top_k,
-            debug=request.debug
-        )
-        return result
-    except ValueError as ve:
-        status_code = 400
-        raise HTTPException(status_code=400, detail=str(ve))
+        # 1) retrieval con fallback
+        hits = hybrid_search_with_fallback(os_client, index_name, req.query, k=req.top_k or 5) or []
+
+        # 2) generación (asegúrate dict)
+        result_dict = generate_label(query=req.query, context_docs=hits, max_candidates=req.top_k or 3)
+        if not isinstance(result_dict, dict):
+            result_dict = result_dict.dict() if hasattr(result_dict, "dict") else {}
+
+        # 3) normalizar evidencia de la consulta
+        def _norm(h):
+            src = h.get("_source", {}) if isinstance(h, dict) else {}
+            return {
+                "fragment_id": (src or {}).get("fragment_id") or h.get("fragment_id"),
+                "score": h.get("_score") or h.get("score"),
+                "text": (src or {}).get("text") or h.get("text", ""),
+                "bucket": (src or {}).get("bucket"),
+                "unit": (src or {}).get("unit"),
+                "doc_id": (src or {}).get("doc_id"),
+                "reason": h.get("reason") or "retrieved_by_search",
+            }
+        try:
+            result_dict["evidence"] = [_norm(h) for h in hits]
+        except Exception:
+            logger.exception("evidence normalization failed")
+            result_dict["evidence"] = []
+
+        # 4) evidencia anclada al código (opcional)
+        main_code = None
+        cands = result_dict.get("top_candidates") or result_dict.get("candidates") or []
+        if isinstance(cands, list) and cands:
+            main_code = cands[0].get("code") or cands[0].get("hs_code")
+
+        result_dict["support_evidence"] = []
+        if main_code:
+            try:
+                result_dict["support_evidence"] = retrieve_support_for_code(os_client, index_name, main_code, k=3) or []
+            except Exception:
+                logger.exception("support_evidence retrieval failed")
+                result_dict["support_evidence"] = []
+
+        return ClassifyResponse(**result_dict)
+
+    except HTTPException:
+        raise
     except Exception as e:
-        status_code = 500
-        raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
-    finally:
-        LATENCY.labels("/classify", "POST").observe(perf_counter() - t0)
-        REQUESTS.labels("/classify", "POST", str(status_code)).inc()
+        logger.exception("Unhandled error in /classify")
+        raise HTTPException(status_code=500, detail=f"Internal error: {e.__class__.__name__}: {e}")
+
+@app.post("/chat", response_model=ChatResponse)
+def chat_followup(req: ChatRequest):
+    answer = generate_followup_answer(req.question, req.previous_result)
+    return ChatResponse(answer=answer)
 
 @app.get("/metrics", include_in_schema=False)
 def metrics():

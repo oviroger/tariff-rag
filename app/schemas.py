@@ -18,6 +18,16 @@ class Citation(BaseModel):
     text: Optional[str] = Field(None, description="Texto del fragmento (opcional)")
     reason: Optional[str] = Field(None, description="Razón de relevancia")
 
+class EvidenceFragment(BaseModel):
+    """Fragmento de evidencia para clasificación"""
+    fragment_id: Optional[str] = None
+    score: Optional[float] = None
+    text: Optional[str] = None
+    bucket: Optional[str] = None
+    unit: Optional[str] = None
+    doc_id: Optional[str] = None
+    reason: Optional[str] = None
+
 class Candidate(BaseModel):
     """Candidato de clasificación arancelaria"""
     code: str = Field(..., description="Código arancelario (ej: 3907.30.00)")
@@ -28,7 +38,8 @@ class Candidate(BaseModel):
 class ClassifyResponse(BaseModel):
     """Respuesta del endpoint /classify"""
     top_candidates: List[Candidate] = Field(default_factory=list)
-    evidence: List[Citation] = Field(default_factory=list)
+    evidence: List[EvidenceFragment] = Field(default_factory=list)
+    support_evidence: List[EvidenceFragment] = Field(default_factory=list)
     applied_rgi: List[str] = Field(default_factory=list, description="RGI aplicadas")
     inclusions: List[str] = Field(default_factory=list)
     exclusions: List[str] = Field(default_factory=list)

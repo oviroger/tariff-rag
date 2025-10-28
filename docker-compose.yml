@@ -61,6 +61,8 @@
       context: .
       dockerfile: Dockerfile
     container_name: rag-api
+    env_file:
+      - .env
     environment:
       # OpenSearch
       - OPENSEARCH_HOST=${OPENSEARCH_HOST}
