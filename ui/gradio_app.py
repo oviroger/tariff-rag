@@ -191,7 +191,7 @@ def is_tariff_related(text: str) -> tuple[bool, str]:
                 "**Ejemplos válidos:**\n"
                 "- *Láminas de acero laminadas en caliente, 2mm*\n"
                 "- *¿Cuáles son las reglas generales de clasificación?*\n"
-                "- *Smartphone con pantalla OLED, 128GB*\n"
+                "- *Smartphone con pantalla OLED, 128GB almacenamiento*\n"
                 "- *¿Qué es la RGI 3?*"
             )
     
@@ -223,38 +223,42 @@ def is_tariff_related(text: str) -> tuple[bool, str]:
     return True, ""
 
 def is_followup_question(message: str) -> bool:
-    """Detect if message is a follow-up question."""
-    followup_keywords = [
-        # Original keywords
-        "por qué", "porque", "por que",
-        "qué falta", "que falta", "información adicional",
-        "alternativas", "otras opciones",
-        "explica", "detalla", "más información",
-        "diferencia", "comparar",
-        
-        # Translation and formatting requests
-        "traduc", "español", "inglés", "english",
-        "resume", "resumen", "simplifica",
-        
-        # Clarification requests
-        "cuál", "cual", "cómo", "como",
-        "significa", "quiere decir",
-        "ejemplo", "caso",
-        
-        # References to previous result
-        "este código", "ese código", "estos códigos",
-        "el resultado", "la respuesta", "lo anterior"
+    """
+    Detecta si el mensaje es una pregunta de seguimiento sobre la clasificación anterior.
+    """
+    message_lower = message.lower().strip()
+    
+    # Patrones de seguimiento
+    followup_patterns = [
+        "por qué",
+        "porque",
+        "razón",
+        "justifica",
+        "explica",
+        "traduc",
+        "inglés",
+        "español",
+        "resumen",
+        "resume",
+        "sintetiza",
+        "alternativa",
+        "otro código",
+        "otras opciones",
+        "qué falta",              # NUEVO
+        "qué información falta",  # NUEVO
+        "información falta",      # NUEVO
+        "información adicional",  # NUEVO
+        "más detalles",           # NUEVO
+        "detalles faltantes",     # NUEVO
+        "campos faltantes",       # NUEVO
     ]
-    message_lower = message.lower()
     
-    # Short questions are likely follow-ups
-    if len(message.split()) <= 8 and any(kw in message_lower for kw in followup_keywords):
-        return True
-    
-    return any(kw in message_lower for kw in followup_keywords)
+    return any(pattern in message_lower for pattern in followup_patterns)
 
-def handle_followup_question(question: str, last_result: Dict[str, Any]) -> str:
-    """Handle follow-up questions about the last classification."""
+def handle_followup_question(question: str, last_result: Dict) -> str:
+    """
+    Genera respuestas a preguntas de seguimiento basadas en la última clasificación.
+    """
     question_lower = question.lower()
     
     # Get candidates with both possible field names
@@ -350,7 +354,7 @@ def handle_followup_question(question: str, last_result: Dict[str, Any]) -> str:
                 "- ¿Hay alternativas?\n"
                 "- Dame un resumen")
 
-def chat_response(message: str, history: list) -> str:
+def chat_response(message: str, history: list, state: ConversationState) -> str:
     """
     Main chatbot response function.
     Handles both classification requests and follow-up questions.
@@ -358,8 +362,21 @@ def chat_response(message: str, history: list) -> str:
     message = message.strip()
     
     # Check if it's a follow-up question about previous classification
-    if conv_state.has_context() and is_followup_question(message):
-        return handle_followup_question(message, conv_state.last_classification)
+    if is_followup_question(message) and state.last_classification:
+        try:
+            r = requests.post(
+                f"{API_BASE_URL.replace('/classify','')}/chat",  # base del API + /chat
+                json={
+                    "question": message,
+                    "previous_result": state.last_classification
+                },
+                timeout=60,
+            )
+            r.raise_for_status()
+            answer = r.json().get("answer") or "No hay respuesta disponible."
+            return answer
+        except Exception as e:
+            return f"⚠️ No pude procesar la pregunta de seguimiento: {e}"
     
     # Validate input is tariff-related
     is_valid, validation_msg = is_tariff_related(message)
@@ -391,6 +408,29 @@ def chat_response(message: str, history: list) -> str:
     
     except requests.RequestException as e:
         return f"❌ **Error al clasificar:** {str(e)}\n\nPor favor, intenta de nuevo o verifica que el servicio API esté funcionando."
+
+def render_evidence_markdown(result: dict) -> str:
+    support = result.get("support_evidence") or []
+    generic = result.get("evidence") or result.get("context_docs") or []
+    lines = []
+
+    if support:
+        lines.append("### 📌 Evidencia del código principal\n")
+        for ev in support:
+            lines.append(f"- ({float(ev.get('score',0)):0.3f}) {ev.get('text','')[:240]}…  \n  `frag:` {ev.get('fragment_id')}")
+
+    if generic:
+        lines.append("\n### 📚 Evidencia recuperada por la consulta\n")
+        for ev in generic:
+            text = ev.get("text") or (ev.get("_source", {}) or {}).get("text", "")
+            score = ev.get("score") or ev.get("_score", 0)
+            frag = ev.get("fragment_id") or (ev.get("_source", {}) or {}).get("fragment_id")
+            lines.append(f"- ({float(score):0.3f}) {text[:240]}…  \n  `frag:` {frag}")
+
+    if not lines:
+        return "🟡 No se recuperó evidencia.\n\nSugerencias:\n- Ingerir documentos del Capítulo/Partida (e.g., 4011)\n- Aumentar top_k\n- Verificar índice con scripts/init_index.py e ingest_docs.py"
+
+    return "\n".join(lines)
 
 # === INTERFAZ GRADIO ===
 with gr.Blocks(
@@ -427,9 +467,7 @@ with gr.Blocks(
                 ],
                 title=None,
                 description=None,
-                retry_btn="🔄 Reintentar",
-                undo_btn="↩️ Deshacer",
-                clear_btn="🗑️ Limpiar",
+                # Los botones retry/undo/clear se manejan automáticamente en Gradio 5.x
             )
         
         # TAB 2: FORMULARIO CLÁSICO
