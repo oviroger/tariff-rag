@@ -91,7 +91,8 @@ class ClassifyRequest(BaseModel):
 
 class ChatRequest(BaseModel):
     question: str
-    previous_result: Dict[str, Any]
+    previous_result: Optional[Dict[str, Any]] = None
+    conversation_history: Optional[str] = None  # NUEVO
 
 class ChatResponse(BaseModel):
     answer: str
@@ -223,12 +224,94 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
         logger.exception("Unhandled error in /classify")
         raise HTTPException(status_code=500, detail=f"Internal error: {e.__class__.__name__}: {e}")
 
-@app.post("/chat", response_model=ChatResponse)
-def chat_followup(req: ChatRequest):
-    answer = generate_followup_answer(req.question, req.previous_result)
-    return ChatResponse(answer=answer)
+@app.post("/chat")
+async def chat_endpoint(req: ChatRequest):
+    """
+    Endpoint para preguntas de seguimiento sobre clasificaciones.
+    Ahora soporta historial completo de la conversación.
+    """
+    if not req.previous_result:
+        raise HTTPException(status_code=400, detail="No hay clasificación previa en el contexto.")
+    
+    try:
+        # OPCIONAL: Enriquecer previous_result con historial si el LLM lo necesita
+        # Puedes agregar el historial dentro de previous_result["conversation_history"]
+        enriched_result = req.previous_result.copy()
+        if req.conversation_history:
+            enriched_result["conversation_history"] = req.conversation_history
+        
+        # Llamar al LLM con firma correcta: (question, previous_result)
+        answer = generate_followup_answer(
+            question=req.question,
+            previous_result=enriched_result
+        )
+        
+        return {"answer": answer}
+    
+    except Exception as e:
+        logger.error(f"Error en /chat: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/metrics", include_in_schema=False)
 def metrics():
     data = generate_latest()
     return Response(content=data, media_type=CONTENT_TYPE_LATEST)
+
+@app.post("/classify")
+async def classify_product(request: dict):
+    try:
+        query = request.get("query", "")
+        if not query:
+            raise HTTPException(status_code=400, detail="Query is required")
+        
+        os_client = getattr(fastapi_request.app.state, "os_client", None)
+        index_name = getattr(fastapi_request.app.state, "index_name", None)
+        if os_client is None or index_name is None:
+            raise HTTPException(status_code=503, detail="Search backend not ready")
+
+        # 1) retrieval con fallback
+        hits = hybrid_search_with_fallback(os_client, index_name, query, k=5) or []
+
+        # 2) generación (asegúrate dict)
+        result_dict = generate_label(query=query, context_docs=hits, max_candidates=3)
+        if not isinstance(result_dict, dict):
+            result_dict = result_dict.dict() if hasattr(result_dict, "dict") else {}
+
+        # 3) normalizar evidencia de la consulta
+        def _norm(h):
+            src = h.get("_source", {}) if isinstance(h, dict) else {}
+            return {
+                "fragment_id": (src or {}).get("fragment_id") or h.get("fragment_id"),
+                "score": h.get("_score") or h.get("score"),
+                "text": (src or {}).get("text") or h.get("text", ""),
+                "bucket": (src or {}).get("bucket"),
+                "unit": (src or {}).get("unit"),
+                "doc_id": (src or {}).get("doc_id"),
+                "reason": h.get("reason") or "retrieved_by_search",
+            }
+        try:
+            result_dict["evidence"] = [_norm(h) for h in hits]
+        except Exception:
+            logger.exception("evidence normalization failed")
+            result_dict["evidence"] = []
+
+        # 4) evidencia anclada al código (opcional)
+        main_code = None
+        cands = result_dict.get("top_candidates") or result_dict.get("candidates") or []
+        if isinstance(cands, list) and cands:
+            main_code = cands[0].get("code") or cands[0].get("hs_code")
+
+        result_dict["support_evidence"] = []
+        if main_code:
+            try:
+                result_dict["support_evidence"] = retrieve_support_for_code(os_client, index_name, main_code, k=3) or []
+            except Exception:
+                logger.exception("support_evidence retrieval failed")
+                result_dict["support_evidence"] = []
+
+        return {"classification": result_dict}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Classification error: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Classification failed: {str(e)}")

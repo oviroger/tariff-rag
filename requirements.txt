@@ -5,6 +5,7 @@ pydantic-settings==2.6.1
 python-dotenv==1.0.1
 requests==2.32.3
 tqdm==4.66.5
+packaging==24.0
 
 # LLM + embeddings (Gemini)
 google-generativeai==0.8.3
@@ -15,6 +16,11 @@ opensearch-py==2.7.1
 # Azure OCR
 azure-ai-formrecognizer==3.3.3
 azure-core==1.30.2
+
+# OCR (no Azure)
+pytesseract==0.3.10
+pypdfium2==4.30.0
+Pillow==10.4.0
 
 # Data & DB
 SQLAlchemy==2.0.36

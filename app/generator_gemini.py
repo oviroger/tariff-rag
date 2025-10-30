@@ -57,15 +57,15 @@ def _build_evidence_from_os_hits(context_docs: List[Dict[str, Any]]) -> List[Dic
     return evidence
 
 
-def generate_label(query: str, context_docs: List[Dict[str, Any]], max_candidates: int = 3) -> Dict[str, Any]:
+def generate_label(query: str, context_docs: list, max_candidates: int = 5) -> dict:
     """
-    Genera clasificación arancelaria usando Gemini con structured output.
-    Args:
-        query: Descripción del producto a clasificar
-        context_docs: Lista de hits de OpenSearch (formato: {_id, _score, _source: {text, ...}})
-        max_candidates: Número máximo de códigos candidatos
-    Returns:
-        Dict con: top_candidates, applied_rgi, inclusions, exclusions, missing_fields
+    Genera clasificación HS usando Gemini con contexto RAG.
+    
+    Devuelve un dict con:
+    - top_candidates: lista de códigos HS candidatos
+    - inclusions/exclusions: criterios
+    - applied_rgi: reglas aplicadas
+    - missing_fields: info adicional requerida
     """
 
     # Si no hay clave API, retornar resultado offline (sin inventar códigos)
@@ -81,26 +81,65 @@ def generate_label(query: str, context_docs: List[Dict[str, Any]], max_candidate
     ])
 
     # Prompt (las reglas de alcance y guardrails están en SYSTEM_INSTRUCTIONS)
-    prompt = f"""You are an expert in tariff classification using the Harmonized System (HS).
+    prompt = f"""Eres un experto en clasificación arancelaria del Sistema Armonizado (HS).
 
-PRODUCT DESCRIPTION:
-{query}
+**INSTRUCCIÓN IMPORTANTE: Toda tu respuesta debe estar en español, incluyendo los campos de inclusión, exclusión y la información faltante.**
 
-RELEVANT HS DOCUMENTATION (from tariff database):
+CONTEXTO RECUPERADO:
 {context_text}
 
-TASK:
-Based on the product description and HS documentation, provide a complete tariff classification analysis.
+PRODUCTO A CLASIFICAR:
+{query}
 
-INSTRUCTIONS:
-1. Identify {max_candidates} most likely HS codes with confidence scores
-2. Apply relevant General Rules for Interpretation (RGI)
-3. List what products are INCLUDED in this classification
-4. List what products are EXCLUDED
-5. Identify any MISSING information needed for precise classification
+INSTRUCCIONES:
+1. Identifica los {max_candidates} códigos HS más probables (mínimo 4 dígitos, preferiblemente 6)
+2. Para cada código, proporciona:
+   - Código HS normalizado (formato: XXXX.XX o XXXXXX)
+   - Descripción técnica en español
+   - Nivel de confianza (0.0 a 1.0)
+   - Nivel HS (HS2/HS4/HS6)
+3. Identifica qué incluye/excluye la partida (en español)
+4. Especifica qué RGI aplicaste (RGI 1, RGI 3(a), etc.)
+5. Lista información faltante para precisar la clasificación (en español)
 
-Return ONLY valid JSON, no markdown formatting.
-"""
+FORMATO DE RESPUESTA (JSON estricto):
+{{
+  "top_candidates": [
+    {{
+      "code": "XXXXXX",
+      "description": "Descripción en español del producto",
+      "confidence": 0.85,
+      "level": "HS6"
+    }}
+  ],
+  "inclusions": [
+    "Carne y despojos comestibles de aves de la partida 01.05",
+    "Productos frescos, refrigerados o congelados"
+  ],
+  "exclusions": [
+    "Animales vivos de la partida 01.05",
+    "Carnes de mamíferos de la partida 02.08"
+  ],
+  "applied_rgi": ["RGI 1"],
+  "missing_fields": [
+    "Estado del producto (fresco, refrigerado, congelado)",
+    "Presentación (entero, en trozos, deshuesado)"
+  ]
+}}
+
+EJEMPLO DE RESPUESTA VÁLIDA:
+{{
+  "top_candidates": [
+    {{"code": "020711", "description": "Gallos y gallinas sin trocear, frescos o refrigerados", "confidence": 0.85, "level": "HS6"}},
+    {{"code": "020712", "description": "Gallos y gallinas sin trocear, congelados", "confidence": 0.80, "level": "HS6"}}
+  ],
+  "inclusions": ["Aves de corral de la especie Gallus domesticus", "Productos sin procesar"],
+  "exclusions": ["Aves cocidas o preparadas", "Despojos por separado"],
+  "applied_rgi": ["RGI 1"],
+  "missing_fields": ["Especificar si están frescos, refrigerados o congelados"]
+}}
+
+RESPUESTA (solo JSON, sin explicaciones adicionales):"""
 
     try:
         model_name = "models/gemini-2.0-flash"
@@ -239,8 +278,7 @@ def _fallback_followup_answer(question: str, previous_result: dict) -> str:
 
 def generate_followup_answer(question: str, previous_result: dict) -> str:
     """
-    Usa Gemini para responder una pregunta de seguimiento basándose SOLO en previous_result.
-    Devuelve texto en español con Markdown ligero.
+    Usa Gemini para responder una pregunta de seguimiento o reclasificar con nueva info.
     """
     if not question or not previous_result:
         return "No hay clasificación previa en contexto."
@@ -252,12 +290,50 @@ def generate_followup_answer(question: str, previous_result: dict) -> str:
             model_name="models/gemini-2.0-flash",
             system_instruction=FOLLOWUP_SYSTEM_INSTRUCTIONS,
         )
-        prompt = (
-            "Clasificación previa (JSON):\n"
-            f"{json.dumps(previous_result, ensure_ascii=False, indent=2)}\n\n"
-            f"Pregunta del usuario: {question}\n\n"
-            "Responde en español, con Markdown simple, y SOLO en base a esa clasificación."
-        )
+        
+        # Construir prompt con historial y detectar si es reclasificación
+        prompt_parts = []
+        
+        # Agregar historial si existe
+        conv_history = previous_result.get("conversation_history")
+        if conv_history:
+            prompt_parts.append("## Historial de conversación:\n")
+            prompt_parts.append(conv_history)
+            prompt_parts.append("\n---\n")
+        
+        # Agregar clasificación actual
+        prompt_parts.append("## Clasificación previa:\n")
+        candidates = previous_result.get("top_candidates", [])
+        if candidates:
+            top = candidates[0]
+            prompt_parts.append(f"**Código principal:** {top.get('code', 'N/A')}")
+            prompt_parts.append(f"**Descripción:** {top.get('description', '')}")
+        
+        # Agregar información faltante si existe
+        missing = previous_result.get("missing_fields", [])
+        if missing:
+            prompt_parts.append("\n**Información que faltaba:**")
+            for field in missing:
+                prompt_parts.append(f"- {field}")
+        
+        prompt_parts.append("\n---\n")
+        
+        # Pregunta/información del usuario
+        prompt_parts.append(f"**Usuario dice:** {question}\n\n")
+        
+        # Instrucciones adaptativas
+        prompt_parts.append("**INSTRUCCIONES:**\n")
+        prompt_parts.append("Si el usuario está proporcionando información adicional (estado, presentación, tipo):\n")
+        prompt_parts.append("1. Actualiza la clasificación con los nuevos datos\n")
+        prompt_parts.append("2. Ajusta el código HS según corresponda\n")
+        prompt_parts.append("3. Explica el cambio si lo hay\n")
+        prompt_parts.append("4. Menciona si ahora hay mayor certeza\n\n")
+        prompt_parts.append("Si es una pregunta de seguimiento normal:\n")
+        prompt_parts.append("- Responde basándote solo en la clasificación previa\n\n")
+        prompt_parts.append("Responde en español con Markdown simple.")
+        
+        prompt = "".join(prompt_parts)
+        
         resp = model.generate_content(prompt)
         text = (getattr(resp, "text", None) or "").strip()
         return text or _fallback_followup_answer(question, previous_result)

@@ -8,17 +8,37 @@ import requests
 from typing import Any, Tuple, Dict, Optional
 import json
 
-API_BASE_URL = "http://api:8000"
+API_URL = "http://api:8000"
 
 class ConversationState:
     """Manages conversation history and context."""
     def __init__(self):
         self.last_classification: Optional[Dict[str, Any]] = None
         self.last_query: str = ""
+        self.history: list[tuple[str, str]] = []  # NUEVO: historial completo (user, assistant)
     
     def update(self, query: str, result: Dict[str, Any]):
         self.last_query = query
         self.last_classification = result
+    
+    def add_turn(self, user_message: str, assistant_message: str):
+        """Agrega un turno completo al historial."""
+        self.history.append((user_message, assistant_message))
+        # Mantener solo los últimos 10 turnos para no sobrecargar el contexto
+        if len(self.history) > 10:
+            self.history = self.history[-10:]
+    
+    def get_context_for_llm(self) -> str:
+        """Construye un string con el historial para enviar al LLM."""
+        if not self.history:
+            return ""
+        lines = []
+        for i, (user, assistant) in enumerate(self.history, 1):
+            lines.append(f"Turno {i}:")
+            lines.append(f"Usuario: {user}")
+            lines.append(f"Asistente: {assistant[:500]}...")  # truncar respuestas largas
+            lines.append("")
+        return "\n".join(lines)
     
     def has_context(self) -> bool:
         return self.last_classification is not None
@@ -33,7 +53,7 @@ def classify(desc: str, hs_edition: str) -> Tuple[Any, Any, Any, Any, Any]:
     """
     try:
         payload = {"text": desc, "query": desc, "top_k": 5}
-        resp = requests.post(f"{API_BASE_URL}/classify", json=payload, timeout=60)
+        resp = requests.post(f"{API_URL}/classify", json=payload, timeout=60)
         resp.raise_for_status()
         data = resp.json()
         
@@ -224,36 +244,53 @@ def is_tariff_related(text: str) -> tuple[bool, str]:
 
 def is_followup_question(message: str) -> bool:
     """
-    Detecta si el mensaje es una pregunta de seguimiento sobre la clasificación anterior.
+    Detecta si el mensaje es una pregunta de seguimiento o proporciona información adicional.
     """
     message_lower = message.lower().strip()
     
-    # Patrones de seguimiento
+    # Patrones de seguimiento explícitos
     followup_patterns = [
-        "por qué",
-        "porque",
-        "razón",
-        "justifica",
-        "explica",
-        "traduc",
-        "inglés",
-        "español",
-        "resumen",
-        "resume",
-        "sintetiza",
-        "alternativa",
-        "otro código",
-        "otras opciones",
-        "qué falta",              # NUEVO
-        "qué información falta",  # NUEVO
-        "información falta",      # NUEVO
-        "información adicional",  # NUEVO
-        "más detalles",           # NUEVO
-        "detalles faltantes",     # NUEVO
-        "campos faltantes",       # NUEVO
+        "por qué", "porque", "razón", "justifica", "explica",
+        "traduc", "inglés", "español",
+        "resumen", "resume", "sintetiza",
+        "alternativa", "otro código", "otras opciones",
+        "qué falta", "qué información falta", "información falta",
+        "información adicional", "más detalles", "detalles faltantes", "campos faltantes",
     ]
     
-    return any(pattern in message_lower for pattern in followup_patterns)
+    if any(pattern in message_lower for pattern in followup_patterns):
+        return True
+    
+    # NUEVO: Detectar respuestas directas a información faltante
+    # Patrones que indican que el usuario está respondiendo a missing_fields
+    info_response_patterns = [
+        # Estados/condiciones
+        r"\b(es|son|está|están)\s+(fresco|refrigerado|congelado|entero|troceado|sin\s+trocear|con\s+huesos?|sin\s+huesos?)",
+        # Presentaciones
+        r"\b(sin\s+trocear|troceado|en\s+trozos|entero|cortado|deshuesado)",
+        # Estados combinados
+        r"\b(fresco\s+y|congelado\s+y|refrigerado\s+y)",
+        # Respuestas cortas típicas
+        r"^(sí|si|no),?\s",
+        # Tipo de ave
+        r"\b(pollo|pavo|pato|ganso|gallina)\b",
+    ]
+    
+    import re
+    for pattern in info_response_patterns:
+        if re.search(pattern, message_lower):
+            return True
+    
+    # Heurística adicional: mensajes muy cortos después de una clasificación
+    # probablemente son respuestas a missing_fields
+    word_count = len(message.split())
+    if word_count <= 6 and conv_state.has_context():
+        # Check si hay missing_fields en la última clasificación
+        last_missing = (conv_state.last_classification or {}).get("missing_fields", [])
+        if last_missing:
+            return True
+    
+    return False
 
 def handle_followup_question(question: str, last_result: Dict) -> str:
     """
@@ -354,48 +391,70 @@ def handle_followup_question(question: str, last_result: Dict) -> str:
                 "- ¿Hay alternativas?\n"
                 "- Dame un resumen")
 
-def chat_response(message: str, history: list, state: ConversationState) -> str:
+def chat_response(message: str, history: list) -> str:
     """
     Main chatbot response function.
     Handles both classification requests and follow-up questions.
     """
     message = message.strip()
-    
+
     # Check if it's a follow-up question about previous classification
-    if is_followup_question(message) and state.last_classification:
+    if is_followup_question(message) and conv_state.last_classification:
         try:
+            # MEJORADO: construir pregunta enriquecida con contexto
+            enriched_question = message
+            
+            # Si parece una respuesta a missing_fields, enriquecerla
+            last_missing = conv_state.last_classification.get("missing_fields", [])
+            if last_missing and len(message.split()) <= 6:
+                # Agregar contexto al mensaje
+                enriched_question = (
+                    f"El usuario respondió sobre la información faltante: '{message}'. "
+                    f"Campos que faltaban: {', '.join(last_missing)}. "
+                    f"Producto original: {conv_state.last_query}. "
+                    "Por favor, reclasifica con esta nueva información."
+                )
+            
             r = requests.post(
-                f"{API_BASE_URL.replace('/classify','')}/chat",  # base del API + /chat
+                f"{API_URL}/chat",
                 json={
-                    "question": message,
-                    "previous_result": state.last_classification
+                    "question": enriched_question,
+                    "previous_result": conv_state.last_classification,
+                    "conversation_history": conv_state.get_context_for_llm()
                 },
                 timeout=60,
             )
             r.raise_for_status()
             answer = r.json().get("answer") or "No hay respuesta disponible."
+            
+            # Guardar turno en el historial
+            conv_state.add_turn(message, answer)
+            
             return answer
         except Exception as e:
-            return f"⚠️ No pude procesar la pregunta de seguimiento: {e}"
-    
+            error_msg = f"⚠️ No pude procesar la pregunta de seguimiento: {e}"
+            conv_state.add_turn(message, error_msg)
+            return error_msg
+
     # Validate input is tariff-related
     is_valid, validation_msg = is_tariff_related(message)
     if not is_valid:
+        conv_state.add_turn(message, validation_msg)
         return validation_msg
-    
+
     # Otherwise, treat it as a new classification request
     try:
         payload = {"text": message, "query": message, "top_k": 5}
-        resp = requests.post(f"{API_BASE_URL}/classify", json=payload, timeout=60)
+        resp = requests.post(f"{API_URL}/classify", json=payload, timeout=60)
         resp.raise_for_status()
         data = resp.json()
-        
-        # Update conversation state
+
+        # Update conversation state (global)
         conv_state.update(message, data)
-        
+
         # Format response
         response = format_classification_markdown(data)
-        
+
         # Add helpful tips
         response += "\n---\n"
         response += "💡 **Puedes preguntar:**\n"
@@ -404,10 +463,15 @@ def chat_response(message: str, history: list, state: ConversationState) -> str:
         response += "- ¿Hay alternativas?\n"
         response += "- Dame un resumen\n"
         
+        # NUEVO: guardar turno en el historial
+        conv_state.add_turn(message, response)
+
         return response
-    
+
     except requests.RequestException as e:
-        return f"❌ **Error al clasificar:** {str(e)}\n\nPor favor, intenta de nuevo o verifica que el servicio API esté funcionando."
+        error_msg = f"❌ **Error al clasificar:** {str(e)}\n\nPor favor, intenta de nuevo o verifica que el servicio API esté funcionando."
+        conv_state.add_turn(message, error_msg)
+        return error_msg
 
 def render_evidence_markdown(result: dict) -> str:
     support = result.get("support_evidence") or []
@@ -456,8 +520,11 @@ with gr.Blocks(
                 """
             )
             
+            # Establecer chatbot con type='messages' para evitar deprecation de 'tuples'
+            chatbot_component = gr.Chatbot(type="messages")
             chatbot = gr.ChatInterface(
                 fn=chat_response,
+                chatbot=chatbot_component,
                 examples=[
                     "Láminas de acero laminadas en caliente, 2mm de espesor, para construcción",
                     "Smartphone con pantalla OLED de 6.5 pulgadas, 128GB almacenamiento",
@@ -467,7 +534,6 @@ with gr.Blocks(
                 ],
                 title=None,
                 description=None,
-                # Los botones retry/undo/clear se manejan automáticamente en Gradio 5.x
             )
         
         # TAB 2: FORMULARIO CLÁSICO

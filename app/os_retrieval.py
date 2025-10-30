@@ -155,11 +155,49 @@ def bm25_search(os_client, index: str, query_text: str, k: int = 5) -> List[Dict
     return resp.get("hits", {}).get("hits", [])
 
 
+def ensure_index_exists(os_client, index_name: str):
+    """Crea el índice si no existe."""
+    if os_client.indices.exists(index=index_name):
+        return
+    
+    emb_dim = int(os.getenv('OPENSEARCH_EMB_DIM', '768'))
+    knn_space = os.getenv('OPENSEARCH_KNN_SPACE', 'cosinesimil')
+    
+    mapping = {
+        "settings": {
+            "index": {
+                "knn": True,
+                "knn.algo_param.ef_search": 100
+            }
+        },
+        "mappings": {
+            "properties": {
+                "text": {"type": "text"},
+                "embedding": {
+                    "type": "knn_vector",
+                    "dimension": emb_dim,
+                    "method": {
+                        "name": "hnsw",
+                        "space_type": knn_space,
+                        "engine": "nmslib"
+                    }
+                },
+                "metadata": {"type": "object", "enabled": False}
+            }
+        }
+    }
+    
+    os_client.indices.create(index=index_name, body=mapping)
+    logger.info(f"Created index: {index_name}")
+
 def hybrid_search_with_fallback(os_client, index: str, query_text: str, k: int = 5) -> List[Dict]:
     """
     1) Intenta KNN semántico con embeddings.
     2) Si vacío o falla, cae a BM25 con boosts de dominio.
     """
+    # Asegurar que el índice existe
+    ensure_index_exists(os_client, index)
+
     try:
         hits = knn_semantic_search(os_client, index, query_text, k)
         if hits:

@@ -22,6 +22,8 @@ venv/
 storage/
 data/finales/
 data/originales/
+data/afr/
+data/corpus/
 
 # Optional: if the full corpus is large, consider ignoring it too
 # data/corpus/
