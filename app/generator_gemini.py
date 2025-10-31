@@ -193,6 +193,12 @@ RESPUESTA (solo JSON, sin explicaciones adicionales):"""
         result.setdefault("inclusions", [])
         result.setdefault("exclusions", [])
         result.setdefault("missing_fields", [])
+        
+        # Asegurar que cada candidato tenga descripción (evitar None)
+        for candidate in result.get("top_candidates", []):
+            if candidate.get("description") is None or not candidate.get("description"):
+                candidate["description"] = ""
+        
         # Adjuntar evidencia si no vino ya integrada
         if "evidence" not in result:
             result["evidence"] = [

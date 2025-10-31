@@ -78,11 +78,23 @@ def format_classification_markdown(result: Dict[str, Any]) -> str:
     candidates = result.get("top_candidates", result.get("candidates", []))
     if candidates and len(candidates) > 0:
         md += "### 📊 Códigos HS Candidatos\n\n"
-        for i, cand in enumerate(candidates, 1):
+        
+        # Explicación del porcentaje de confianza
+        md += "💡 **Nota sobre confianza:** El porcentaje de confianza se calcula mediante un modelo de IA que analiza la similitud entre tu consulta y los fragmentos de texto del corpus arancelario, considerando factores como la especificidad de la descripción, la claridad de los criterios de clasificación y la coherencia con las Reglas Generales de Interpretación (RGI). Un porcentaje >70% indica alta confianza, 50-70% confianza media, y <50% confianza baja.\n\n"
+        
+        # Usar letras como incisos en lugar de números
+        incisos = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+        for idx, cand in enumerate(candidates):
             # Handle both 'code' and 'hs_code' field names
             hs_code = cand.get('code', cand.get('hs_code', 'N/A'))
             confidence = cand.get('confidence', 0)
-            description = cand.get('description', 'Sin descripción')
+            # CORREGIDO: maneja None + campos alternativos
+            description = (
+                cand.get('description') or 
+                cand.get('desc') or 
+                cand.get('product_description') or
+                ''  # Dejar vacío en lugar de mostrar mensaje
+            )
             level = cand.get('level', '')
             
             # Format confidence with color indicator
@@ -93,10 +105,14 @@ def format_classification_markdown(result: Dict[str, Any]) -> str:
             else:
                 conf_emoji = "🔴"
             
-            md += f"{conf_emoji} **{i}. {hs_code}** (Confianza: {confidence:.1%})\n"
-            md += f"   - {description}\n"
+            # Usar inciso (letra) en lugar de número
+            inciso = incisos[idx] if idx < len(incisos) else str(idx + 1)
+            md += f"{conf_emoji} **{inciso}) {hs_code}** (Confianza: {confidence:.1%})\n"
+            # Solo mostrar descripción si no está vacía
+            if description and description.strip():
+                md += f"   *{description}*\n"
             if level:
-                md += f"   - 📊 Nivel: *{level}*\n"
+                md += f"   📊 Nivel: {level}\n"
             md += "\n"
         
         # Inclusions/Exclusions (at root level)
@@ -306,12 +322,14 @@ def handle_followup_question(question: str, last_result: Dict) -> str:
         response = "### 🌐 Resumen en Español\n\n"
         if candidates:
             response += "**📊 Códigos HS:**\n\n"
-            for i, cand in enumerate(candidates[:3], 1):
+            incisos = ['a', 'b', 'c', 'd', 'e']
+            for idx, cand in enumerate(candidates[:3]):
                 hs_code = cand.get('code', cand.get('hs_code', 'N/A'))
                 confidence = cand.get('confidence', 0)
                 
                 conf_emoji = "🟢" if confidence > 0.7 else "🟡" if confidence > 0.5 else "🔴"
-                response += f"{conf_emoji} **{i}. {hs_code}** ({confidence:.0%} confianza)\n\n"
+                inciso = incisos[idx] if idx < len(incisos) else str(idx + 1)
+                response += f"{conf_emoji} **{inciso}) {hs_code}** ({confidence:.0%} confianza)\n\n"
         
         if last_result.get("inclusions"):
             response += "**✅ Incluye:**\n"
@@ -358,12 +376,18 @@ def handle_followup_question(question: str, last_result: Dict) -> str:
     elif "alternativa" in question_lower or "otras opciones" in question_lower:
         response = "### 🔄 Códigos Alternativos\n\n"
         if candidates and len(candidates) > 1:
-            for i, cand in enumerate(candidates[1:4], 2):
+            incisos = ['b', 'c', 'd', 'e', 'f']  # Empezar desde 'b' porque 'a' es el principal
+            for idx, cand in enumerate(candidates[1:4]):
                 hs_code = cand.get('code', cand.get('hs_code', 'N/A'))
                 confidence = cand.get('confidence', 0)
                 description = cand.get('description', '')
-                response += f"**{i}. {hs_code}** ({confidence:.1%})\n"
-                response += f"   {description}\n\n"
+                inciso = incisos[idx] if idx < len(incisos) else str(idx + 2)
+                response += f"**{inciso}) {hs_code}** ({confidence:.1%})\n"
+                # Solo mostrar descripción si no está vacía
+                if description and description.strip():
+                    response += f"   {description}\n\n"
+                else:
+                    response += "\n"
         else:
             response += "No se encontraron alternativas con suficiente confianza."
         return response
