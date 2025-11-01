@@ -60,90 +60,86 @@ def _build_evidence_from_os_hits(context_docs: List[Dict[str, Any]]) -> List[Dic
 def generate_label(query: str, context_docs: list, max_candidates: int = 5) -> dict:
     """
     Genera clasificación HS usando Gemini con contexto RAG.
-    
-    Devuelve un dict con:
-    - top_candidates: lista de códigos HS candidatos
-    - inclusions/exclusions: criterios
-    - applied_rgi: reglas aplicadas
-    - missing_fields: info adicional requerida
     """
-
-    # Si no hay clave API, retornar resultado offline (sin inventar códigos)
     if not getattr(settings, "gemini_api_key", None):
         logger.warning("GEMINI_API_KEY no configurada, usando resultado offline.")
         return _offline_result(evidence=context_docs, reason="verifica GEMINI_API_KEY / conectividad")
 
-    # Construir evidencia y contexto textual
     evidence = _build_evidence_from_os_hits(context_docs)
     context_text = "\n\n".join([
         f"[Fragment {e['fragment_id']} | Score: {e['score']:.3f}]\n{e['text']}"
         for e in evidence
     ])
 
-    # Prompt (las reglas de alcance y guardrails están en SYSTEM_INSTRUCTIONS)
+    # PROMPT MEJORADO: gestiona consultas vagas y seguimientos
     prompt = f"""Eres un experto en clasificación arancelaria del Sistema Armonizado (HS).
 
-**INSTRUCCIÓN IMPORTANTE: Toda tu respuesta debe estar en español, incluyendo los campos de inclusión, exclusión y la información faltante.**
-
-CONTEXTO RECUPERADO:
+CONTEXTO RECUPERADO (HS docs):
 {context_text}
 
-PRODUCTO A CLASIFICAR:
+CONSULTA DEL USUARIO:
 {query}
 
 INSTRUCCIONES:
-1. Identifica los {max_candidates} códigos HS más probables (mínimo 4 dígitos, preferiblemente 6)
-2. Para cada código, proporciona:
-   - Código HS normalizado (formato: XXXX.XX o XXXXXX)
-   - Descripción técnica en español
-   - Nivel de confianza (0.0 a 1.0)
-   - Nivel HS (HS2/HS4/HS6)
-3. Identifica qué incluye/excluye la partida (en español)
-4. Especifica qué RGI aplicaste (RGI 1, RGI 3(a), etc.)
-5. Lista información faltante para precisar la clasificación (en español)
+- Si la consulta es VAGA o GENÉRICA (ej: "vehículos" sin especificar tipo/uso):
+  - NO propongas códigos HS.
+  - Deja top_candidates VACÍO [].
+  - En missing_fields, lista la información necesaria (tipo, uso, características técnicas, estado).
+  - En warnings, indica: "La descripción del producto es muy general. Se necesita más información para clasificar correctamente."
 
-FORMATO DE RESPUESTA (JSON estricto):
+- Si la consulta tiene SUFICIENTE DETALLE (o es un seguimiento que completa información):
+  - Propón hasta {max_candidates} códigos HS candidatos (formato: XXXXXX o XXXX.XX).
+  - Para cada código: description (español), confidence (0.0-1.0), level (HS2/HS4/HS6).
+  - Indica inclusions/exclusions de la partida.
+  - Lista missing_fields solo si aún faltan detalles para refinar (ej: cilindrada, peso, nuevo/usado).
+  - Especifica applied_rgi (RGI 1, RGI 3(a), etc.).
+
+FORMATO DE RESPUESTA (JSON estricto, en español):
 {{
   "top_candidates": [
-    {{
-      "code": "XXXXXX",
-      "description": "Descripción en español del producto",
-      "confidence": 0.85,
-      "level": "HS6"
-    }}
+    {{"code": "XXXXXX", "description": "...", "confidence": 0.85, "level": "HS6"}}
   ],
-  "inclusions": [
-    "Carne y despojos comestibles de aves de la partida 01.05",
-    "Productos frescos, refrigerados o congelados"
-  ],
-  "exclusions": [
-    "Animales vivos de la partida 01.05",
-    "Carnes de mamíferos de la partida 02.08"
-  ],
+  "inclusions": ["...", "..."],
+  "exclusions": ["...", "..."],
   "applied_rgi": ["RGI 1"],
-  "missing_fields": [
-    "Estado del producto (fresco, refrigerado, congelado)",
-    "Presentación (entero, en trozos, deshuesado)"
-  ]
+  "missing_fields": ["...", "..."],
+  "warnings": []
 }}
 
-EJEMPLO DE RESPUESTA VÁLIDA:
+EJEMPLO 1 (consulta vaga):
+Usuario: "Cual es la partida arancelaria de los vehículos"
+{{
+  "top_candidates": [],
+  "missing_fields": [
+    "Tipo de vehículo (automóvil, camión, motocicleta, etc.)",
+    "Uso del vehículo (transporte de personas, mercancías, uso especial)",
+    "Características técnicas (cilindrada, tipo de motor, peso)",
+    "Si está completo o incompleto",
+    "Si es nuevo o usado"
+  ],
+  "warnings": ["La descripción del producto es muy general. Se necesita más información para clasificar el vehículo correctamente."]
+}}
+
+EJEMPLO 2 (seguimiento con tipo):
+Usuario: "Tipo de vehículo automóvil"
 {{
   "top_candidates": [
-    {{"code": "020711", "description": "Gallos y gallinas sin trocear, frescos o refrigerados", "confidence": 0.85, "level": "HS6"}},
-    {{"code": "020712", "description": "Gallos y gallinas sin trocear, congelados", "confidence": 0.80, "level": "HS6"}}
+    {{"code": "8703", "description": "Automóviles de turismo para transporte de personas", "confidence": 0.70, "level": "HS4"}}
   ],
-  "inclusions": ["Aves de corral de la especie Gallus domesticus", "Productos sin procesar"],
-  "exclusions": ["Aves cocidas o preparadas", "Despojos por separado"],
-  "applied_rgi": ["RGI 1"],
-  "missing_fields": ["Especificar si están frescos, refrigerados o congelados"]
+  "missing_fields": [
+    "Cilindrada del motor",
+    "Tipo de motor (gasolina, diesel, eléctrico, híbrido)",
+    "Si es nuevo o usado"
+  ],
+  "inclusions": ["Automóviles de turismo", "Vehículos familiares (station wagon)"],
+  "exclusions": ["Vehículos de la partida 87.02 (transporte de más de 10 personas)"],
+  "applied_rgi": ["RGI 1"]
 }}
 
 RESPUESTA (solo JSON, sin explicaciones adicionales):"""
 
     try:
         model_name = "models/gemini-2.0-flash"
-
         model = genai.GenerativeModel(
             model_name=model_name,
             generation_config={
@@ -152,7 +148,6 @@ RESPUESTA (solo JSON, sin explicaciones adicionales):"""
                 "top_k": 40,
                 "max_output_tokens": 2048,
                 "response_mime_type": "application/json",
-                # Si tu SDK >= 0.8.x soporta schema, esto ayuda a mantener el contrato
                 "response_schema": OUTPUT_SCHEMA,
             },
             safety_settings={
@@ -161,20 +156,17 @@ RESPUESTA (solo JSON, sin explicaciones adicionales):"""
                 "HARM_CATEGORY_SEXUALLY_EXPLICIT": "BLOCK_NONE",
                 "HARM_CATEGORY_DANGEROUS_CONTENT": "BLOCK_NONE",
             },
-            # CRÍTICO: Guardrails de alcance y formato
             system_instruction=SYSTEM_INSTRUCTIONS,
         )
 
         logger.info(f"Llamando a Gemini {model_name} para generación...")
         response = model.generate_content(prompt)
 
-        # Manejo de respuesta bloqueada
         if not getattr(response, "parts", None):
             finish = getattr(response.candidates[0], "finish_reason", "unknown")
             logger.warning(f"Gemini bloqueó la respuesta. Finish reason: {finish}")
             raise ValueError(f"Gemini bloqueó el contenido (finish_reason={finish})")
 
-        # Parsear JSON robusto
         text = (response.text or "").strip()
         try:
             result = json.loads(text)
@@ -187,19 +179,20 @@ RESPUESTA (solo JSON, sin explicaciones adicionales):"""
                 text = text[:-3]
             result = json.loads(text.strip())
 
-        # Normalizar campos esperados
+        # Normalizar campos
         result.setdefault("top_candidates", [])
-        result.setdefault("applied_rgi", ["RGI 1"])
+        result.setdefault("applied_rgi", [])
         result.setdefault("inclusions", [])
         result.setdefault("exclusions", [])
         result.setdefault("missing_fields", [])
-        
-        # Asegurar que cada candidato tenga descripción (evitar None)
+        result.setdefault("warnings", [])
+
+        # Evitar descripciones None
         for candidate in result.get("top_candidates", []):
-            if candidate.get("description") is None or not candidate.get("description"):
+            if candidate.get("description") is None:
                 candidate["description"] = ""
-        
-        # Adjuntar evidencia si no vino ya integrada
+
+        # Adjuntar evidencia
         if "evidence" not in result:
             result["evidence"] = [
                 {"fragment_id": e["fragment_id"], "score": e["score"], "reason": "retrieved_by_hybrid_search"}
@@ -211,12 +204,9 @@ RESPUESTA (solo JSON, sin explicaciones adicionales):"""
 
     except json.JSONDecodeError as e:
         logger.error(f"Gemini no devolvió JSON válido: {e}")
-        # Devolvemos fallback sin códigos inventados
         return _offline_result(evidence=context_docs, reason="JSON inválido de LLM")
-
     except Exception as e:
         logger.error(f"Error en generación con Gemini: {e}")
-        # Devolvemos fallback sin códigos inventados
         return _offline_result(evidence=context_docs, reason=str(e))
 
 

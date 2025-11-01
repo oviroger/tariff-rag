@@ -260,10 +260,10 @@ def is_tariff_related(text: str) -> tuple[bool, str]:
 
 def is_followup_question(message: str) -> bool:
     """
-    Detecta si el mensaje es una pregunta de seguimiento o proporciona información adicional.
+    Detecta si el mensaje es una pregunta de seguimiento o aporta datos que completan la clasificación.
     """
     message_lower = message.lower().strip()
-    
+
     # Patrones de seguimiento explícitos
     followup_patterns = [
         "por qué", "porque", "razón", "justifica", "explica",
@@ -273,39 +273,37 @@ def is_followup_question(message: str) -> bool:
         "qué falta", "qué información falta", "información falta",
         "información adicional", "más detalles", "detalles faltantes", "campos faltantes",
     ]
-    
-    if any(pattern in message_lower for pattern in followup_patterns):
+    if any(p in message_lower for p in followup_patterns):
         return True
-    
-    # NUEVO: Detectar respuestas directas a información faltante
-    # Patrones que indican que el usuario está respondiendo a missing_fields
-    info_response_patterns = [
-        # Estados/condiciones
-        r"\b(es|son|está|están)\s+(fresco|refrigerado|congelado|entero|troceado|sin\s+trocear|con\s+huesos?|sin\s+huesos?)",
-        # Presentaciones
-        r"\b(sin\s+trocear|troceado|en\s+trozos|entero|cortado|deshuesado)",
-        # Estados combinados
-        r"\b(fresco\s+y|congelado\s+y|refrigerado\s+y)",
-        # Respuestas cortas típicas
-        r"^(sí|si|no),?\s",
-        # Tipo de ave
-        r"\b(pollo|pavo|pato|ganso|gallina)\b",
+
+    # Patrones típicos de completar información (vehículos u otros)
+    vehicle_info_patterns = [
+        r"\btipo de veh[ií]culo\b|\bes una moto\b|\bes una motocicleta\b|\bes un autom[oó]vil\b|\bes un camion\b|\bes un cami[oó]n\b",
+        r"\buso del veh[ií]culo\b|\btransporte de personas\b|\btransporte de mercanc[ií]as\b|\buso especial\b",
+        r"\bcilindrada\b|\bpotencia\b|\btipo de motor\b|\bgasolina\b|\bd[ií]esel\b|\bh[ií]brido\b|\bhev\b|\bphev\b|\bel[eé]ctrico\b|\bev\b",
+        r"\bpeso\b|\bpeso bruto\b|\bmasa\b|\bcarga [uú]til\b",
+        r"\bcompleto\b|\bincompleto\b|\bchasis\b|\bcabina\b|\bsidecar\b",
+        r"\bnuevo\b|\bnueva\b|\busado\b|\busada\b",
     ]
-    
     import re
-    for pattern in info_response_patterns:
-        if re.search(pattern, message_lower):
+    for pat in vehicle_info_patterns:
+        if re.search(pat, message_lower):
             return True
-    
-    # Heurística adicional: mensajes muy cortos después de una clasificación
-    # probablemente son respuestas a missing_fields
-    word_count = len(message.split())
-    if word_count <= 6 and conv_state.has_context():
-        # Check si hay missing_fields en la última clasificación
-        last_missing = (conv_state.last_classification or {}).get("missing_fields", [])
-        if last_missing:
+
+    # Si hay contexto previo: mensajes cortos suelen ser respuestas a missing_fields
+    if conv_state.has_context():
+        word_count = len(message.split())
+        if word_count <= 12:
+            last_missing = (conv_state.last_classification or {}).get("missing_fields", [])
+            if last_missing:
+                return True
+
+        # Coincidencia por keywords presentes en missing_fields anteriores
+        last_missing_text = " ".join((conv_state.last_classification or {}).get("missing_fields", [])).lower()
+        keywords = ["tipo", "uso", "cilindrada", "motor", "peso", "nuevo", "nueva", "usado", "usada", "completo", "incompleto", "sidecar"]
+        if any(k in message_lower for k in keywords) and any(k in last_missing_text for k in keywords):
             return True
-    
+
     return False
 
 def handle_followup_question(question: str, last_result: Dict) -> str:
