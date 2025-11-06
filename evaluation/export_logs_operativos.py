@@ -75,7 +75,7 @@ def parse_metrics(text: str, endpoint: str | None = None, method: str | None = N
     metrics['throughput'] = total_tp
 
     # 3) Error rate: api_requests_errors_returned con o sin etiquetas
-    err_re = re.compile(r'^api_requests_errors_returned(?:\{([^}]*)\})?\s+([0-9eE\+\.-]+)$', re.M)
+    err_re = re.compile(r'^api_requests_errors_returned(?:\{([^}]*)\})?\s+([0-9eE\+\.-]+)$', re.M)   
     total_err = 0.0
     for labels_str, val_str in err_re.findall(text):
         if labels_str:
@@ -85,7 +85,7 @@ def parse_metrics(text: str, endpoint: str | None = None, method: str | None = N
             if method and labels.get('method') != method:
                 continue
         total_err += float(val_str)
-    # Si tenemos breakdown por status en api_requests_total, preferimos ese para tasa de error
+    # Si tenemos breakdown por status en api_requests_total, preferimos ese para tasa de error       
     if total_tp > 0:
         metrics['error_rate'] = total_err_from_status / total_tp
     else:
@@ -93,54 +93,121 @@ def parse_metrics(text: str, endpoint: str | None = None, method: str | None = N
 
     return metrics
 
+
+def calculate_percentile(buckets: list[tuple[float, float]], percentile: float) -> float:
+    """
+    Calcula percentil desde histograma acumulativo de Prometheus.
+    
+    Args:
+        buckets: Lista de tuplas (le, count_cumulative) ordenadas por le
+        percentile: Percentil a calcular (0-100)
+    
+    Returns:
+        Valor estimado del percentil, o None si no hay datos suficientes
+    """
+    if not buckets:
+        return None
+    
+    # Filtrar buckets válidos (excluir +Inf temporalmente)
+    finite_buckets = [(le, count) for le, count in buckets if le != float('inf')]
+    
+    # Obtener total de observaciones
+    total_count = buckets[-1][1]  # El último bucket (+Inf) tiene el count total
+    
+    if total_count == 0:
+        return 0.0
+    
+    # Calcular threshold para el percentil
+    threshold = total_count * (percentile / 100.0)
+    
+    # Caso especial: si todas las observaciones están en el primer bucket
+    if finite_buckets and finite_buckets[0][1] >= threshold:
+        return finite_buckets[0][0]
+    
+    # Buscar el bucket donde se alcanza el threshold
+    prev_le = 0.0
+    prev_count = 0.0
+    
+    for le, count in finite_buckets:
+        if count >= threshold:
+            # Interpolación lineal dentro del bucket
+            if count > prev_count:
+                # Proporción dentro del bucket
+                bucket_fraction = (threshold - prev_count) / (count - prev_count)
+                return prev_le + bucket_fraction * (le - prev_le)
+            else:
+                # Si count == prev_count, usar límite inferior
+                return prev_le
+        prev_le = le
+        prev_count = count
+    
+    # Si llegamos aquí, el threshold está más allá de todos los buckets finitos
+    # Usar el límite superior del último bucket finito
+    if finite_buckets:
+        return finite_buckets[-1][0]
+    
+    # Caso extremo: solo hay bucket +Inf
+    return None
+
+
 def export_logs(metrics, output_file):
     # Encabezados: timestamp, latency_p50, latency_p95, latency_p99, throughput, error_rate
     now = datetime.now().isoformat()
-    latency_buckets = [le for le, _ in metrics['latency']]
-    counts = [count for _, count in metrics['latency']]
-    total = counts[-1] if counts else 0.0
-    def percentile(p):
-        if not counts or total == 0.0:
+    
+    latency_buckets = metrics['latency']
+    
+    # Calcular percentiles con la nueva función mejorada
+    p50 = calculate_percentile(latency_buckets, 50)
+    p95 = calculate_percentile(latency_buckets, 95)
+    p99 = calculate_percentile(latency_buckets, 99)
+    
+    # Si no se pudo calcular (sin datos), usar 0.0 en lugar de None
+    def safe_value(val):
+        if val is None:
             return 0.0
-        threshold = total * p / 100
-        for le, count in zip(latency_buckets, counts):
-            if count >= threshold:
-                return le
-        return latency_buckets[-1] if latency_buckets else 0.0
-    def safe_zero(val):
-        return val if val is not None else 0.0
+        return val
+    
     row = {
         'timestamp': now,
-        'latency_p50': safe_zero(percentile(50)),
-        'latency_p95': safe_zero(percentile(95)),
-        'latency_p99': safe_zero(percentile(99)),
-        'throughput': safe_zero(metrics['throughput']),
-        'error_rate': safe_zero(metrics['error_rate'])
+        'latency_p50': safe_value(p50),
+        'latency_p95': safe_value(p95),
+        'latency_p99': safe_value(p99),
+        'throughput': metrics['throughput'],
+        'error_rate': metrics['error_rate']
     }
+    
     # Asegurar directorio
     os.makedirs(os.path.dirname(output_file) or '.', exist_ok=True)
     write_header = not os.path.exists(output_file) or os.path.getsize(output_file) == 0
-    with open(output_file, 'a', newline='') as f:
+    with open(output_file, 'a', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=row.keys())
         if write_header:
             writer.writeheader()
         writer.writerow(row)
 
+
 def main():
     parser = argparse.ArgumentParser(description='Exporta logs_operativos.csv desde Prometheus /metrics')
-    parser.add_argument('--url', type=str, required=True, help='URL de /metrics de Prometheus')
+    parser.add_argument('--url', type=str, required=True, help='URL de /metrics de Prometheus')      
     parser.add_argument('--endpoint', type=str, default=None, help='Filtra por etiqueta endpoint (opcional)')
     parser.add_argument('--method', type=str, default=None, help='Filtra por etiqueta method (opcional)')
     parser.add_argument('--status', type=str, default=None, help='Filtra por etiqueta status (opcional)')
     parser.add_argument('--output', type=str, default='logs_operativos.csv', help='Archivo de salida CSV')
     args = parser.parse_args()
-    resp = requests.get(args.url)
-    if resp.status_code != 200:
-        print(f'Error al consultar {args.url}: {resp.status_code}')
+    
+    try:
+        resp = requests.get(args.url, timeout=10)
+        if resp.status_code != 200:
+            print(f'Error al consultar {args.url}: {resp.status_code}')
+            return
+    except Exception as e:
+        print(f'Error al conectar con {args.url}: {e}')
         return
+    
     metrics = parse_metrics(resp.text, endpoint=args.endpoint, method=args.method, status=args.status)
     export_logs(metrics, args.output)
     print(f'Exportado a {args.output}')
+
 
 if __name__ == '__main__':
     main()

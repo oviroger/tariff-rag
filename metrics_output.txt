@@ -1,0 +1,107 @@
+﻿# HELP python_gc_objects_collected_total Objects collected during gc
+# TYPE python_gc_objects_collected_total counter
+python_gc_objects_collected_total{generation="0"} 8763.0
+python_gc_objects_collected_total{generation="1"} 5935.0
+python_gc_objects_collected_total{generation="2"} 813.0
+# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
+# TYPE python_gc_objects_uncollectable_total counter
+python_gc_objects_uncollectable_total{generation="0"} 0.0
+python_gc_objects_uncollectable_total{generation="1"} 0.0
+python_gc_objects_uncollectable_total{generation="2"} 0.0
+# HELP python_gc_collections_total Number of times this generation was collected
+# TYPE python_gc_collections_total counter
+python_gc_collections_total{generation="0"} 349.0
+python_gc_collections_total{generation="1"} 31.0
+python_gc_collections_total{generation="2"} 2.0
+# HELP python_info Python platform information
+# TYPE python_info gauge
+python_info{implementation="CPython",major="3",minor="11",patchlevel="14",version="3.11.14"} 1.0
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 2.24770048e+09
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 1.3576192e+08
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.76239834509e+09
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 18.92
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 36.0
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP api_requests_total Total de requests
+# TYPE api_requests_total counter
+api_requests_total{endpoint="/health",method="GET",status="200"} 129.0
+api_requests_total{endpoint="/classify",method="POST",status="200"} 20.0
+api_requests_total{endpoint="/metrics",method="GET",status="200"} 4.0
+# HELP api_requests_created Total de requests
+# TYPE api_requests_created gauge
+api_requests_created{endpoint="/health",method="GET",status="200"} 1.762398357465403e+09
+api_requests_created{endpoint="/classify",method="POST",status="200"} 1.7623986133387222e+09
+api_requests_created{endpoint="/metrics",method="GET",status="200"} 1.7623986953412662e+09
+# HELP api_request_seconds Latencia por endpoint
+# TYPE api_request_seconds histogram
+api_request_seconds_bucket{endpoint="/health",le="0.005",method="GET"} 0.0
+api_request_seconds_bucket{endpoint="/health",le="0.01",method="GET"} 48.0
+api_request_seconds_bucket{endpoint="/health",le="0.025",method="GET"} 96.0
+api_request_seconds_bucket{endpoint="/health",le="0.05",method="GET"} 107.0
+api_request_seconds_bucket{endpoint="/health",le="0.075",method="GET"} 110.0
+api_request_seconds_bucket{endpoint="/health",le="0.1",method="GET"} 112.0
+api_request_seconds_bucket{endpoint="/health",le="0.25",method="GET"} 125.0
+api_request_seconds_bucket{endpoint="/health",le="0.5",method="GET"} 129.0
+api_request_seconds_bucket{endpoint="/health",le="0.75",method="GET"} 129.0
+api_request_seconds_bucket{endpoint="/health",le="1.0",method="GET"} 129.0
+api_request_seconds_bucket{endpoint="/health",le="2.5",method="GET"} 129.0
+api_request_seconds_bucket{endpoint="/health",le="5.0",method="GET"} 129.0
+api_request_seconds_bucket{endpoint="/health",le="7.5",method="GET"} 129.0
+api_request_seconds_bucket{endpoint="/health",le="10.0",method="GET"} 129.0
+api_request_seconds_bucket{endpoint="/health",le="+Inf",method="GET"} 129.0
+api_request_seconds_count{endpoint="/health",method="GET"} 129.0
+api_request_seconds_sum{endpoint="/health",method="GET"} 4.820977591998599
+api_request_seconds_bucket{endpoint="/classify",le="0.005",method="POST"} 0.0
+api_request_seconds_bucket{endpoint="/classify",le="0.01",method="POST"} 0.0
+api_request_seconds_bucket{endpoint="/classify",le="0.025",method="POST"} 0.0
+api_request_seconds_bucket{endpoint="/classify",le="0.05",method="POST"} 0.0
+api_request_seconds_bucket{endpoint="/classify",le="0.075",method="POST"} 0.0
+api_request_seconds_bucket{endpoint="/classify",le="0.1",method="POST"} 0.0
+api_request_seconds_bucket{endpoint="/classify",le="0.25",method="POST"} 0.0
+api_request_seconds_bucket{endpoint="/classify",le="0.5",method="POST"} 0.0
+api_request_seconds_bucket{endpoint="/classify",le="0.75",method="POST"} 0.0
+api_request_seconds_bucket{endpoint="/classify",le="1.0",method="POST"} 0.0
+api_request_seconds_bucket{endpoint="/classify",le="2.5",method="POST"} 0.0
+api_request_seconds_bucket{endpoint="/classify",le="5.0",method="POST"} 3.0
+api_request_seconds_bucket{endpoint="/classify",le="7.5",method="POST"} 5.0
+api_request_seconds_bucket{endpoint="/classify",le="10.0",method="POST"} 5.0
+api_request_seconds_bucket{endpoint="/classify",le="+Inf",method="POST"} 20.0
+api_request_seconds_count{endpoint="/classify",method="POST"} 20.0
+api_request_seconds_sum{endpoint="/classify",method="POST"} 264.5129137059999
+api_request_seconds_bucket{endpoint="/metrics",le="0.005",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="0.01",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="0.025",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="0.05",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="0.075",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="0.1",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="0.25",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="0.5",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="0.75",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="1.0",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="2.5",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="5.0",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="7.5",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="10.0",method="GET"} 4.0
+api_request_seconds_bucket{endpoint="/metrics",le="+Inf",method="GET"} 4.0
+api_request_seconds_count{endpoint="/metrics",method="GET"} 4.0
+api_request_seconds_sum{endpoint="/metrics",method="GET"} 0.008998540000106914
+# HELP api_request_seconds_created Latencia por endpoint
+# TYPE api_request_seconds_created gauge
+api_request_seconds_created{endpoint="/health",method="GET"} 1.7623983574652772e+09
+api_request_seconds_created{endpoint="/classify",method="POST"} 1.762398613338153e+09
+api_request_seconds_created{endpoint="/metrics",method="GET"} 1.7623986953412e+09
+# HELP retriever_docs_returned Docs devueltos tras fusión
+# TYPE retriever_docs_returned gauge
+
