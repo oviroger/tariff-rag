@@ -70,6 +70,46 @@ pwsh -File evaluation/tools/warmup_and_export.ps1 -BaseUrl "http://localhost:800
 	-Query "Necesito importar plátanos" -Output "evaluation/templates/logs_operativos.csv"
 ```
 
+	## Generar CSVs de evaluación automáticamente
+
+	### Clasificador (eval_clasificador_hs6.csv)
+
+	Consulta `/classify` con queries de prueba y registra predicciones:
+
+	```bash
+	python evaluation/tools/generate_eval_clasificador.py \
+		--base-url http://localhost:8000 \
+		--queries "Smartphone OLED 128GB" "Plátanos frescos" "Neumáticos 205/55R16" \
+		--output evaluation/templates/eval_clasificador_hs6.csv
+	```
+
+	O desde un archivo de queries:
+
+	```bash
+	python evaluation/tools/generate_eval_clasificador.py \
+		--base-url http://localhost:8000 \
+		--queries-file evaluation/test_queries.txt \
+		--output evaluation/templates/eval_clasificador_hs6.csv
+	```
+
+	**Importante**: Debes llenar manualmente la columna `true_hs6` con los códigos correctos antes de calcular métricas.
+
+	### Retrieval (eval_retrieval.csv)
+
+	Ejecuta búsquedas híbridas en OpenSearch y registra documentos recuperados:
+
+	```bash
+	python evaluation/tools/generate_eval_retrieval.py \
+		--os-host https://localhost:9200 \
+		--index tariff_docs \
+		--queries "Smartphone OLED" "Plátanos" \
+		--top-k 5 \
+		--output evaluation/templates/eval_retrieval.csv
+	```
+
+	**Importante**: Debes llenar manualmente la columna `relevance` (0 o 1) para cada documento antes de calcular recall@k y nDCG@k.
+
+
 ## Formatos CSV
 
 Ver archivos en `evaluation/templates/` para los encabezados esperados y ejemplos comentados en la segunda línea.
