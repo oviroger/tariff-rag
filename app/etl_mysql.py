@@ -1,4 +1,5 @@
 import hashlib
+import os
 from typing import List, Dict, Any
 from sqlalchemy import create_engine, text as sql_text
 from .schemas import Fragment
@@ -37,17 +38,25 @@ def extract_asgard_fragments() -> List[Fragment]:
     en un texto descriptivo para clasificación arancelaria.
     """
     engine = create_engine(mysql_url(), pool_pre_ping=True)
-    
-    query = """
-    SELECT 
-        codigoproducto,
-        Partida,
-        Mercancia,
-        Param_1, Param_2, Param_3, Param_4, Param_5,
-        Param_6, Param_7, Param_8, Param_9, Param_11, Param_12, Param_14
-    FROM asgard
-    WHERE Mercancia IS NOT NULL
-    """
+
+    # Permitir limitar filas para pruebas/control de costos de embeddings
+    limit = os.getenv("MYSQL_LIMIT")
+    try:
+        limit_val = int(limit) if limit else None
+    except ValueError:
+        limit_val = None
+
+    base_query = (
+        "SELECT "
+        " codigoproducto,"
+        " Partida,"
+        " Mercancia,"
+        " Param_1, Param_2, Param_3, Param_4, Param_5,"
+        " Param_6, Param_7, Param_8, Param_9, Param_11, Param_12, Param_14"
+        " FROM asgard"
+        " WHERE Partida IS NOT NULL"
+    )
+    query = base_query + (f" LIMIT {limit_val}" if limit_val and limit_val > 0 else "")
     
     with engine.connect() as conn:
         result = conn.execute(sql_text(query))

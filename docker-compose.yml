@@ -47,7 +47,7 @@
     ports:
       - "3306:3306"
     volumes:
-      - ./storage/mysql:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
     networks: [ragnet]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
@@ -131,3 +131,7 @@
 networks:
   ragnet:
     driver: bridge
+
+volumes:
+  mysql-data:
+    # volumen nombrado para datos MySQL (persistente y sin conflictos)

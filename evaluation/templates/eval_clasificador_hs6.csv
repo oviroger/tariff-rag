@@ -1,0 +1,3 @@
+id,descripcion,hs6_ref,pred_codes,pred_scores
+# ejemplo:
+# 1,"Motor eléctrico trifásico 2kW",850110,"[\"850110\",\"850120\",\"850140\"]","[0.62,0.21,0.17]"

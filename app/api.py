@@ -77,6 +77,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# === Prometheus instrumentation (middleware) ===
+@app.middleware("http")
+async def prometheus_instrumentation(request: Request, call_next):
+    start = perf_counter()
+    status_code = 500
+    try:
+        response = await call_next(request)
+        status_code = getattr(response, "status_code", 500)
+        return response
+    finally:
+        try:
+            elapsed = perf_counter() - start
+            path = request.url.path
+            method = request.method
+            LATENCY.labels(endpoint=path, method=method).observe(elapsed)
+            REQUESTS.labels(endpoint=path, method=method, status=str(status_code)).inc()
+        except Exception:
+            # No romper la petición si la instrumentación falla
+            pass
+
 # === REQUEST MODEL CON VALIDACIONES ===
 class ClassifyRequest(BaseModel):
     text: str = Field(None, description="Query text (legacy)")

@@ -42,6 +42,12 @@ class ConversationState:
     
     def has_context(self) -> bool:
         return self.last_classification is not None
+    
+    def reset(self):
+        """Limpia todo el estado conversacional."""
+        self.last_classification = None
+        self.last_query = ""
+        self.history = []
 
 # Global conversation state
 conv_state = ConversationState()
@@ -151,11 +157,34 @@ def format_classification_markdown(result: Dict[str, Any]) -> str:
     evidence = result.get("evidence", [])
     if evidence:
         md += f"### 📚 Evidencia: {len(evidence)} fragmentos recuperados\n\n"
-        # Show snippet from top evidence
-        if len(evidence) > 0:
-            top_ev = evidence[0]
-            md += f"**Fragmento más relevante** (score: {top_ev.get('score', 0):.3f}):\n"
-            md += f"> {top_ev.get('text', '')[:200]}...\n\n"
+        # Mostrar los primeros hasta 5 fragmentos con opción de expandir texto completo
+        max_show = min(5, len(evidence))
+        for i in range(max_show):
+            ev = evidence[i] or {}
+            score = ev.get('score', 0)
+            frag_id = ev.get('fragment_id') or ev.get('id') or f"{i+1}"
+            text = ev.get('text', '') or ''
+
+            md += f"**Fragmento {i+1}** (ID: {frag_id}, score: {score:.3f})\n\n"
+            # Prefijo en bloque citado con un resumen corto
+            preview = text.strip()
+            if len(preview) > 300:
+                preview_short = preview[:300].rstrip() + "…"
+            else:
+                preview_short = preview
+            if preview_short:
+                md += f"> {preview_short}\n\n"
+
+            # Agregar expansor con el contenido completo si es largo
+            if len(preview) > 300:
+                # Detalles HTML funciona en Markdown de Gradio
+                # Usamos blockquote dentro para mantener estilo
+                full_escaped = preview.replace("<", "&lt;").replace(">", "&gt;")
+                md += (
+                    "<details><summary>Ver fragmento completo</summary>\n\n"
+                    f"> {full_escaped}\n\n"
+                    "</details>\n\n"
+                )
     
     # Warnings
     warnings = result.get("warnings", [])
@@ -418,7 +447,31 @@ def chat_response(message: str, history: list) -> str:
     Main chatbot response function.
     Handles both classification requests and follow-up questions.
     """
+    if not message or not message.strip():
+        return "Por favor, escribe una consulta sobre clasificación arancelaria."
+    
     message = message.strip()
+    message_lower = message.lower()
+    
+    # Detectar comandos de reset/nueva conversación
+    reset_keywords = [
+        "olvida", "olvidar", "olvida todo", "borra", "borrar",
+        "nueva conversación", "nueva consulta", "empezar de nuevo",
+        "reiniciar", "reset", "clear", "limpiar", "iniciar nueva",
+        "quiero iniciar", "vamos a iniciar"
+    ]
+    
+    if any(keyword in message_lower for keyword in reset_keywords):
+        conv_state.reset()
+        return (
+            "✅ **Conversación reiniciada**\n\n"
+            "He borrado el contexto anterior. Ahora puedes hacer una nueva consulta sobre "
+            "clasificación arancelaria.\n\n"
+            "**Ejemplos de consultas:**\n"
+            "- Láminas de acero laminadas en caliente, 2mm de espesor\n"
+            "- Neumáticos radiales para automóvil 205/55R16\n"
+            "- Smartphones con pantalla OLED, 128GB\n"
+        )
 
     # Check if it's a follow-up question about previous classification
     if is_followup_question(message) and conv_state.last_classification:
@@ -464,9 +517,11 @@ def chat_response(message: str, history: list) -> str:
         conv_state.add_turn(message, validation_msg)
         return validation_msg
 
-    # Otherwise, treat it as a new classification request
+    # Nueva consulta completa: "Neumáticos radiales nuevos... Es caucho natural, es de China, diseño mixto"
+    improved_query = f"{conv_state.last_query}. {message}"
+    # Llamar a /classify con improved_query
     try:
-        payload = {"text": message, "query": message, "top_k": 5}
+        payload = {"text": improved_query, "query": improved_query, "top_k": 5}
         resp = requests.post(f"{API_URL}/classify", json=payload, timeout=60)
         resp.raise_for_status()
         data = resp.json()
