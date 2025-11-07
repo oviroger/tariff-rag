@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from contextlib import asynccontextmanager
 from typing import Optional, Any, Dict
 import os
@@ -99,15 +99,23 @@ async def prometheus_instrumentation(request: Request, call_next):
 
 # === REQUEST MODEL CON VALIDACIONES ===
 class ClassifyRequest(BaseModel):
-    text: str = Field(None, description="Query text (legacy)")
-    query: str = Field(None, description="Query text (preferred)")
+    text: Optional[str] = Field(None, description="Query text (legacy)")
+    query: Optional[str] = Field(None, description="Query text (preferred)")
     top_k: int = Field(default=5, ge=1, le=50)
-    file_url: str = Field(None, description="Optional file URL for context")
+    file_url: Optional[str] = Field(None, description="Optional file URL for context")
     debug: bool = Field(default=False, description="Enable debug mode")
+
+    @model_validator(mode='after')
+    def check_query_provided(self):
+        """Ensure at least one of text or query is provided."""
+        if not self.get_query_text():
+            raise ValueError("At least one of 'text' or 'query' must be provided and non-empty")
+        return self
 
     def get_query_text(self) -> str:
         """Return query or text, preferring query if both provided."""
-        return self.query or self.text or ""
+        q = self.query or self.text or ""
+        return q.strip() if isinstance(q, str) else ""
 
 class ChatRequest(BaseModel):
     question: str
