@@ -1,0 +1,14 @@
+{
+  "lat_ms_percentiles": {
+    "total": {
+      "p50": 5.0,
+      "p95": 7500.0,
+      "p99": 7500.0
+    }
+  },
+  "qpm_avg": 42.88235294117647,
+  "qpm_p50": null,
+  "qpm_p95": null,
+  "error_rate": 0.0,
+  "format": "aggregated_prometheus"
+}
