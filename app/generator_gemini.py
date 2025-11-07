@@ -139,17 +139,21 @@ Usuario: "Tipo de vehículo automóvil"
 RESPUESTA (solo JSON, sin explicaciones adicionales):"""
 
     try:
-        model_name = "models/gemini-2.5-flash"
+        s = get_settings()
+        model_name = s.gemini_model
+        if not model_name.startswith("models/"):
+            model_name = f"models/{model_name}"
+        
         model = genai.GenerativeModel(
             model_name=model_name,
-            generation_config={
-                "temperature": 0.3,
-                "top_p": 0.9,
-                "top_k": 40,
-                "max_output_tokens": 2048,
-                "response_mime_type": "application/json",
-                "response_schema": OUTPUT_SCHEMA,
-            },
+            generation_config=genai.GenerationConfig(
+                temperature=s.gemini_temperature,
+                top_p=s.gemini_top_p,
+                top_k=s.gemini_top_k,
+                max_output_tokens=s.gemini_max_output_tokens,
+                response_mime_type="application/json",
+                response_schema=OUTPUT_SCHEMA,
+            ),
             safety_settings={
                 "HARM_CATEGORY_HARASSMENT": "BLOCK_NONE",
                 "HARM_CATEGORY_HATE_SPEECH": "BLOCK_NONE",
