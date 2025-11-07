@@ -101,7 +101,7 @@ async def prometheus_instrumentation(request: Request, call_next):
 class ClassifyRequest(BaseModel):
     text: Optional[str] = Field(None, description="Query text (legacy)", max_length=4000)
     query: Optional[str] = Field(None, description="Query text (preferred)", max_length=4000)
-    top_k: int = Field(default=5, ge=1, le=50)
+    top_k: int = Field(default=5, ge=1, le=20)
     file_url: Optional[str] = Field(None, description="Optional file URL for context")
     debug: bool = Field(default=False, description="Enable debug mode")
 
