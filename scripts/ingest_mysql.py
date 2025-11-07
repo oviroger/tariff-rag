@@ -8,12 +8,23 @@ from app.config import get_settings
 
 def main():
     s = get_settings()
+    target_index = os.environ.get("TARGET_INDEX") or os.environ.get("OPENSEARCH_INDEX") or s.opensearch_index
+    limit = os.environ.get("MYSQL_LIMIT")
+    no_embed = os.environ.get("NO_EMBED")
+    offset = os.environ.get("MYSQL_OFFSET")
     
     # Detectar si queremos ingestar tabla asgard o genérica
     table = os.environ.get("MYSQL_TABLE", "asgard")
     
     if table.lower() == "asgard":
         print("📊 Ingesta desde tabla ASGARD...")
+        print(f"   → índice destino: {target_index}")
+        if limit:
+            print(f"   → límite de filas (MYSQL_LIMIT): {limit}")
+        if offset:
+            print(f"   → desplazamiento (MYSQL_OFFSET): {offset}")
+        if no_embed in ("1","true","True"):
+            print("   → embeddings: DESACTIVADOS (NO_EMBED=1)")
         fr_db = extract_asgard_fragments()
     else:
         # Modo genérico para otras tablas
@@ -23,8 +34,8 @@ def main():
         fr_db = extract_mysql_fragments(table, text_col, id_col)
     
     if fr_db:
-        bulk_ingest_fragments([f.model_dump() for f in fr_db], s.opensearch_index)
-        print(f"✅ Ingestados {len(fr_db)} fragmentos desde MySQL")
+        bulk_ingest_fragments([f.model_dump() for f in fr_db], target_index)
+        print(f"✅ Ingestados {len(fr_db)} fragmentos desde MySQL en índice '{target_index}'")
         
         # Mostrar ejemplo del primer fragmento
         if fr_db:

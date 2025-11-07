@@ -2,10 +2,10 @@ import re
 from typing import List, Dict, Any
 from .schemas import Fragment
 
-def juridical_chunks(text: str, meta: Dict[str, Any], max_chars: int = 1800) -> List[Fragment]:
+def juridical_chunks(text: str, meta: Dict[str, Any], max_chars: int = 1800, overlap: int = 0) -> List[Fragment]:
     """
     Segmenta por unidades legales aproximadas (capítulos/secciones/artículos) y limita tamaño.
-    Heurístico simple para empezar.
+    Permite solapamiento entre fragmentos (overlap en caracteres).
     """
     if not text or not text.strip():
         return []
@@ -31,10 +31,11 @@ def juridical_chunks(text: str, meta: Dict[str, Any], max_chars: int = 1800) -> 
             return [t]
         chunks = []
         s = 0
+        step = max_chars - overlap if overlap < max_chars else 1
         while s < len(t):
             e = min(s + max_chars, len(t))
             chunks.append(t[s:e])
-            s = e
+            s += step
         return chunks
 
     out: List[Fragment] = []
@@ -42,16 +43,7 @@ def juridical_chunks(text: str, meta: Dict[str, Any], max_chars: int = 1800) -> 
         for c in slice_by_size(p):
             out.append(Fragment(
                 fragment_id="",
-                source=meta.get("source", "DOC"),
-                doc_id=meta.get("doc_id", ""),
-                chapter=meta.get("chapter"),
-                heading=meta.get("heading"),
-                subheading=meta.get("subheading"),
-                unit=meta.get("unit", "SECTION"),
                 text=c,
-                edition=meta.get("edition"),
-                validity_from=meta.get("validity_from"),
-                validity_to=meta.get("validity_to"),
-                metadata=meta.get("metadata", {})
+                metadata=meta.copy()
             ))
     return out

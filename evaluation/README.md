@@ -2,12 +2,29 @@
 
 Este directorio contiene scripts y plantillas para calcular métricas del clasificador, del componente de recuperación (RAG) y métricas operativas.
 
+## 🎯 Dataset de Evaluación Generado
+
+Se han generado **42 queries de prueba** de alta calidad distribuidas en:
+- **35 queries predefinidas** (productos comunes de diversos capítulos HS)
+- **7 queries extraídas de MySQL** (tabla asgard con productos reales)
+
+### Archivos CSV de Evaluación:
+- ✅ **`eval_clasificador_hs6.csv`**: 42 queries con predicciones top-3
+- ✅ **`eval_retrieval.csv`**: 220 registros (42 queries × ~5 docs recuperados)
+
+> 📋 **IMPORTANTE**: Ver `INSTRUCCIONES_ANOTACION.md` para completar las columnas `true_hs6` y `relevance` antes de ejecutar evaluaciones.
+> 
+> ⏱️ **Tiempo de anotación estimado**: 3-4 horas (vs 5-7 horas del dataset anterior)
+> 
+> 📊 **Validez**: Dataset optimizado con todas las queries siendo productos reales válidos
+
 ## Estructura
 
 - `evaluation/eval_clasificador.py`: acc@1, acc@3, macro/micro-F1 (si scikit-learn está disponible), MRR@3 y ECE opcional.
 - `evaluation/eval_retrieval.py`: recall@k y nDCG@k (relevancia binaria) para la fusión RRF.
 - `evaluation/eval_operativo.py`: latencias p50/p95/p99, throughput (QPM) y tasa de errores desde logs.
-- `evaluation/templates/*.csv`: plantillas vacías con encabezados.
+- `evaluation/templates/*.csv`: plantillas con datos generados automáticamente.
+- `evaluation/tools/`: scripts para generar queries y CSVs de evaluación automáticamente.
 
 > Nota de dependencias: los scripts requieren `pandas` y `numpy`. Para macro/micro-F1 se intentará usar `scikit-learn`; si no está instalado, se omite F1 y se imprime `null`.
 
@@ -70,33 +87,47 @@ pwsh -File evaluation/tools/warmup_and_export.ps1 -BaseUrl "http://localhost:800
 	-Query "Necesito importar plátanos" -Output "evaluation/templates/logs_operativos.csv"
 ```
 
-	## Generar CSVs de evaluación automáticamente
+## Generar CSVs de evaluación automáticamente
 
-	### Clasificador (eval_clasificador_hs6.csv)
+### 1. Generar queries de prueba
 
-	Consulta `/classify` con queries de prueba y registra predicciones:
+Primero genera un conjunto de queries desde el corpus:
 
-	```bash
-	python evaluation/tools/generate_eval_clasificador.py \
-		--base-url http://localhost:8000 \
-		--queries "Smartphone OLED 128GB" "Plátanos frescos" "Neumáticos 205/55R16" \
-		--output evaluation/templates/eval_clasificador_hs6.csv
-	```
+```bash
+python evaluation/tools/generate_test_queries.py \
+  --os-host http://localhost:9200 \
+  --os-index tariff_fragments \
+  --os-samples 200 \
+  --synthetic 70 \
+  --target-total 100 \
+  --output evaluation/test_queries.txt
+```
 
-	O desde un archivo de queries:
+Esto genera:
+- `evaluation/test_queries.txt`: lista de queries (una por línea)
+- `evaluation/test_queries_metadata.json`: metadata con códigos HS y fuente
 
-	```bash
-	python evaluation/tools/generate_eval_clasificador.py \
-		--base-url http://localhost:8000 \
-		--queries-file evaluation/test_queries.txt \
-		--output evaluation/templates/eval_clasificador_hs6.csv
-	```
+**Dataset actual generado:** 80 queries (10 corpus + 35 predefinidas + 35 sintéticas)
 
-	**Importante**: Debes llenar manualmente la columna `true_hs6` con los códigos correctos antes de calcular métricas.
+### 2. Clasificador (eval_clasificador_hs6.csv)
 
-	### Retrieval (eval_retrieval.csv)
+Consulta `/classify` con queries de prueba y registra predicciones:
 
-	Ejecuta búsquedas híbridas en OpenSearch y registra documentos recuperados:
+```bash
+python evaluation/tools/generate_eval_clasificador.py \
+  --base-url http://localhost:8000 \
+  --queries-file evaluation/test_queries.txt \
+  --top-n 3 \
+  --output evaluation/templates/eval_clasificador_hs6.csv
+```
+
+**Archivo generado:** ✅ 80 queries con predicciones top-3
+
+**⚠️ Importante**: Debes llenar manualmente la columna `true_hs6` con los códigos correctos antes de calcular métricas.
+
+### 3. Retrieval (eval_retrieval.csv)
+
+Ejecuta búsquedas híbridas en OpenSearch y registra documentos recuperados:
 
 	```bash
 	python evaluation/tools/generate_eval_retrieval.py \

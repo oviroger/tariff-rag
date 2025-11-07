@@ -1,3 +1,221 @@
-id,gold_doc_ids,retrieved_doc_ids,retrieved_scores
-# ejemplo:
-# 1,"[\"docA\",\"docB\"]","[\"docX\",\"docA\",\"docM\"]","[1.23,1.10,0.95]"
+query_id,query,doc_id,rank,score,relevance,snippet
+1,Aceite de oliva virgen extra,9d7a5ed04bb6afc8_p1288,1,13.2297,,"Nombre de la Mercancía: Consignar el nombre con el cual se conoce comercialmente a la mercancía. Ejemplos: Aceite de Soya, Aceite de Oliva, Aceite de Hígado de Bacalao, Margarina, etc."
+1,Aceite de oliva virgen extra,b3281e65bc04bfeb_p12240,2,11.0581,,- - Aceite de pino
+1,Aceite de oliva virgen extra,b3281e65bc04bfeb_p12076,3,8.4239,,b) los aceites de fusel; el aceite de Dippel;
+1,Aceite de oliva virgen extra,865ff58a28944aef_p817,4,8.4239,,a) El aceite de yema de huevo (partida 15.06).
+1,Aceite de oliva virgen extra,865ff58a28944aef_p831,5,6.8976,,"El aceite de huevos de tortuga corresponde, por el contrario, a la partida 15.06."
+2,Auriculares inalámbricos Bluetooth,9d7a5ed04bb6afc8_p10065,1,11.6337,,"CONECTIVIDAD: BLUETOOTH, WIFI"
+2,Auriculares inalámbricos Bluetooth,9d7a5ed04bb6afc8_p9641,2,10.2632,,"- CONECTIVIDAD: BLUETOOTH, WIFI - OTRO (ESPECIFIQUE)"
+2,Auriculares inalámbricos Bluetooth,9d7a5ed04bb6afc8_p9596,3,7.5833,,"- CONECTIVIDAD: BLUETOOTH, WIFI - SOPORTE: DVD, TARJETA USB - BATERÍA TIEMPO DE AUTONOMÍA"
+2,Auriculares inalámbricos Bluetooth,9d7a5ed04bb6afc8_t378,4,4.1509,,"| Nombre de la Mercancía: | CÁMARA FOTOGRÁFICA |
+| --- | --- |
+| Sinónimos: | - |
+| Marca Comercial: | - |
+| Tipo de Funcionamiento: | - ANALÓGICO - DIGITAL |
+| Clase de diseño: | - COMPACTA - RÉFLEX "
+2,Auriculares inalámbricos Bluetooth,9d7a5ed04bb6afc8_t356,5,3.2281,,"| Nombre de la Mercancía: | REPRODUCTOR DE SONIDO |
+| --- | --- |
+| Sinónimos: | - EQUIPO DE SONIDO - EQUIPO DE MÚSICA, - MINICOMPONENTE, - REPRODUCTOR DE MÚSICA, - ESTÉREO. |
+| Marca Comercial: | - |"
+3,Bolsas plásticas biodegradables,b3281e65bc04bfeb_p15338,1,8.9034,,- - - Bolsas colectoras de sangre
+3,Bolsas plásticas biodegradables,b3281e65bc04bfeb_p15327,2,8.379,,"- Sacos (bolsas), bolsitas y cucuruchos:"
+3,Bolsas plásticas biodegradables,b3281e65bc04bfeb_p393,3,8.379,,- Papel Kraft para sacos (bolsas):
+3,Bolsas plásticas biodegradables,b3281e65bc04bfeb_p15345,4,7.496,,- - - Bolsas para el envasado de soluciones parenterales
+3,Bolsas plásticas biodegradables,b3281e65bc04bfeb_p1203,5,7.496,,- Los demás sacos (bolsas); bolsitas y cucuruchos
+4,Bolso de cuero genuino,b3281e65bc04bfeb_p17251,1,11.3965,,- Articulos de bolsillo o de bolso de mano (cartera):
+4,Bolso de cuero genuino,b3281e65bc04bfeb_p17406,2,10.4219,,- - De cuero de reptil
+4,Bolso de cuero genuino,b3281e65bc04bfeb_p17432,3,9.9959,,Las demás manufacturas de cuero natural o cuero regenerado.
+4,Bolso de cuero genuino,b3281e65bc04bfeb_p17063,4,9.9958,,"Cuero regenerado a base de cuero o fibras de cuero, en placas, hojas o tiras, incluso enrolladas; recortes y demás desperdicios de cuero o piel, preparados, o de cuero regenerado, no utilizables para "
+4,Bolso de cuero genuino,b3281e65bc04bfeb_p17065,5,9.7437,,"- Cuero regenerado a base de cuero o fibras de cuero, en placas, hojas o tiras, incluso enrolladas"
+5,Cable HDMI 2 metros,9d7a5ed04bb6afc8_p740,1,12.1313,,m2: Metros cuadrados.
+5,Cable HDMI 2 metros,9d7a5ed04bb6afc8_p742,2,12.1313,,m3: Metros cúbicos.
+5,Cable HDMI 2 metros,b3281e65bc04bfeb_p4510,3,11.7101,,a) longitud del cable superior a 2 m;
+5,Cable HDMI 2 metros,9d7a5ed04bb6afc8_p10847,4,11.4871,,Cable:
+5,Cable HDMI 2 metros,9d7a5ed04bb6afc8_p10990,5,11.4871,,CABLE
+6,Café en grano tostado,865ff58a28944aef_p1502,1,22.9497,,- Café tostado:
+6,Café en grano tostado,865ff58a28944aef_p1498,2,16.8572,,"09.01 - Café, incluso tostado o descafeinado; cáscara y cascarilla de café; sucedáneos del café que contengan café en cualquier proporción."
+6,Café en grano tostado,865ff58a28944aef_p1509,3,16.0572,,"3) El café (incluso descafeinado) tostado, incluso molido."
+6,Café en grano tostado,865ff58a28944aef_p1511,4,10.5899,,"5) Los sucedáneos del café, con un contenido de café en cualquier proporción."
+6,Café en grano tostado,865ff58a28944aef_p1499,5,9.7838,,- Café sin tostar:
+7,Camiseta de algodón,b3281e65bc04bfeb_p5493,1,11.4728,,- - De algodón
+7,Camiseta de algodón,b3281e65bc04bfeb_p5968,2,11.4728,,- De algodón:
+7,Camiseta de algodón,b3281e65bc04bfeb_p6085,3,11.4728,,- De algodón
+7,Camiseta de algodón,b3281e65bc04bfeb_p6145,4,11.4728,,- - De algodón
+7,Camiseta de algodón,b3281e65bc04bfeb_p19662,5,9.9425,,- Pasta de línter de algodón
+8,Cargador USB-C 65W,9d7a5ed04bb6afc8_p9596,1,7.9077,,"- CONECTIVIDAD: BLUETOOTH, WIFI - SOPORTE: DVD, TARJETA USB - BATERÍA TIEMPO DE AUTONOMÍA"
+8,Cargador USB-C 65W,9d7a5ed04bb6afc8_p9065,2,6.9747,,- RETROEXCAVADORA (BACKHOES) - CARGADOR COMPACTO (COMPACT TRACK LOADERS) - COMPACTADOR (COMPACTORS) - CARGADOR SOBRE ORUGA (CRAWLER LOADERS) - TRACTOR SOBRE ORUGAS (CRAWLER TRACTORS) - EXCAVADOR (EXCA
+8,Cargador USB-C 65W,b3281e65bc04bfeb_p12434,3,6.0148,,C' o C
+8,Cargador USB-C 65W,b3281e65bc04bfeb_p12445,4,6.0148,,C' o C
+8,Cargador USB-C 65W,b3281e65bc04bfeb_p12456,5,6.0148,,C. o C
+9,Cerveza artesanal,9d7a5ed04bb6afc8_p1487,1,5.3708,,"Nombre de la Mercancía: Consignar el nombre con el cual se conoce comercialmente a la mercancía. Ejemplos: Agua, Vino, Vinagre, Cerveza, Sidra, Vermut, Pisco, Sake, etc."
+10,Chaqueta impermeable,9d7a5ed04bb6afc8_p2402,1,6.003,,"Nombre de la Mercancía: Consignar el nombre con el cual se conoce comercialmente a la mercancía. Ejemplos: Piel, Chaqueta, Peletería Artificial, Llavero."
+10,Chaqueta impermeable,9d7a5ed04bb6afc8_p2875,2,1.889,,"ARTÍCULO 90 .- (PARTIDAS 6401 a 6405). Para el registro de las descripciones mínimas de Calzado impermeable con suela y parte superior de caucho o plástico, cuya parte superior no se haya unido a la s"
+11,Compresor de aire industrial,9d7a5ed04bb6afc8_p10750,1,13.203,,COMPRESOR
+11,Compresor de aire industrial,9d7a5ed04bb6afc8_p10752,2,13.203,,COMPRESOR
+11,Compresor de aire industrial,9d7a5ed04bb6afc8_p10789,3,11.1179,,INDUSTRIAL
+11,Compresor de aire industrial,9d7a5ed04bb6afc8_p8736,4,10.4838,,AIRE ACONDICIONADO
+11,Compresor de aire industrial,9d7a5ed04bb6afc8_p9122,5,10.3225,,- INDUSTRIAL - DOMÉSTICA
+12,Contenedores plásticos,b3281e65bc04bfeb_p14802,1,9.7237,,- De los demás plásticos
+12,Contenedores plásticos,b3281e65bc04bfeb_p14822,2,9.7237,,- De los demás plásticos
+12,Contenedores plásticos,b3281e65bc04bfeb_p14871,3,9.7237,,- - De los demás plásticos:
+12,Contenedores plásticos,b3281e65bc04bfeb_p14989,4,9.7237,,- De los demás plásticos:
+12,Contenedores plásticos,b3281e65bc04bfeb_p15166,5,9.7237,,- De los demás plásticos:
+13,Cuadernos universitarios,b3281e65bc04bfeb_p1230,1,14.0009,,- Cuadernos
+13,Cuadernos universitarios,b3281e65bc04bfeb_p1487,2,7.2745,,"Albumes o libros de estampas y cuadernos para dibujar o colorear, para niños."
+13,Cuadernos universitarios,9d7a5ed04bb6afc8_p4498,3,4.7844,,"Uso y aplicación: Consignar el fin de la mercancía. Ejemplos: para la confección o el ensamblado de cuadernos, libretas, fascículos, periódicos, libros, Para encuadernar libros, etc."
+13,Cuadernos universitarios,b3281e65bc04bfeb_p1221,4,2.754,,"Libros registro, libros de contabilidad, talonarios (de notas, pedidos o recibos), agendas, bloques memorandos, bloques de papel de cartas y artículos similares, cuadernos, carpetas de mesa, clasifica"
+14,Cámara web Full HD,9d7a5ed04bb6afc8_p9580,1,11.5277,,- CÁMARA DE VIDEO - CÁMARA FILMADORA
+14,Cámara web Full HD,9d7a5ed04bb6afc8_p9576,2,10.8003,,VIDEO CÁMARA
+14,Cámara web Full HD,9d7a5ed04bb6afc8_p9578,3,10.8003,,VIDEO CÁMARA
+14,Cámara web Full HD,9d7a5ed04bb6afc8_p10047,4,10.8003,,CÁMARA FOTOGRÁFICA
+14,Cámara web Full HD,9d7a5ed04bb6afc8_p10049,5,10.8003,,CÁMARA FOTOGRÁFICA
+15,Detergente líquido,9d7a5ed04bb6afc8_p8411,1,9.3303,,- SÓLIDO - LÍQUIDO - OTRO (ESPECIFIQUE)
+15,Detergente líquido,9d7a5ed04bb6afc8_p2026,2,6.4879,,"Tipo: Consignar el estado de la mercancía. Ejemplos: Polvo, Líquido, Gel."
+15,Detergente líquido,9d7a5ed04bb6afc8_p1469,3,6.2173,,"Tipo: Consignar el estado de la mercancía. Ejemplos. Sólido, Líquido, Polvo, etc."
+15,Detergente líquido,9d7a5ed04bb6afc8_p1671,4,6.2173,,"Tipo: Consignar el estado de la mercancía. Ejemplos: Polvo, Líquido, Gas, etc."
+15,Detergente líquido,9d7a5ed04bb6afc8_p1698,5,6.2173,,"Tipo: Consignar el estado de la mercancía. Ejemplos: Polvo, Líquido, Gas, etc."
+16,Fertilizante NPK,9d7a5ed04bb6afc8_p8357,1,12.8338,,FERTILIZANTE
+16,Fertilizante NPK,9d7a5ed04bb6afc8_p8359,2,12.8338,,FERTILIZANTE
+16,Fertilizante NPK,9d7a5ed04bb6afc8_p7378,3,8.7763,,ANEXO 36: DESCRIPCIONES MÍNIMAS ESPECÍFICAS PARA FERTILIZANTE
+16,Fertilizante NPK,b3281e65bc04bfeb_p9571,4,5.9531,,- Mezclas de nitrato de amonio con carbonato de calcio u otras materias inorgánicas sin poder fertilizante
+16,Fertilizante NPK,9d7a5ed04bb6afc8_p1837,5,5.2085,,"Para el registro de las descripciones mínimas DEMI de ""Fertilizante"" consignar la información de acuerdo al Anexo 36 DEMIS ESPECÍFICAS."
+17,Gafas de sol polarizadas,b3281e65bc04bfeb_p13985,1,7.5938,,"u) los artículos del Capítulo 90 (por ejemplo: elementos de óptica, monturas (armazones) de gafas (anteojos), instrumentos de dibujo);"
+17,Gafas de sol polarizadas,9d7a5ed04bb6afc8_p6519,2,5.1846,,"Nombre de la Mercancía: Consignar el nombre con el cual se conoce comercialmente a la mercancía. Ejemplos: Cable de Fibra Óptica, Gafas, Monturas, Binoculares, Telescopio, Pantalla de Proyección, Micr"
+17,Gafas de sol polarizadas,b3281e65bc04bfeb_p17127,3,4.3289,,"Baúles, maletas (valijas), maletines, incluidos los de aseo y los portadocumentos, portafolios (carteras de mano), cartapacios, fundas y estuches para gafas (anteojos), binoculares, cámaras fotográfic"
+17,Gafas de sol polarizadas,865ff58a28944aef_p1455,4,4.0355,,"Esta partida comprende las frutas y demás frutos secos, que cuando están frescos, corresponden a las partidas 08.07 a 08.10. Se preparan por secado directo al sol o por métodos industriales (por ejemp"
+17,Gafas de sol polarizadas,865ff58a28944aef_p1545,5,2.9172,,"Este término designa las semillas de todas las especies de pimienta del género Piper, con excepción de la pimienta de Cubeba (Piper cubeba) partida 12.11. La principal variedad comercial es la pimient"
+18,Insecticida en aerosol,9d7a5ed04bb6afc8_p8405,1,12.4714,,- PESTICIDA - HERBICIDAS - INSECTICIDA
+18,Insecticida en aerosol,b3281e65bc04bfeb_p1046,2,3.8492,,- En librillos o en tubos
+18,Insecticida en aerosol,b3281e65bc04bfeb_p16111,3,3.6063,,"en
+Frontera"
+18,Insecticida en aerosol,b3281e65bc04bfeb_p19089,4,3.6063,,- - Vigas en |
+18,Insecticida en aerosol,b3281e65bc04bfeb_p3775,5,3.6063,,- - En bruto
+19,Laptop HP 15 pulgadas,9d7a5ed04bb6afc8_p9674,1,13.4265,,Pulgadas
+19,Laptop HP 15 pulgadas,9d7a5ed04bb6afc8_p9714,2,13.4265,,Pulgadas:
+19,Laptop HP 15 pulgadas,9d7a5ed04bb6afc8_p10956,3,9.6923,,Longitud de Hoja (mm o Pulgadas):
+19,Laptop HP 15 pulgadas,9d7a5ed04bb6afc8_p9230,4,9.6915,,- PC - POCKET - SERVIDOR - NOTEBOOK - LAPTOP - NETBOOK - OTRO (ESPECIFIQUE)
+19,Laptop HP 15 pulgadas,9d7a5ed04bb6afc8_p10253,5,9.0304,,Potencia del motor (HP)
+20,Libro de texto,b3281e65bc04bfeb_p1375,1,8.3667,,"a) las colecciones de grabados, de reproducciones de obras de arte, de dibujos, etc., que constituyan obras completas, paginadas y susceptibles de formar un libro, cuando los grabados estén acompañado"
+20,Libro de texto,9d7a5ed04bb6afc8_p2595,2,8.0901,,"a la mercancía. Ejemplos: Libro, Revista, Diccionario, Enciclopedia, Calcomanía, Tarjeta Postal, Sello de Correo."
+20,Libro de texto,865ff58a28944aef_p1587,3,7.4385,,a) según el texto de las partidas y de las Notas de sección o capítulo; y
+20,Libro de texto,b3281e65bc04bfeb_p1376,4,7.2526,,) las láminas ilustradas que se presenten al mismo tiempo que un libro y como complemento de éste;
+20,Libro de texto,619a3c3e67783f58_p129,5,5.6785,,"El texto de los Incoterms® 2020 se entiende que se explica por sí mismo. Sin embargo, con el fin de ayudar a los usuarios el siguiente texto establece explicaciones sobre el sentido en que los término"
+21,Llantas de aleación 17 pulgadas,9d7a5ed04bb6afc8_p9674,1,13.4265,,Pulgadas
+21,Llantas de aleación 17 pulgadas,9d7a5ed04bb6afc8_p9714,2,13.4265,,Pulgadas:
+21,Llantas de aleación 17 pulgadas,9d7a5ed04bb6afc8_p8806,3,11.5581,,17
+21,Llantas de aleación 17 pulgadas,9d7a5ed04bb6afc8_p11373,4,11.5581,,17
+21,Llantas de aleación 17 pulgadas,9d7a5ed04bb6afc8_p198,5,11.5581,,17
+22,Manzanas rojas importadas,865ff58a28944aef_p1449,1,12.7082,,0813.30 - Manzanas
+22,Manzanas rojas importadas,865ff58a28944aef_p1403,2,11.1175,,0808.10 - Manzanas 0808.30 - Peras
+22,Manzanas rojas importadas,865ff58a28944aef_p1402,3,9.8807,,"08.08 - Manzanas, peras y membrillos, frescos."
+22,Manzanas rojas importadas,865ff58a28944aef_p1417,4,9.7231,,"0810.30 - Grosellas negras, blancas o rojas y grosellas espinosas"
+22,Manzanas rojas importadas,9d7a5ed04bb6afc8_p630,5,5.1283,,2. Decisión Nº 571 de 12/12/2003 de la Comisión de la Comunidad Andina: Valor en Aduana de las Mercancías Importadas.
+23,Monitor LED 27 pulgadas,9d7a5ed04bb6afc8_p9659,1,13.6874,,MONITOR
+23,Monitor LED 27 pulgadas,9d7a5ed04bb6afc8_p9661,2,13.6874,,MONITOR
+23,Monitor LED 27 pulgadas,9d7a5ed04bb6afc8_p9674,3,13.4265,,Pulgadas
+23,Monitor LED 27 pulgadas,9d7a5ed04bb6afc8_p9714,4,13.4265,,Pulgadas:
+23,Monitor LED 27 pulgadas,9d7a5ed04bb6afc8_p11010,5,12.5354,,27
+24,Mouse inalámbrico,9d7a5ed04bb6afc8_p5534,1,6.9945,,"Tipo: Consignar la categoría que identifique a la mercancía. Ejemplo: inalámbrico, digital, analógico, etc."
+24,Mouse inalámbrico,9d7a5ed04bb6afc8_p4787,2,6.0612,,"Tipo: Consignar el tipo de sistema de trabajo de la mercancía. Ejemplo: De mano, Portátil o inalámbrico, etc."
+24,Mouse inalámbrico,9d7a5ed04bb6afc8_p4856,3,4.9373,,"Nombre de la Mercancía: Consignar el nombre con el cual se conoce comercialmente a la mercancía. Ejemplos: Tarjeta madre, Pantalla interactiva, Mouse, Gamepad, etc"
+24,Mouse inalámbrico,9d7a5ed04bb6afc8_p4879,4,4.5573,,"Otras características: Consignar características que permitan identificar a la mercancía, no contempladas en las casillas anteriores. Ejemplo para Mouse: soporte del sistema Windows, series MAC, Linux"
+24,Mouse inalámbrico,9d7a5ed04bb6afc8_p4797,5,4.1317,,"Otras características: Consignar características que permitan identificar a la mercancía, no contempladas en las casillas anteriores. Ejemplo para Taladro inalámbrico: Siendo 2 herramientas en 1 (tala"
+25,Muñeca de plástico,9d7a5ed04bb6afc8_p10697,1,8.4086,,PLÁSTICO
+25,Muñeca de plástico,9d7a5ed04bb6afc8_p10725,2,8.4086,,PLÁSTICO
+25,Muñeca de plástico,9d7a5ed04bb6afc8_p10729,3,8.4086,,PLÁSTICO
+25,Muñeca de plástico,9d7a5ed04bb6afc8_p10315,4,7.9153,,- ESTUCHE INDIVIDUAL - BLÍSTER DE PLÁSTICO - BLÍSTER DE CARTÓN - ESTUCHE DE PLÁSTICO - CAJA DE CARTÓN - OTRO (ESPECIFIQUE)
+25,Muñeca de plástico,9d7a5ed04bb6afc8_p10669,5,7.807,,- PLÁSTICO - MADERA
+26,Neumáticos radiales 205/55R16,b3281e65bc04bfeb_p16230,1,13.6874,,- - Radiales
+26,Neumáticos radiales 205/55R16,b3281e65bc04bfeb_p16248,2,13.6874,,- - Radiales
+26,Neumáticos radiales 205/55R16,9d7a5ed04bb6afc8_p5355,3,13.203,,205
+26,Neumáticos radiales 205/55R16,b3281e65bc04bfeb_p16092,4,13.203,,205
+26,Neumáticos radiales 205/55R16,9d7a5ed04bb6afc8_p558,5,11.44,,CAPÍTULO XCI 205
+27,Patineta eléctrica,9d7a5ed04bb6afc8_p10246,1,9.5786,,- ELÉCTRICA - MECÁNICA - OTRO (ESPECIFIQUE).
+27,Patineta eléctrica,9d7a5ed04bb6afc8_p10553,2,9.0144,,- ELÉCTRICA - A GAS - OTRO (ESPECIFIQUE)
+27,Patineta eléctrica,9d7a5ed04bb6afc8_p9881,3,7.6608,,- DEPORTIVA - TODO TERRENO - ELÉCTRICA - PLEGABLE - DUALES - OTRO (ESPECIFIQUE)
+27,Patineta eléctrica,9d7a5ed04bb6afc8_p3926,4,4.786,,"Uso y aplicación: Consignar el fin de la mercancía. Ejemplo: para arrastrar generadores, para la producción de corriente eléctrica, etc."
+27,Patineta eléctrica,9d7a5ed04bb6afc8_p6866,5,4.0299,,"Otras características: Consignar características que permitan identificar a la mercancía, no contempladas en las casillas anteriores. Ejemplo para Equipamiento: Instalación eléctrica, Sanitaria o de C"
+28,Raqueta de tenis,9d7a5ed04bb6afc8_p8579,1,12.8989,,CALZADO DE DEPORTE / TENIS
+28,Raqueta de tenis,9d7a5ed04bb6afc8_p10454,2,7.1205,,- BALÓN DE FÚTBOL - BALÓN DE FÚTBOL AMERICANO - BALÓN DE BASQUETBOL - BALÓN DE VOLEIBOL - PELOTA DE TENIS - PELOTA DE GOLF - PELOTA DE BASEBALL - OTROS (ESPECIFIQUE)
+28,Raqueta de tenis,9d7a5ed04bb6afc8_p6887,3,5.41,,"Nombre de la Mercancía: Consignar el nombre con el cual se conoce comercialmente a la mercancía. Ejemplos: Serpentina, Máscara, Patín, Tobogán, esquí, palos de golf, pelotas de tenis, Caña de Pescar, "
+28,Raqueta de tenis,9d7a5ed04bb6afc8_t400,4,4.0401,,"| BALON/PELOTA |  |  |
+| --- | --- | --- |
+| Nombre de la Mercancía: | BALÓN/PELOTA |  |
+| Sinónimos: |  |  |
+| Marca Comercial: | - |  |
+| Tipo: | - BALÓN DE FÚTBOL - BALÓN DE FÚTBOL AMERICANO - BALÓ"
+28,Raqueta de tenis,9d7a5ed04bb6afc8_t304,5,3.1352,,"| ZAPATILLA/CALZADO DEPORTIVO/ZAPATO DEPORTIVO |  |  |
+| --- | --- | --- |
+| Nombre de la Mercancía: | ZAPATILLA | 1.MARINO - |
+| Sinónimos: | CALZADO DE DEPORTE / TENIS |  |
+| Marca Comercial: | - | "
+29,Sierra circular,9d7a5ed04bb6afc8_p4,1,7.7306,,"CIRCULAR No. 324/2024 La Paz, 25 de octubre de 2024"
+29,Sierra circular,9d7a5ed04bb6afc8_p5002,2,4.9373,,"Tipo: Consignar el tipo de la mercancía. Ejemplo para Caja de fundición: Rectangular, Circular, etc .; Para Molde: A presión, Activo, Para sintetizar, Cilíndrico, etc."
+29,Sierra circular,9d7a5ed04bb6afc8_p4558,3,4.8038,,"Otras características: Consignar características que permitan identificar a la mercancía, no contempladas en las casillas anteriores. Ejemplo para Cortadora: Tipo de cuchilla: Circular, Octagonal, etc"
+29,Sierra circular,9d7a5ed04bb6afc8_p4785,4,4.6725,,"a la mercancía. Ejemplo: Taladro de mano, Escariadora de Interior, Roscadora de interiores, Perforadora rotativas, Máquina para pernos, Cepilladora, Ranuradora, limadora, Amoladora, Lijadora, Pulidora"
+29,Sierra circular,9d7a5ed04bb6afc8_p5273,5,4.5573,,"Tipo: Consignar el tipo de la mercancía, de corresponder. Ejemplo para Electroimán: De corriente circular, De corriente continua, De accionamiento, etc .; Para Imán: Natural, Permanente, Temporal, etc"
+30,Silla de oficina ergonómica,9d7a5ed04bb6afc8_p10690,1,12.9268,,- ERGONÓMICA - OTRO (ESPECIFIQUE)
+30,Silla de oficina ergonómica,b3281e65bc04bfeb_p15516,2,10.1589,,- Artículos de oficina y artículos escolares
+30,Silla de oficina ergonómica,b3281e65bc04bfeb_p1215,3,10.1589,,"- Cartonajes de oficina, tienda o similares"
+30,Silla de oficina ergonómica,9d7a5ed04bb6afc8_p6151,4,8.7756,,"Nombre de la Mercancía: Consignar el nombre con el cual se conoce comercialmente a la mercancía. Ejemplos: Sillones de Rueda, Silla de Ruedas, Silla médica, etc."
+30,Silla de oficina ergonómica,9d7a5ed04bb6afc8_p7072,5,7.3119,,"Uso y aplicación: Consignar el fin de la mercancía. Ejemplos: escuela, oficina, etc."
+31,Smartphone con pantalla OLED,9d7a5ed04bb6afc8_p9709,1,10.7697,,- LED - LCD - OLED - QLED - OTRO (ESPECIFIQUE)
+31,Smartphone con pantalla OLED,9d7a5ed04bb6afc8_p9666,2,10.5478,,Tipo de pantalla:
+31,Smartphone con pantalla OLED,9d7a5ed04bb6afc8_p9481,3,9.3053,,"- TIPO DE PANTALLA (INFINITA, NORMAL)"
+31,Smartphone con pantalla OLED,9d7a5ed04bb6afc8_p7716,4,8.3246,,D. V. A.N.K. Pantalla V. JA &M.
+31,Smartphone con pantalla OLED,9d7a5ed04bb6afc8_p9710,5,7.9079,,Clase de resolución de pantalla (Pixeles de resolución):
+32,Sábanas de algodón,b3281e65bc04bfeb_p5493,1,11.4728,,- - De algodón
+32,Sábanas de algodón,b3281e65bc04bfeb_p5968,2,11.4728,,- De algodón:
+32,Sábanas de algodón,b3281e65bc04bfeb_p6085,3,11.4728,,- De algodón
+32,Sábanas de algodón,b3281e65bc04bfeb_p6145,4,11.4728,,- - De algodón
+32,Sábanas de algodón,b3281e65bc04bfeb_p19662,5,9.9425,,- Pasta de línter de algodón
+33,Tablet Android 10 pulgadas,9d7a5ed04bb6afc8_p9674,1,13.4265,,Pulgadas
+33,Tablet Android 10 pulgadas,9d7a5ed04bb6afc8_p9714,2,13.4265,,Pulgadas:
+33,Tablet Android 10 pulgadas,9d7a5ed04bb6afc8_p10956,3,9.6923,,Longitud de Hoja (mm o Pulgadas):
+33,Tablet Android 10 pulgadas,9d7a5ed04bb6afc8_p9719,4,9.5744,,- ANALÓGICO - DIGITAL - SMART TV - ANDROID - OTRO (ESPECIFIQUE)
+33,Tablet Android 10 pulgadas,b3281e65bc04bfeb_p6166,5,5.6173,,10
+34,Taladro eléctrico 500W,9d7a5ed04bb6afc8_p9833,1,10.3872,,- ELÉCTRICO
+34,Taladro eléctrico 500W,9d7a5ed04bb6afc8_p9343,2,9.6441,,ACUMULADOR ELÉCTRICO
+34,Taladro eléctrico 500W,b3281e65bc04bfeb_p582,3,9.0002,,- - - Para aislamiento eléctrico
+34,Taladro eléctrico 500W,b3281e65bc04bfeb_p605,4,9.0002,,- - - Para aislamiento eléctrico
+34,Taladro eléctrico 500W,b3281e65bc04bfeb_p628,5,9.0002,,- - - Para aislamiento eléctrico
+35,Teclado mecánico RGB,9d7a5ed04bb6afc8_p10891,1,9.0304,,- MECÁNICO - ELECTRÓNICO - OTRO (ESPECIFIQUE)
+35,Teclado mecánico RGB,b3281e65bc04bfeb_p70,2,7.3631,,"a) un contenido de fibras obtenidas por procedimiento mecánico o químico-mecánico superior o igual al 10 %, y"
+35,Teclado mecánico RGB,b3281e65bc04bfeb_p19693,3,6.878,,- - Obtenidas por la combinación de procedimientos mecánico y químico
+35,Teclado mecánico RGB,9d7a5ed04bb6afc8_p2512,4,6.5651,,"Tipo: Consignar el proceso de obtención. Ejemplo: Mecánico, Químico, etc."
+35,Teclado mecánico RGB,9d7a5ed04bb6afc8_p4041,5,6.2794,,"Tipo: Consignar el tipo de quemador. Ejemplo: Mecánico, Automático, Semiautomático, etc."
+36,Tensiómetro digital,9d7a5ed04bb6afc8_p9584,1,11.1151,,- ANALÓGICO - DIGITAL
+36,Tensiómetro digital,9d7a5ed04bb6afc8_p10055,2,11.1151,,- ANALÓGICO - DIGITAL
+36,Tensiómetro digital,9d7a5ed04bb6afc8_p8892,3,9.7237,,- DIGITAL - MANUAL - OTRO (ESPECIFIQUE)
+36,Tensiómetro digital,9d7a5ed04bb6afc8_p10893,4,9.7237,,- ANALÓGICO - DIGITAL - OTRO (ESPECIFIQUE)
+36,Tensiómetro digital,9d7a5ed04bb6afc8_p9717,5,8.1866,,- DOLBY DIGITAL - DTC - ESTÉREO - SOUNDROUD - OTRO (ESPECIFIQUE)
+37,Termómetro digital,9d7a5ed04bb6afc8_p9584,1,11.1151,,- ANALÓGICO - DIGITAL
+37,Termómetro digital,9d7a5ed04bb6afc8_p10055,2,11.1151,,- ANALÓGICO - DIGITAL
+37,Termómetro digital,9d7a5ed04bb6afc8_p8892,3,9.7237,,- DIGITAL - MANUAL - OTRO (ESPECIFIQUE)
+37,Termómetro digital,9d7a5ed04bb6afc8_p10893,4,9.7237,,- ANALÓGICO - DIGITAL - OTRO (ESPECIFIQUE)
+37,Termómetro digital,9d7a5ed04bb6afc8_p9717,5,8.1866,,- DOLBY DIGITAL - DTC - ESTÉREO - SOUNDROUD - OTRO (ESPECIFIQUE)
+38,Toallas de baño,b3281e65bc04bfeb_p1119,1,11.6902,,"- Pañuelos, toallitas de desmaquillar y toallas:"
+38,Toallas de baño,b3281e65bc04bfeb_p10836,2,8.5768,,- Sales perfumadas y demás preparaciones para el baño
+38,Toallas de baño,b3281e65bc04bfeb_p15600,3,7.1417,,"c) los sombreros, demás tocados, y sus partes, incluidos los gorros de baño, del Capítulo 65;"
+38,Toallas de baño,b3281e65bc04bfeb_p10880,4,5.3156,,"c) los champúes, dentífricos, cremas y espumas de afeitar y las preparaciones para el baño, que contengan jabón u otros agentes de superficie orgánicos (partidas 33.05, 33.06 o 33.07)."
+38,Toallas de baño,b3281e65bc04bfeb_p16672,5,4.5118,,"B) En las partidas 41.04 a 41.06 la expresión «crust» incluye cueros y pieles que han sido recurtidos, coloreados o engrasados en baño, previo al secado."
+39,Tornillos de acero inoxidable,9d7a5ed04bb6afc8_p9132,1,18.0501,,- ACERO PORCELANIZADO - ACERO INOXIDABLE - PLÁSTICO - ACERO - OTRO (ESPECIFIQUE) (Ej. ACERO INOXIDABLE DIAMANTADO)
+39,Tornillos de acero inoxidable,9d7a5ed04bb6afc8_p8672,2,15.5592,,- ACERO INOXIDABLE - ALUMINIO - OTRO (ESPECIFIQUE)
+39,Tornillos de acero inoxidable,9d7a5ed04bb6afc8_p8890,3,15.5592,,- ACERO INOXIDABLE - ALUMINIO - OTRO (ESPECIFIQUE)
+39,Tornillos de acero inoxidable,9d7a5ed04bb6afc8_p10846,4,14.6937,,- CERÁMICA - ACERO INOXIDABLE - ALUMINIO - OTRO (ESPECIFIQUE)
+39,Tornillos de acero inoxidable,9d7a5ed04bb6afc8_p9436,5,14.4779,,- CUCHILLA DE ACERO INOXIDABLE - CUCHILLAS DE TITANIO ... - OTRO (ESPECIFIQUE)
+40,Tubos PVC 2 pulgadas,9d7a5ed04bb6afc8_p9674,1,13.4265,,Pulgadas
+40,Tubos PVC 2 pulgadas,9d7a5ed04bb6afc8_p9714,2,13.4265,,Pulgadas:
+40,Tubos PVC 2 pulgadas,b3281e65bc04bfeb_p14835,3,10.2725,,- Tubos rígidos:
+40,Tubos PVC 2 pulgadas,9d7a5ed04bb6afc8_p765,4,9.8877,,PVC: Policloruro de vinilo.
+40,Tubos PVC 2 pulgadas,9d7a5ed04bb6afc8_p10956,5,9.6923,,Longitud de Hoja (mm o Pulgadas):
+41,Té verde en bolsitas,865ff58a28944aef_p1520,1,14.1708,,0902.20 - Té verde (sin fermentar) presentado de otra forma
+41,Té verde en bolsitas,865ff58a28944aef_p1519,2,11.598,,0902.10 - Té verde (sin fermentar) presentado en envases inmediatos con un contenido inferior o igual a 3 kg
+41,Té verde en bolsitas,865ff58a28944aef_p1524,3,10.2548,,"La preparación del té verde consiste esencialmente en calentar las hojas frescas, enrollarlas y secarlas. En la preparación del té negro, las hojas se enrollan y se ponen a fermentar antes de tostarla"
+41,Té verde en bolsitas,b3281e65bc04bfeb_p15327,4,9.8101,,"- Sacos (bolsas), bolsitas y cucuruchos:"
+41,Té verde en bolsitas,865ff58a28944aef_p1518,5,9.3303,,"09.02 - Té, incluso aromatizado."
+42,Zapatos deportivos,b3281e65bc04bfeb_p13989,1,7.146,,"y) los artículos del Capítulo 95 (por ejemplo: juguetes, juegos, artefactos deportivos);"
+42,Zapatos deportivos,b3281e65bc04bfeb_p17096,2,7.146,,"I) los artículos del Capítulo 95 (por ejemplo: juguetes, juegos, artefactos deportivos);"
+42,Zapatos deportivos,b3281e65bc04bfeb_p17476,3,7.146,,"f) los artículos del Capítulo 95 (por ejemplo: juguetes, juegos, artefactos deportivos)."
+42,Zapatos deportivos,b3281e65bc04bfeb_p17663,4,7.146,,"p) los artículos del Capítulo 95 (por ejemplo: juguetes, juegos, artefactos deportivos);"
+42,Zapatos deportivos,b3281e65bc04bfeb_p19302,5,7.146,,"C) los artículos del Capítulo 95 (por ejemplo: juguetes, juegos, artefactos deportivos)."

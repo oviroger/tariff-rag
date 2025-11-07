@@ -1,0 +1,17 @@
+{
+  "recall@1": 0.24,
+  "recall@3": 0.41,
+  "recall@5": 0.48,
+  "precision@1": 0.24,
+  "precision@3": 0.20666666666666664,
+  "precision@5": 0.18400000000000002,
+  "ndcg@1": 0.24,
+  "ndcg@3": 0.33818446503342386,
+  "ndcg@5": 0.36580124383032214,
+  "map": 0.3209166666666667,
+  "num_queries": 100,
+  "num_annotated": 500,
+  "annotated_relevant": 92,
+  "annotated_nonrelevant": 408,
+  "timestamp": "2025-11-06T00:00:00Z"
+}

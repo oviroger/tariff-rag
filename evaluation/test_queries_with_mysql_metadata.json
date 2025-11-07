@@ -1,0 +1,266 @@
+[
+  {
+    "query": "Té verde en bolsitas",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": "Coco, abacá (cáñamo de Manila (Musa textilis Nee)), ramio y demás fibras",
+    "hs_code": "",
+    "category": "00",
+    "source": "opensearch"
+  },
+  {
+    "query": "01.01 - Caballos, asnos, mulos y burdéganos, vivos ",
+    "hs_code": "01.01",
+    "category": "00",
+    "source": "opensearch"
+  },
+  {
+    "query": "REGLAMENTO SOBRE EL LLENADO DE LAS DESCRIPCIONES MÍNIMAS DE MERCANCÍAS",
+    "hs_code": "",
+    "category": "00",
+    "source": "opensearch"
+  },
+  {
+    "query": "G88301292125 azul",
+    "hs_code": "G88301292125",
+    "category": "G8",
+    "source": "synthetic:mysql:asgard"
+  },
+  {
+    "query": "Modelo: Consignar de acuerdo a la mercancía la codificación que el fabricante o",
+    "hs_code": "",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": "GV415HTGLX6_BO",
+    "hs_code": "GV415HTGLX6_BO",
+    "category": "GV",
+    "source": "mysql:asgard"
+  },
+  {
+    "query": "Bolso de cuero genuino",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": " Productos mencionados en la Nota 1 de subpartida de este Capítulo",
+    "hs_code": "",
+    "category": "00",
+    "source": "opensearch"
+  },
+  {
+    "query": "c) La cafeína, alcaloide del café (partida 29.39",
+    "hs_code": "29.39",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": " - Neomicina (DCI) y sus derivados; sales de estos productos",
+    "hs_code": "",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": "REGLAMENTO SOBRE EL LLENADO DE LAS DESCRIPCIONES MÍNIMAS DE MERCANCÍAS",
+    "hs_code": "",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": "Libro de texto",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": "Coco, abacá (cáñamo de Manila (Musa textilis Nee)), ramio y demás fibras",
+    "hs_code": "",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": "Silla de oficina ergonómica",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": "Tensiómetro digital",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": "GV415HTGLX6_BO de aluminio",
+    "hs_code": "GV415HTGLX6_BO",
+    "category": "GV",
+    "source": "synthetic:mysql:asgard"
+  },
+  {
+    "query": "Contenedores plásticos",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": "c) La cafeína, alcaloide del café (partida 29.39",
+    "hs_code": "29.39",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": "DEL VALLE FRESH CITRUS P1A,P1H,P3,P1D,P1G,P2C,P1E,P2A,P2",
+    "hs_code": "DEL VALLE FRESH CITRUS P1A,P1H,P3,P1D,P1G,P2C,P1E,P2A,P2",
+    "category": "DE",
+    "source": "mysql:asgard"
+  },
+  {
+    "query": " - Neomicina (DCI) y sus derivados; sales de estos productos",
+    "hs_code": "",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": "Modelo: Consignar de acuerdo a la mercancía la codificación que el fabricante o",
+    "hs_code": "",
+    "category": "00",
+    "source": "opensearch"
+  },
+  {
+    "query": "Compresor de aire industrial",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": "Gafas de sol polarizadas",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": "Cable HDMI 2 metros",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": " - Neomicina (DCI) y sus derivados; sales de estos productos",
+    "hs_code": "",
+    "category": "00",
+    "source": "opensearch"
+  },
+  {
+    "query": "Pescados y crustáceos, moluscos y demás invertebrados acuáticos",
+    "hs_code": "",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": "Taladro eléctrico 500W",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": "Mouse inalámbrico",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": "Bolsas plásticas biodegradables",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": " Nombre de la Mercancía: | TORNO |  ",
+    "hs_code": "",
+    "category": "00",
+    "source": "opensearch"
+  },
+  {
+    "query": "c) La cafeína, alcaloide del café (partida 29.39",
+    "hs_code": "29.39",
+    "category": "00",
+    "source": "opensearch"
+  },
+  {
+    "query": "Modelo: Consignar de acuerdo a la mercancía la codificación que el fabricante o",
+    "hs_code": "",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": "G88301292125",
+    "hs_code": "G88301292125",
+    "category": "G8",
+    "source": "synthetic:mysql:asgard"
+  },
+  {
+    "query": "Modelo: Consignar de acuerdo a la mercancía la codificación que el fabricante o",
+    "hs_code": "",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": "Pescados y crustáceos, moluscos y demás invertebrados acuáticos",
+    "hs_code": "",
+    "category": "00",
+    "source": "opensearch"
+  },
+  {
+    "query": "Coco, abacá (cáñamo de Manila (Musa textilis Nee)), ramio y demás fibras",
+    "hs_code": "",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": "Insecticida en aerosol",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": "227-11-20-0",
+    "hs_code": "227-11-20-0",
+    "category": "22",
+    "source": "mysql:asgard"
+  },
+  {
+    "query": "G88301292125",
+    "hs_code": "G88301292125",
+    "category": "G8",
+    "source": "mysql:asgard"
+  },
+  {
+    "query": "Llantas de aleación 17 pulgadas",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  },
+  {
+    "query": "01.01 - Caballos, asnos, mulos y burdéganos, vivos ",
+    "hs_code": "01.01",
+    "category": "00",
+    "source": "synthetic:opensearch"
+  },
+  {
+    "query": "DEL VALLE FRUT DURAZNO - KIT CON P1,P1D,P1G,P3,P1C,P1E Y P2",
+    "hs_code": "DEL VALLE FRUT DURAZNO - KIT CON P1,P1D,P1G,P3,P1C,P1E Y P2",
+    "category": "DE",
+    "source": "mysql:asgard"
+  },
+  {
+    "query": "Zapatos deportivos",
+    "hs_code": "",
+    "category": "00",
+    "source": "predefined"
+  }
+]

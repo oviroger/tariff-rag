@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     # Gemini
     gemini_api_key: str | None = None
     gemini_embed_model: str = "text-embedding-004"
-    gemini_model: str = "gemini-1.5-pro"
+    gemini_model: str = "gemini-2.5-flash"
 
     # Azure Form Recognizer
     azure_formrec_endpoint: str | None = None

@@ -1,0 +1,229 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║           📊 DATASET FINAL DE EVALUACIÓN - ACTUALIZADO CON MYSQL            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+✅ REGENERACIÓN COMPLETADA EXITOSAMENTE
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 1. ARCHIVOS CSV DE EVALUACIÓN GENERADOS                                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  📁 eval_clasificador_hs6.csv
+  ├─ Queries: 42
+  ├─ Registros: 42 (1 por query)
+  ├─ Columnas: query_id, query, pred_hs6_1, pred_hs6_2, pred_hs6_3, true_hs6
+  └─ Estado: ✅ GENERADO - ⚠️ Requiere anotación columna 'true_hs6'
+
+  📁 eval_retrieval.csv
+  ├─ Queries: 42
+  ├─ Registros: 220 (5.2 docs promedio por query)
+  ├─ Columnas: query_id, query, doc_id, rank, score, relevance, snippet
+  └─ Estado: ✅ GENERADO - ⚠️ Requiere anotación columna 'relevance'
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 2. COMPOSICIÓN DEL DATASET                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  📊 Total queries: 42
+
+  Distribución por fuente:
+  ┌────────────────────────────┬────────┬──────────┐
+  │ Fuente                     │ Cant.  │ %        │
+  ├────────────────────────────┼────────┼──────────┤
+  │ Predefinidas (comunes)     │   35   │  83.3%   │
+  │ MySQL (tabla asgard)       │    7   │  16.7%   │
+  └────────────────────────────┴────────┴──────────┘
+
+  Nota: Todas las queries son productos reales, limpias y válidas.
+        Se eliminaron códigos, fragmentos de formularios y texto no válido.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 3. QUERIES EXTRAÍDAS DE MYSQL                                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Base de datos: corpusdb (MySQL)
+  Tabla principal: asgard
+  Registros consultados: 50
+  Queries válidas extraídas: 7
+
+  ✅ Queries de MySQL incluidas en el dataset:
+
+  1. Bolso de cuero genuino             (Cap. 42 - Cuero y manufacturas)
+  2. Tensiómetro digital                 (Cap. 90 - Instrumentos médicos)
+  3. Taladro eléctrico 500W              (Cap. 84 - Maquinaria)
+  4. Bolsas plásticas biodegradables     (Cap. 39 - Plástico)
+  5. Insecticida en aerosol              (Cap. 38 - Productos químicos)
+  6. Llantas de aleación 17 pulgadas     (Cap. 87 - Vehículos y partes)
+  7. Zapatos deportivos*                 (Cap. 64 - Calzado)
+
+  * Nota: Algunas queries estaban duplicadas con las predefinidas y se
+          mantuvieron como únicas en el dataset final.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 4. COBERTURA DE CAPÍTULOS HS                                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  El dataset cubre las siguientes secciones de la nomenclatura HS:
+
+  📦 Sección I-V (Productos vivos y animales, vegetales):
+     - Manzanas, café, té, cerveza, aceite de oliva
+
+  🏭 Sección VI-VII (Productos químicos):
+     - Detergente, champú, fertilizante, insecticida, plásticos
+
+  📄 Sección VIII-IX (Pieles, madera, papel):
+     - Cuadernos, libros, toallas, sábanas, bolso de cuero
+
+  🔧 Sección X-XV (Textiles, calzado, piedra, metales):
+     - Camisetas, zapatos, chaqueta, tornillos, tubos
+
+  ⚙️ Sección XVI (Maquinaria y equipos):
+     - Compresor, taladro, sierra circular
+
+  💻 Sección XVII (Transporte):
+     - Neumáticos, llantas de aleación
+
+  🖥️ Sección XVIII-XIX (Instrumentos ópticos, electrónica):
+     - Smartphone, laptop, tablet, monitor, cable HDMI, cámara web,
+       auriculares, mouse, teclado, termómetro, tensiómetro, gafas
+
+  🎮 Sección XX (Artículos diversos):
+     - Muñeca, raqueta, patineta, silla, contenedores
+
+  ✅ COBERTURA: Excelente diversidad de capítulos HS representados
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 5. TAMAÑO Y VALIDEZ DEL DATASET                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Comparación con benchmarks académicos:
+
+  ┌──────────────────────────┬─────────────┬──────────────────────────┐
+  │ Benchmark                │ Queries     │ Uso típico               │
+  ├──────────────────────────┼─────────────┼──────────────────────────┤
+  │ TREC (anual)             │    50       │ Evaluación IR research   │
+  │ Prototipo académico      │   30-50     │ Tesis, POC               │
+  │ ▶ NUESTRO DATASET        │   **42**    │ ✅ Prototipo maestría    │
+  │ Sistema en producción    │  200-500    │ Enterprise               │
+  │ MS MARCO                 │  100,000+   │ Research a gran escala   │
+  └──────────────────────────┴─────────────┴──────────────────────────┘
+
+  ✅ VALIDEZ: ADECUADO para prototipo académico de maestría
+  ✅ CALIDAD: Alta - todas las queries son productos reales
+  ✅ DIVERSIDAD: Excelente cobertura de capítulos HS
+
+  📊 Estadísticas finales:
+  ├─ Clasificación: 42 queries → 42 registros
+  ├─ Retrieval: 42 queries → 220 registros
+  └─ Total registros a anotar: 262
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 6. ESTIMACIÓN DE TIEMPO DE ANOTACIÓN                                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Tarea                                  Registros    Tiempo
+  ───────────────────────────────────────────────────────────────────────
+  📝 Anotar true_hs6 (clasificador)          42       1-1.5 hrs
+  ✅ Anotar relevance (retrieval)           220       2-2.5 hrs
+  ───────────────────────────────────────────────────────────────────────
+  TOTAL ANOTACIÓN                           262       3-4 hrs
+
+  ⏱️ Reducción vs dataset anterior (80 queries):
+     - Tiempo anterior: 5-7 horas
+     - Tiempo actual: 3-4 horas
+     - Ahorro: 2-3 horas ⚡
+
+  💡 Ventaja: Dataset más manejable sin sacrificar validez estadística
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 7. PRÓXIMOS PASOS                                                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  1. 📝 Anotar eval_clasificador_hs6.csv:
+     ├─ Abrir archivo en Excel o VS Code
+     ├─ Llenar columna 'true_hs6' con código HS correcto (6 dígitos)
+     ├─ Usar predicciones como referencia (pred_hs6_1, pred_hs6_2, pred_hs6_3)
+     └─ Consultar nomenclatura HS oficial si hay dudas
+
+  2. ✅ Anotar eval_retrieval.csv:
+     ├─ Abrir archivo en Excel o VS Code
+     ├─ Para cada doc recuperado, leer el snippet
+     ├─ Marcar relevance: 1 (relevante) o 0 (no relevante)
+     └─ Criterio: ¿El documento ayuda a clasificar el producto?
+
+  3. 📊 Ejecutar evaluaciones:
+     ```bash
+     # Clasificador
+     python evaluation/eval_clasificador.py \
+       --csv evaluation/templates/eval_clasificador_hs6.csv
+
+     # Retrieval
+     python evaluation/eval_retrieval.py \
+       --csv evaluation/templates/eval_retrieval.csv --k 5
+
+     # Operativo (después de generar tráfico)
+     python evaluation/tools/warmup_requests.py \
+       --base-url http://localhost:8000 --num-classify 100
+     python evaluation/export_logs_operativos.py \
+       --metrics-url http://localhost:8000/metrics
+     python evaluation/eval_operativo.py \
+       --csv evaluation/templates/logs_operativos.csv
+     ```
+
+  4. 📄 Documentar en tesis (Sección 3.5):
+     ├─ Incluir métricas calculadas
+     ├─ Analizar fortalezas y debilidades
+     └─ Proponer mejoras basadas en resultados
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 8. ARCHIVOS GENERADOS Y UBICACIONES                                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  📦 Archivos de queries:
+     ✅ evaluation/test_queries_final.txt (42 queries limpias)
+     ✅ evaluation/test_queries_cleaned.txt (35 predefinidas)
+     ✅ evaluation/test_queries_mysql_clean.txt (queries de MySQL)
+     ✅ evaluation/test_queries_with_mysql.txt (antes de limpiar)
+     ✅ evaluation/test_queries_with_mysql_metadata.json (metadata)
+
+  📦 Archivos CSV de evaluación:
+     ✅ evaluation/templates/eval_clasificador_hs6.csv (42 registros)
+     ✅ evaluation/templates/eval_retrieval.csv (220 registros)
+     ⏳ evaluation/templates/logs_operativos.csv (por generar)
+
+  📦 Scripts:
+     ✅ evaluation/tools/generate_test_queries.py (con soporte MySQL)
+     ✅ evaluation/tools/generate_eval_clasificador.py
+     ✅ evaluation/tools/generate_eval_retrieval.py
+     ✅ evaluation/tools/clean_queries.py
+     ✅ evaluation/eval_clasificador.py
+     ✅ evaluation/eval_retrieval.py
+     ✅ evaluation/eval_operativo.py
+
+  📦 Documentación:
+     ✅ evaluation/README.md
+     ✅ evaluation/INSTRUCCIONES_ANOTACION.md
+     ✅ evaluation/RESUMEN_DATASET.txt
+     ✅ evaluation/RESUMEN_FINAL_MYSQL.txt (este archivo)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    🎉 DATASET FINAL CON MYSQL COMPLETADO                    ║
+║                                                                              ║
+║  ✅ Queries totales: 42                                                      ║
+║  ✅ Fuentes: Predefinidas (35) + MySQL (7)                                   ║
+║  ✅ Registros clasificador: 42                                               ║
+║  ✅ Registros retrieval: 220                                                 ║
+║  ✅ Total a anotar: 262 registros                                            ║
+║  ✅ Tiempo estimado: 3-4 horas                                               ║
+║  ✅ Validez académica: ADECUADO para maestría                                ║
+║                                                                              ║
+║  🚀 Dataset optimizado: Menos queries pero más calidad                      ║
+║  📊 Mejor que el anterior: Todas las queries son productos válidos          ║
+║  ⚡ Más eficiente: 40% menos tiempo de anotación                            ║
+║                                                                              ║
+║  📝 Ver: evaluation/INSTRUCCIONES_ANOTACION.md para comenzar                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Fecha de generación: 6 de noviembre de 2025
+Sistema: Tariff RAG - Clasificación Arancelaria con IA
+Versión: Prototipo v1.0 - Dataset con MySQL

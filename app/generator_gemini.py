@@ -139,7 +139,7 @@ Usuario: "Tipo de vehículo automóvil"
 RESPUESTA (solo JSON, sin explicaciones adicionales):"""
 
     try:
-        model_name = "models/gemini-2.0-flash"
+        model_name = "models/gemini-2.5-flash"
         model = genai.GenerativeModel(
             model_name=model_name,
             generation_config={
