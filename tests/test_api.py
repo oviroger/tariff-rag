@@ -25,7 +25,7 @@ def test_health_check():
 def test_classify_validation_min_length():
     """Test que el endpoint procesa textos cortos con fallback"""
     with TestClient(app) as client:
-        response = client.post("/classify", json={"text": "steel"})
+        response = client.post("/classify", json={"user_query": "steel"})
         assert response.status_code == 200
         data = response.json()
         assert "top_candidates" in data
@@ -44,14 +44,14 @@ def test_classify_validation_max_length():
     """Test validación de longitud máxima"""
     with TestClient(app) as client:
         long_text = "a" * 5000  # Más de 4000 caracteres
-        response = client.post("/classify", json={"text": long_text})
+        response = client.post("/classify", json={"user_query": long_text})
         assert response.status_code == 422
 
 def test_classify_success_stub():
     """Test clasificación exitosa (con datos stub)"""
     with TestClient(app) as client:
         response = client.post("/classify", json={
-            "text": "Resina epoxi líquida en bidones de 25kg para uso industrial en recubrimientos protectores",
+            "user_query": "Resina epoxi líquida en bidones de 25kg para uso industrial en recubrimientos protectores",
             "top_k": 3,
             "debug": True
         })
@@ -74,7 +74,7 @@ def test_classify_with_versions():
     """Test con versión HS específica"""
     with TestClient(app) as client:
         response = client.post("/classify", json={
-            "text": "Resina epoxi en escamas para uso industrial",
+            "user_query": "Resina epoxi en escamas para uso industrial",
             "versions": {"hs_edition": "HS_2017"},
             "top_k": 5
         })
@@ -87,20 +87,20 @@ def test_classify_boundary_conditions():
     with TestClient(app) as client:
         # Texto mínimo válido
         response = client.post("/classify", json={
-            "text": "Producto X"  # 10 caracteres exactos
+            "user_query": "Producto X"  # 10 caracteres exactos
         })
         assert response.status_code == 200
         
         # top_k mínimo
         response = client.post("/classify", json={
-            "text": "Resina epoxi industrial",
+            "user_query": "Resina epoxi industrial",
             "top_k": 1
         })
         assert response.status_code == 200
         
         # top_k máximo
         response = client.post("/classify", json={
-            "text": "Resina epoxi industrial",
+            "user_query": "Resina epoxi industrial",
             "top_k": 20
         })
         assert response.status_code == 200
@@ -110,14 +110,14 @@ def test_classify_invalid_top_k():
     with TestClient(app) as client:
         # top_k = 0 (menor que 1)
         response = client.post("/classify", json={
-            "text": "Resina epoxi industrial",
+            "user_query": "Resina epoxi industrial",
             "top_k": 0
         })
         assert response.status_code == 422
         
         # top_k = 21 (mayor que 20)
         response = client.post("/classify", json={
-            "text": "Resina epoxi industrial",
+            "user_query": "Resina epoxi industrial",
             "top_k": 21
         })
         assert response.status_code == 422
