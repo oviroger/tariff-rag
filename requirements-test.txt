@@ -5,6 +5,7 @@ pydantic==2.9.2
 pydantic-settings==2.5.2
 opensearch-py==2.7.1
 google-generativeai>=0.8.0
+openai>=1.51.0
 azure-ai-documentintelligence==1.0.0b4
 sqlalchemy==2.0.35
 pymysql==1.1.1
