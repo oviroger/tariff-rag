@@ -28,15 +28,29 @@ class Settings(BaseSettings):
     gemini_top_k: int = 40
     gemini_max_output_tokens: int = 2048
 
+    # Candidatos HS
+    min_candidate_confidence: float = 0.70
+
     # Azure Form Recognizer
     azure_formrec_endpoint: str | None = None
     azure_formrec_key: str | None = None
     azure_fr_model: str = "prebuilt-layout"
 
+    # Azure OpenAI (fallback/second option)
+    azure_openai_endpoint: str = "https://kpofoundry.cognitiveservices.azure.com"
+    azure_openai_key: str | None = None
+    azure_openai_api_version: str = "2024-05-01-preview"
+    azure_openai_chat_deployment: str = "gpt-4o-mini"
+    azure_openai_embed_deployment: str = "text-embedding-3-small"
+
     # Parámetros de la app
     final_pasages: int = 6
     min_evidence: int = 2
     min_score: float = 0.35
+    enable_retrieval_fallback: bool = False
+
+    # Redis
+    redis_url: str = "redis://redis:6379/0"
 
     # lee .env fuera de Docker; en Docker vienen por env
     model_config = SettingsConfigDict(

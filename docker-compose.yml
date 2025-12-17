@@ -1,6 +1,7 @@
 ﻿services:
   opensearch:
     image: opensearchproject/opensearch:${OPENSEARCH_VERSION}
+    platform: linux/amd64
     container_name: opensearch
     environment:
       - discovery.type=single-node
@@ -25,6 +26,7 @@
 
   dashboards:
     image: opensearchproject/opensearch-dashboards:${OPENSEARCH_VERSION}
+    platform: linux/amd64
     container_name: os-dashboards
     environment:
       - OPENSEARCH_HOSTS=["http://opensearch:9200"]
@@ -37,6 +39,7 @@
 
   mysql:
     image: mysql:8.0
+    platform: linux/amd64
     container_name: mysql
     command: --default-authentication-plugin=mysql_native_password
     environment:
@@ -51,15 +54,16 @@
     networks: [ragnet]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
-      interval: 10s
-      timeout: 5s
-      retries: 20
-      start_period: 30s
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 180s
 
   api:
     build:
       context: .
       dockerfile: Dockerfile
+    platform: linux/amd64
     container_name: rag-api
     env_file:
       - .env
@@ -81,10 +85,12 @@
       - GEMINI_MODEL=${GEMINI_GEN_MODEL}
       - AZURE_FORMREC_ENDPOINT=${AZURE_FR_ENDPOINT}
       - AZURE_FORMREC_KEY=${AZURE_FR_KEY}
+      - MIN_CANDIDATE_CONFIDENCE=${MIN_CANDIDATE_CONFIDENCE:-0.7}
       # App
       - FINAL_PASAGES=${FINAL_PASAGES}
       - MIN_EVIDENCE=${MIN_EVIDENCE}
       - MIN_SCORE=${MIN_SCORE}
+      - REDIS_URL=${REDIS_URL}
     volumes:
       - ./app:/app/app
       - ./scripts:/app/scripts
@@ -111,6 +117,7 @@
 
   ui:
     image: python:3.11-slim
+    platform: linux/amd64
     container_name: rag-ui
     working_dir: /app
     environment:
@@ -126,6 +133,15 @@
         condition: service_healthy
     ports:
       - "7860:7860"
+    networks: [ragnet]
+
+  redis:
+    image: redis:7-alpine
+    container_name: rag-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"        # opcional, solo si quieres acceso desde host
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
     networks: [ragnet]
 
 networks:

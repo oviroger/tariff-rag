@@ -8,6 +8,9 @@ from time import perf_counter
 import logging
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from opensearchpy import OpenSearch
+import redis, json
+from uuid import uuid4
+from datetime import datetime
 
 from app.config import get_settings
 from app.schemas import ClassifyResponse, HealthResponse
@@ -15,6 +18,25 @@ from app.metrics import REQUESTS, LATENCY
 from app.generator_gemini import generate_label, generate_followup_answer
 from app.os_retrieval import retrieve_support_for_code  # si implementaste esta función
 from app.os_retrieval import hybrid_search_with_fallback
+
+# === Redis Helpers ===
+HISTORY_TTL = 86400  # 24 horas en segundos
+
+def load_history(r, conv_id):
+    """Carga historial desde Redis. Retorna [] si no existe."""
+    if not conv_id:
+        return []
+    raw = r.get(f"chat:{conv_id}")
+    return json.loads(raw) if raw else []
+
+def save_history(r, conv_id, history):
+    """Guarda historial en Redis con expiración de 24h."""
+    if conv_id:
+        r.setex(
+            f"chat:{conv_id}",
+            HISTORY_TTL,
+            json.dumps(history)
+        )
 
 # Configuración del logger
 logger = logging.getLogger("tariff_rag.api")
@@ -48,6 +70,14 @@ async def lifespan(app: FastAPI):
         logger.exception("Error inicializando OpenSearch: %s", e)
         app.state.os_client = None
         app.state.index_name = None
+
+    # Inicializar Redis y guardarlo en app.state
+    try:
+        redis_client = redis.Redis.from_url(settings.redis_url, decode_responses=True)
+        app.state.redis = redis_client
+    except Exception as e:
+        logger.exception("Error inicializando Redis: %s", e)
+        app.state.redis = None
 
     # Lifespan activo
     try:
@@ -99,28 +129,28 @@ async def prometheus_instrumentation(request: Request, call_next):
 
 # === REQUEST MODEL CON VALIDACIONES ===
 class ClassifyRequest(BaseModel):
-    text: Optional[str] = Field(None, description="Query text (legacy)", max_length=4000)
-    query: Optional[str] = Field(None, description="Query text (preferred)", max_length=4000)
-    top_k: int = Field(default=5, ge=1, le=20)
-    file_url: Optional[str] = Field(None, description="Optional file URL for context")
-    debug: bool = Field(default=False, description="Enable debug mode")
+    user_query: str
+    hs_code: Optional[str] = None
+    conversation_history: Optional[list] = []
+    conversation_id: Optional[str] = None
+    top_k: Optional[int] = 5
 
     @model_validator(mode='after')
     def check_query_provided(self):
-        """Ensure at least one of text or query is provided."""
-        if not self.get_query_text():
-            raise ValueError("At least one of 'text' or 'query' must be provided and non-empty")
+        """Ensure user_query is provided and non-empty."""
+        if not self.user_query or not self.user_query.strip():
+            raise ValueError("user_query must be provided and non-empty")
         return self
 
     def get_query_text(self) -> str:
-        """Return query or text, preferring query if both provided."""
-        q = self.query or self.text or ""
-        return q.strip() if isinstance(q, str) else ""
+        """Return user_query text."""
+        return self.user_query.strip() if isinstance(self.user_query, str) else ""
 
 class ChatRequest(BaseModel):
     question: str
     previous_result: Optional[Dict[str, Any]] = None
-    conversation_history: Optional[str] = None  # NUEVO
+    conversation_history: Optional[list] = []
+    conversation_id: Optional[str] = None
 
 class ChatResponse(BaseModel):
     answer: str
@@ -201,8 +231,24 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
     try:
         os_client = getattr(fastapi_request.app.state, "os_client", None)
         index_name = getattr(fastapi_request.app.state, "index_name", None)
+        redis_client = getattr(fastapi_request.app.state, "redis", None)
         if os_client is None or index_name is None:
             raise HTTPException(status_code=503, detail="Search backend not ready")
+        
+        # Asegurar conversation_id
+        conv_id = req.conversation_id or uuid4().hex
+        
+        # Cargar historial desde Redis
+        history = []
+        if redis_client:
+            try:
+                history = load_history(redis_client, conv_id)
+                # Solo sobrescribir con historial del request si NO está vacío (UI tiene datos)
+                if req.conversation_history and len(req.conversation_history) > 0:
+                    history = req.conversation_history
+            except Exception as e:
+                logger.warning(f"Redis load_history failed: {e}")
+                history = req.conversation_history or []
 
         # 0) Validación de query vaga/corta
         query_text = req.get_query_text().strip()
@@ -228,7 +274,12 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
             hits = []
 
         # 2) generación (asegúrate dict)
-        result_dict = generate_label(query=query_text, context_docs=hits, max_candidates=req.top_k or 3)
+        result_dict = generate_label(
+            query=query_text, 
+            context_docs=hits, 
+            max_candidates=req.top_k or 3,
+            conversation_history=history
+        )
         if not isinstance(result_dict, dict):
             result_dict = result_dict.dict() if hasattr(result_dict, "dict") else {}
 
@@ -250,6 +301,96 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
             logger.exception("evidence normalization failed")
             result_dict["evidence"] = []
 
+        # 3.5) Normalización/Corrección de missing_fields genéricos según contexto
+        def _is_vehicle_query(t: str) -> bool:
+            t = (t or "").lower()
+            vehicle_terms = [
+                "vehículo", "vehiculo", "vehículos", "vehiculos",
+                "auto", "automóvil", "automovil", "coche", "carro",
+                "camión", "camion", "camioneta", "pickup",
+                "motocicleta", "moto", "bus", "autobús", "autobus", "microbús", "microbus",
+            ]
+            return any(w in t for w in vehicle_terms)
+
+        def _has_generic_missing(missing_list):
+            banned = [
+                "tipo de producto y su uso",
+                "material o composición",
+                "características técnicas relevantes",
+                "presentación/estado",
+            ]
+            ml = [str(m).lower() for m in (missing_list or [])]
+            return any(any(b in m for b in banned) for m in ml)
+
+        def _vehicle_missing_by_text(t: str):
+            tl = (t or "").lower()
+            motor_terms = ["diésel", "diesel", "gasolina", "eléctrico", "electrico", "híbrido", "hibrido"]
+            estado_terms = ["nuevo", "nueva", "usado", "usada"]
+            import re
+            has_bus = any(w in tl for w in ["bus", "autobús", "autobus", "microbús", "microbus"])
+            # Detectar subtipos comunes de vehículo
+            has_auto = any(w in tl for w in ["automóvil", "automovil", "auto", "coche", "carro"])
+            has_camion = any(w in tl for w in ["camión", "camion", "camioneta", "pickup"])
+            has_moto = any(w in tl for w in ["motocicleta", "moto"])
+            has_motor = any(w in tl for w in motor_terms)
+            has_plazas = bool(re.search(r"\b(\d{1,3})\s*(plazas|personas|pasajeros)\b", tl))
+            has_estado = any(w in tl for w in estado_terms)
+
+            # Si ya hay contexto de bus + motor, limitar a estos 2-3 puntos
+            if has_bus and has_motor:
+                lst = []
+                if not has_plazas:
+                    lst.append("Número de plazas o pasajeros (define si va en 87.02 o 87.03 y afina subpartida)")
+                lst.append("Cilindrada del motor en cm³ (si aplica, para afinar subpartida)")
+                if not has_estado:
+                    lst.append("Si es nuevo o usado")
+                return lst or [
+                    "Número de plazas o pasajeros",
+                    "Cilindrada del motor en cm³",
+                    "Si es nuevo o usado",
+                ]
+
+            # Vehículo genérico: pedir tipo, uso, motor+cilindrada, plazas
+            return [
+                "Tipo de vehículo (automóvil, camión, motocicleta, autobús, etc.)",
+                "Uso principal (transporte de personas, mercancías, uso especial)",
+                "Tipo de motor (gasolina, diésel, eléctrico, híbrido) y cilindrada (cm³)",
+                "Número de plazas o pasajeros (si es para personas)",
+            ]
+
+        try:
+            mf = result_dict.get("missing_fields") or []
+            is_veh = _is_vehicle_query(query_text)
+            has_gen = _has_generic_missing(mf)
+            logger.info(f"Sanitizer: is_vehicle={is_veh}, has_generic={has_gen}, missing_fields={mf}")
+            # Regla 1: Si es vehículo y Azure devolvió campos genéricos prohibidos → reemplazar por específicos
+            if is_veh and has_gen:
+                new_mf = _vehicle_missing_by_text(query_text)
+                logger.info(f"Sanitizer: replacing generic with {new_mf}")
+                result_dict["missing_fields"] = new_mf
+            # Regla 2: Si es una consulta genérica de vehículo (sin subtipo detectado), SIEMPRE priorizar pedir "Tipo de vehículo"
+            else:
+                tl = (query_text or "").lower()
+                has_any_subtype = any(w in tl for w in [
+                    "automóvil", "automovil", "auto", "coche", "carro",
+                    "camión", "camion", "camioneta", "pickup",
+                    "motocicleta", "moto",
+                    "bus", "autobús", "autobus", "microbús", "microbus"
+                ])
+                mentions_vehicle = any(w in tl for w in ["vehículo", "vehiculos", "vehículos", "vehiculo"]) or not has_any_subtype
+                if is_veh and not has_any_subtype and mentions_vehicle:
+                    new_mf = _vehicle_missing_by_text(query_text)
+                    # Asegurarse que el primer campo sea "Tipo de vehículo..."
+                    if not new_mf or "tipo de vehículo" not in new_mf[0].lower():
+                        # Reordenar para poner tipo primero
+                        new_mf = sorted(new_mf, key=lambda x: 0 if "tipo de vehículo" in str(x).lower() else 1)
+                    logger.info(f"Sanitizer: enforcing type-first missing_fields {new_mf}")
+                    result_dict["missing_fields"] = new_mf
+        except Exception as e:
+            # No interrumpir si el saneamiento falla
+            logger.exception(f"Sanitizer failed: {e}")
+            pass
+
         # 4) evidencia anclada al código (opcional)
         main_code = None
         cands = result_dict.get("top_candidates") or result_dict.get("candidates") or []
@@ -259,10 +400,32 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
         result_dict["support_evidence"] = []
         if main_code:
             try:
-                result_dict["support_evidence"] = retrieve_support_for_code(os_client, index_name, main_code, k=3) or []
+                result_dict["support_evidence"] = retrieve_support_for_code(
+                    os_client,
+                    index_name,
+                    main_code,
+                    k=3,
+                    query_text=query_text,
+                ) or []
             except Exception:
                 logger.exception("support_evidence retrieval failed")
                 result_dict["support_evidence"] = []
+        
+        # Actualizar y guardar historial en Redis
+        if redis_client:
+            try:
+                # Añadir nuevo turno al historial
+                history.append({
+                    "user": query_text,
+                    "assistant": result_dict.get("top_candidates", [{}])[0].get("code", "N/A") if result_dict.get("top_candidates") else "N/A",
+                    "timestamp": datetime.now().isoformat()
+                })
+                save_history(redis_client, conv_id, history)
+            except Exception as e:
+                logger.warning(f"Redis save_history failed: {e}")
+        
+        # Añadir conversation_id a la respuesta
+        result_dict["conversation_id"] = conv_id
 
         return ClassifyResponse(**result_dict)
 

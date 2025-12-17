@@ -152,14 +152,16 @@ def classify(
         except:
             detected_missing = ["información del producto incompleta"]
         
+        # Nota: no devolvemos códigos placeholder. Si el generador falla, devolvemos solo campos faltantes.
         result = {
-            "top_candidates": [
-                {"code": "0000.00.00", "description": "Clasificación no disponible (generador offline)", "confidence": 0.0, "level": "chapter"}
-            ],
+            "top_candidates": [],
             "applied_rgi": ["RGI 1"],
             "inclusions": [],
             "exclusions": [],
-            "missing_fields": detected_missing
+            "missing_fields": detected_missing,
+            "warnings": ["Generador offline: no se propusieron códigos."],
+            "versions": {"hs_edition": "HS_2022"},
+            "evidence": [],
         }
     
     # === 5. Validación de salida ===

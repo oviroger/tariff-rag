@@ -9,6 +9,7 @@ packaging==24.0
 
 # LLM + embeddings (Gemini)
 google-generativeai==0.8.3
+openai>=1.51.0
 
 # OpenSearch
 opensearch-py==2.7.1
@@ -39,3 +40,5 @@ prometheus-client==0.20.0
 ir-measures==0.3.4
 # pytrec_eval es opcional; requiere toolchain para compilar en algunos entornos
 # pytrec_eval==0.5
+
+redis>=5.0

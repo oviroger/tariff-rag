@@ -2,13 +2,17 @@
 app/os_retrieval.py
 Recuperación semántica desde OpenSearch usando embeddings.
 """
-from typing import List, Dict
+from typing import List, Dict, Optional
+import os
+import logging
 from app.os_index import get_os_client
 from app.config import get_settings
 from app.metrics import RETRIEVAL_K
 from app.embedder_gemini import GeminiEmbedder
 
-def retrieve_fragments(query_text: str, top_k: int = 5, index: str = None) -> list:
+logger = logging.getLogger(__name__)
+
+def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = None) -> list:
     """
     Recupera fragmentos relevantes usando búsqueda semántica (kNN + embeddings).
     """
@@ -36,7 +40,18 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: str = None) -> li
                 }
             }
         },
-        "_source": ["fragment_id", "text", "doc_id", "bucket", "unit", "validity_from", "filename"]
+        "_source": [
+            "fragment_id",
+            "text",
+            "doc_id",
+            "bucket",
+            "unit",
+            "validity_from",
+            "filename",
+            "chapter",
+            "heading",
+            "subheading"
+        ]
     }
     
     try:
@@ -64,27 +79,35 @@ def _hs_variants(code: str) -> List[str]:
     spaced_both = c.replace(".", " . ")
     return list({c, no_dot, with_space, with_dash, with_space_after, with_space_before, spaced_both})
 
-def retrieve_support_for_code(os_client, index_name: str, code: str, k: int = 5) -> List[Dict]:
+def retrieve_support_for_code(os_client, index_name: str, code: str, k: int = 5, query_text: str | None = None) -> List[Dict]:
     """
-    Recupera evidencia textual que soporte el código HS elegido (BM25 léxico).
+    Recupera evidencia textual que soporte el código HS elegido.
+
+    Estrategia:
+      1) BM25 léxico contra variantes del código/heading.
+      2) Si no hay resultados y tenemos query_text, fallback semántico (kNN) con la consulta del usuario.
     """
     if not code:
         return []
     heading = code.split(".")[0]  # '4011' de '4011.10'
-    terms = _hs_variants(code) + [heading, "neumático", "neumáticos", "tire", "tires", "tyre", "tyres", "pneumatic"]
-    # Construimos 'should' con boosts más altos al match exacto del código y el heading
+    # Solo buscar variantes del código y su heading para evitar arrastrar evidencia de otros dominios (ej: neumáticos)
+    terms = _hs_variants(code) + [heading]
     should = [
         {"match_phrase": {"text": {"query": code, "boost": 8.0}}},
         {"match_phrase": {"text": {"query": heading, "boost": 6.0}}},
-    ] + [{"match": {"text": {"query": t, "boost": 3.0}}} for t in terms]
+    ] + [{"match_phrase": {"text": {"query": t, "boost": 4.0}}} for t in terms]
 
     body = {
         "size": k,
         "query": {"bool": {"should": should, "minimum_should_match": 1}},
         "_source": ["fragment_id", "text", "bucket", "unit", "doc_id"],
     }
-    resp = os_client.search(index=index_name, body=body)
-    hits = resp.get("hits", {}).get("hits", [])
+    try:
+        resp = os_client.search(index=index_name, body=body)
+        hits = resp.get("hits", {}).get("hits", [])
+    except Exception:
+        hits = []
+
     results = []
     for h in hits:
         src = h.get("_source", {})
@@ -97,6 +120,26 @@ def retrieve_support_for_code(os_client, index_name: str, code: str, k: int = 5)
             "doc_id": src.get("doc_id"),
             "reason": "support_for_code",
         })
+
+    # Fallback semántico si no hay evidencia y tenemos la consulta del usuario
+    if not results and query_text:
+        try:
+            sem_k = min(k, 2)  # limitar a top-2 para mantener conciso
+            sem_hits = knn_semantic_search(os_client, index_name, query_text, k=sem_k)
+            for h in sem_hits:
+                src = h.get("_source", {})
+                results.append({
+                    "fragment_id": src.get("fragment_id"),
+                    "score": h.get("_score", 0.0),
+                    "text": src.get("text", ""),
+                    "bucket": src.get("bucket"),
+                    "unit": src.get("unit"),
+                    "doc_id": src.get("doc_id"),
+                    "reason": "semantic_support",
+                })
+        except Exception:
+            pass
+
     return results
 
 def knn_semantic_search(os_client, index: str, query_text: str, k: int = 5) -> List[Dict]:

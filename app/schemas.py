@@ -1,4 +1,4 @@
-﻿from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Literal
 from pydantic import BaseModel, HttpUrl, Field
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -28,13 +28,14 @@ class EvidenceFragment(BaseModel):
     doc_id: Optional[str] = None
     reason: Optional[str] = None
 
+HSLevel = Literal["HS6", "NANDINA8", "NATIONAL10"]
+
 class Candidate(BaseModel):
     """Candidato de clasificación arancelaria"""
     code: str = Field(..., description="Código arancelario (ej: 3907.30.00)")
     description: Optional[str] = Field(None, description="Descripción del código")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Confianza [0-1]")
-    level: Optional[str] = Field(None, description="Nivel: heading/subheading/item")
-
+    level: HSLevel = Field(..., description="Nivel: HS6 | NANDINA8 | NATIONAL10")
 class ClassifyResponse(BaseModel):
     """Respuesta del endpoint /classify"""
     top_candidates: List[Candidate] = Field(default_factory=list)
@@ -47,6 +48,7 @@ class ClassifyResponse(BaseModel):
     warnings: List[str] = Field(default_factory=list)
     versions: Dict[str, str] = Field(default_factory=dict)
     debug_info: Optional[Dict[str, Any]] = None
+    conversation_id: Optional[str] = None
 
 class HealthResponse(BaseModel):
     """Respuesta del health check"""
