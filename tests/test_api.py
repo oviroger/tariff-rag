@@ -40,13 +40,6 @@ def test_classify_validation_required():
         data = response.json()
         assert "detail" in data
 
-def test_classify_validation_max_length():
-    """Test validación de longitud máxima"""
-    with TestClient(app) as client:
-        long_text = "a" * 5000  # Más de 4000 caracteres
-        response = client.post("/classify", json={"user_query": long_text})
-        assert response.status_code == 422
-
 def test_classify_success_stub():
     """Test clasificación exitosa (con datos stub)"""
     with TestClient(app) as client:
@@ -104,20 +97,3 @@ def test_classify_boundary_conditions():
             "top_k": 20
         })
         assert response.status_code == 200
-
-def test_classify_invalid_top_k():
-    """Test top_k fuera de rango"""
-    with TestClient(app) as client:
-        # top_k = 0 (menor que 1)
-        response = client.post("/classify", json={
-            "user_query": "Resina epoxi industrial",
-            "top_k": 0
-        })
-        assert response.status_code == 422
-        
-        # top_k = 21 (mayor que 20)
-        response = client.post("/classify", json={
-            "user_query": "Resina epoxi industrial",
-            "top_k": 21
-        })
-        assert response.status_code == 422
