@@ -612,7 +612,7 @@ def _detect_category(text: str) -> Optional[str]:
     return None
 
 
-def _format_classification_simple(result: Dict[str, Any], user_query: str = "") -> str:
+def _format_classification_simple(result: Dict[str, Any], user_query: str = "", conv_state=None) -> str:
     """Formato breve: muestra código(s) y descripción sin confianza ni evidencia."""
     candidates = result.get("top_candidates") or result.get("candidates") or []
     missing = result.get("missing_fields", [])
@@ -623,8 +623,20 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "") 
     clean_warnings = [w for w in warnings if not any(x in str(w).lower() for x in technical_keywords)]
     clean_missing = [m for m in missing if not any(x in str(m).lower() for x in technical_keywords)]
 
+    # **CRÍTICO**: Construir contexto acumulado para detectar vehículos/metales correctamente
+    contextual_query = user_query or ""
+    if conv_state and hasattr(conv_state, 'history') and conv_state.history:
+        # Tomar las últimas 2-3 preguntas del usuario para dar contexto
+        # conv_state.history es una lista de tuplas: [(user, assistant), ...]
+        recent_user_queries = []
+        for turn in reversed(conv_state.history[-3:]):  # Últimos 3 turnos
+            if isinstance(turn, tuple) and len(turn) >= 1:
+                recent_user_queries.insert(0, turn[0])  # turn[0] es el mensaje del usuario
+        if recent_user_queries:
+            contextual_query = " ".join(recent_user_queries + [user_query])
+    
     # Prune vehicle-related missing fields if user_query already contains them
-    uq = (user_query or "").lower()
+    uq = contextual_query.lower()  # Usar contexto completo
     vehicle_terms = [
         "vehículo", "vehiculo", "auto", "automóvil", "automovil", "coche", "carro",
         "camión", "camion", "camioneta", "pickup", "bus", "autobús", "autobus",
@@ -646,20 +658,28 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "") 
         _drop_if_matches(["nuevo", "usado"]) 
 
     # Prune metal-related missing fields if already provided
-    metal_terms = ["acero", "steel", "hierro", "inox", "inoxidable", "lámina", "lamina", "chapa", "plancha", "bobina", "laminado", "frío", "frio", "caliente"]
+    metal_terms = ["acero", "steel", "hierro", "inox", "inoxidable", "lámina", "lamina", "chapa", "plancha", "bobina", "laminado", "frío", "frio", "caliente", "aluminio", "aluminum", "cobre", "copper"]
     has_metal = any(t in uq for t in metal_terms)
-    has_process = any(t in uq for t in ["laminado en caliente", "laminado en frío", "laminado en frio", "en caliente", "en frío", "en frio", "caliente", "frío", "frio"])
-    has_thickness = any(tok.endswith("mm") or " mm" in tok for tok in uq.split()) or any(k in uq for k in ["mm", "milimetro", "milímetro", "espesor"])
-    has_dims = any(k in uq for k in ["ancho", "largo", "bobina"])
+    has_process = any(t in uq for t in ["laminado en caliente", "laminado en frío", "laminado en frio", "en caliente", "en frío", "en frio", "caliente", "frío", "frio", "hot rolled", "cold rolled"])
+    has_thickness = any(tok.endswith("mm") or " mm" in tok for tok in uq.split()) or any(k in uq for k in ["mm", "milimetro", "milímetro", "espesor", "grosor"])
+    has_dims = any(k in uq for k in ["ancho", "largo", "bobina", "metro", "metros", "cm", "centímetro", "centimetro", "dimensiones"])
+    has_coating = any(k in uq for k in ["galvanizado", "pintado", "recubierto", "estañado", "coated", "galvanized", "painted"])
+    has_grade = any(k in uq for k in ["aisi", "astm", "en ", "sae", "iso", "grado", "norma"])
+    no_norm = any(phrase in uq for phrase in ["no tiene norma", "sin norma", "no se norma", "no sé norma", "no tiene ninguna norma", "ninguna norma"])
+    no_process = any(phrase in uq for phrase in ["no se proceso", "no sé proceso", "no tiene proceso", "sin proceso", "no sé el proceso", "no se el proceso"])
 
     if has_metal:
-        _drop_if_matches(["tipo de producto", "tipo de producto específico", "tipo de producto (vehículo", "tipo de producto específico (ej."])
-    if has_process:
-        _drop_if_matches(["proceso de laminado", "laminado en caliente", "laminado en frío", "laminado en frio", "proceso: laminado"])
+        _drop_if_matches(["tipo de producto", "tipo de producto específico", "tipo de producto (vehículo", "tipo de producto específico (ej.", "tipo de metal"])
+    if has_process or no_process:
+        _drop_if_matches(["proceso de laminado", "laminado en caliente", "laminado en frío", "laminado en frio", "proceso: laminado", "proceso (caliente", "proceso (frío"])
     if has_thickness:
         _drop_if_matches(["espesor", "grosor", "espesor en mm", "grosor en mm"])
     if has_dims:
-        _drop_if_matches(["ancho", "largo", "dimensiones", "ancho y largo", "ancho si es bobina"])
+        _drop_if_matches(["ancho", "largo", "dimensiones", "ancho y largo", "ancho si es bobina", "dimensiones (ancho"])
+    if has_coating:
+        _drop_if_matches(["recubrimiento", "galvanizado", "pintado", "estañado", "coated"])
+    if has_grade or no_norm:
+        _drop_if_matches(["norma", "grado", "aisi", "astm", "grado o norma"])
 
     if not candidates:
         # No candidates: reutiliza únicamente missing_fields del backend sin sobre-especificaciones en UI
@@ -670,22 +690,96 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "") 
 
         # Si el backend no trajo missing_fields, ofrecer guía específica por categoría
         if not extras and not clean_missing:
-            cat = _detect_category(user_query)
-            uq = (user_query or "").lower()
-            metals_terms = ["acero", "inox", "inoxidable", "lámina", "lamina", "chapa", "plancha", "hoja", "bobina", "coil", "sheet", "plate"]
+            cat = _detect_category(contextual_query)  # Usar contexto completo
+            # uq ya está definido arriba como contextual_query.lower()
+            metals_terms = ["acero", "inox", "inoxidable", "lámina", "lamina", "chapa", "plancha", "hoja", "bobina", "coil", "sheet", "plate", "aluminio", "aluminum", "cobre", "copper", "hierro", "metal"]
             is_metals = (cat == "metal") or any(t in uq for t in metals_terms)
+            
+            vehicles_terms = ["vehículo", "vehiculo", "auto", "automóvil", "automovil", "carro", "coche", "bus", "autobús", "autobus", "camión", "camion", "motocicleta", "moto", "jeep", "camioneta", "minibús", "minibus", "microbús", "microbus"]
+            is_vehicles = (cat == "vehicle") or any(t in uq for t in vehicles_terms)
+
+            # Detectar si ya se ha dado información específica
+            import re
+            has_thickness = bool(re.search(r"\b(\d+\.?\d*)\s*(mm|milímetro|milimetro)", uq))
+            has_dimensions = bool(re.search(r"\b(\d+\.?\d*)\s*(m|metro|cm|centímetro|centimetro)", uq)) or any(w in uq for w in ["ancho", "largo"])
+            has_process = any(w in uq for w in ["laminado en caliente", "laminado en frío", "laminado en frio", "hot rolled", "cold rolled"])
+            no_process = any(phrase in uq for phrase in ["no se proceso", "no sé proceso", "no tiene proceso", "sin proceso", "no sé el proceso"])
+            no_norm = any(phrase in uq for phrase in ["no tiene norma", "sin norma", "no se norma", "no sé norma", "no tiene ninguna norma"])
 
             if is_metals:
-                specific_extras = [
-                    "Espesor en mm",
-                    "Ancho y largo (o ancho si es bobina)",
-                    "Proceso: laminado en caliente o laminado en frío",
-                    "Si es inoxidable: grado (AISI 304, 316, etc.) y acabado (2B, BA, No.4)",
-                    "Formato: plancha/hoja o bobina",
-                ]
-                if not question:
-                    question = "¿Puedes confirmar el espesor en mm?"
-                extras = specific_extras[:3]
+                # Si ya tiene espesor + dimensiones, información suficiente
+                if has_thickness and has_dimensions:
+                    specific_extras = []
+                    if not has_process and not no_process:
+                        specific_extras.append("Proceso: laminado en caliente o laminado en frío")
+                    if not no_norm:
+                        specific_extras.append("Norma o grado (AISI, ASTM) si está disponible")
+                    specific_extras.append("Recubrimiento si existe (galvanizado, pintado, etc.)")
+                    # Si no hay extras necesarios, no pedir nada más
+                    if not specific_extras or (no_process and no_norm):
+                        question = None
+                        extras = []
+                    else:
+                        if not question:
+                            question = f"¿Puedes confirmar {specific_extras[0].lower()}?" if specific_extras else None
+                        extras = specific_extras[:2]
+                else:
+                    # Información incompleta
+                    specific_extras = []
+                    if not has_thickness:
+                        specific_extras.append("Espesor en mm")
+                    if not has_dimensions:
+                        specific_extras.append("Dimensiones (ancho y largo en metros)")
+                    if not has_process and not no_process:
+                        specific_extras.append("Proceso: laminado en caliente o laminado en frío")
+                    if not question and specific_extras:
+                        question = f"¿Puedes confirmar {specific_extras[0].lower()}?"
+                    extras = specific_extras[:3]
+            
+            elif is_vehicles:
+                # Detectar información ya proporcionada sobre vehículos
+                for_persons = any(w in uq for w in ["personas", "pasajeros", "transporte de personas", "para personas"])
+                for_cargo = any(w in uq for w in ["mercancías", "mercancias", "carga", "para carga"])
+                has_vehicle_type = any(w in uq for w in ["automóvil", "automovil", "auto", "carro", "coche", "bus", "autobús", "autobus", "camión", "camion", "motocicleta", "moto", "jeep", "camioneta", "minibús", "minibus", "microbús", "microbus"])
+                has_motor = any(w in uq for w in ["gasolina", "diesel", "diésel", "eléctrico", "electrico", "híbrido", "hibrido"])
+                has_displacement = bool(re.search(r"\b(\d+)\s*(cm³|cm3|cc|centímetros cúbicos)", uq))
+                has_seats = bool(re.search(r"\b(\d+)\s*(plazas|pasajeros|personas)", uq))
+                is_new_or_used = any(w in uq for w in ["nuevo", "nueva", "usado", "usada", "usado"])
+                
+                specific_extras = []
+                
+                # Si solo dice "vehículos" (muy genérico)
+                if not has_vehicle_type and not for_persons and not for_cargo:
+                    specific_extras.append("Tipo específico de vehículo (automóvil, autobús, camión, motocicleta, etc.)")
+                    specific_extras.append("Uso principal (transporte de personas, mercancías, uso especial)")
+                    question = "¿Qué tipo de vehículo es?"
+                # Si ya sabe que es para personas pero no el tipo específico
+                elif for_persons and not has_vehicle_type:
+                    specific_extras.append("Tipo específico (automóvil, autobús, microbús, minibús, jeep, camioneta)")
+                    if not has_motor:
+                        specific_extras.append("Tipo de motor (gasolina, diésel, eléctrico, híbrido) y cilindrada en cm³")
+                    if not has_seats:
+                        specific_extras.append("Número de plazas o pasajeros (≤9 plazas → 87.03, ≥10 plazas → 87.02)")
+                    question = "¿Qué tipo específico de vehículo es?"
+                # Si ya tiene tipo de vehículo
+                else:
+                    if not has_motor:
+                        specific_extras.append("Tipo de motor (gasolina, diésel, eléctrico, híbrido)")
+                        if not has_displacement:
+                            specific_extras.append("Cilindrada del motor en cm³ (si aplica)")
+                    elif has_motor and not has_displacement:
+                        specific_extras.append("Cilindrada del motor en cm³ (afina la subpartida)")
+                    
+                    if (for_persons or has_vehicle_type) and not has_seats:
+                        specific_extras.append("Número de plazas o pasajeros (≤9 → 87.03, ≥10 → 87.02)")
+                    
+                    if not is_new_or_used:
+                        specific_extras.append("Si es nuevo o usado")
+                    
+                    if specific_extras:
+                        question = f"¿Puedes confirmar {specific_extras[0].lower()}?"
+                
+                extras = specific_extras[:4]
 
         lines = [
             "### 🔍 Necesito más información para clasificar",
@@ -697,14 +791,27 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "") 
             lines += ["", "También ayuda:"]
             lines += [f"- {m}" for m in extras]
         # Fallback mínimo cuando no hay extras ni missing_fields
+        # PERO: Si detectamos contexto de vehículos o metales, NO usar fallback genérico
         if not extras and not clean_missing:
-            lines += [
-                "",
-                "También ayuda:",
-                "- Dimensiones relevantes (medidas y unidades)",
-                "- Proceso de fabricación o norma aplicable",
-                "- Cualquier característica técnica clave para identificar la subpartida",
-            ]
+            # Detectar si hay contexto de vehículos o metales en toda la conversación
+            all_user_queries = ""
+            if conv_state and hasattr(conv_state, 'history') and conv_state.history:
+                all_user_queries = " ".join([turn[0] for turn in conv_state.history[-5:] if isinstance(turn, tuple)])
+            all_user_queries += " " + (user_query or "")
+            all_lower = all_user_queries.lower()
+            
+            is_vehicle_context = any(w in all_lower for w in ["vehículo", "vehiculo", "auto", "automóvil", "coche", "carro", "bus", "autobús", "camión", "moto"])
+            is_metal_context = any(w in all_lower for w in ["acero", "metal", "lámina", "lamina", "chapa", "aluminio", "cobre"])
+            
+            # Solo usar fallback genérico si NO es vehículo ni metal
+            if not is_vehicle_context and not is_metal_context:
+                lines += [
+                    "",
+                    "También ayuda:",
+                    "- Dimensiones relevantes (medidas y unidades)",
+                    "- Proceso de fabricación o norma aplicable",
+                    "- Cualquier característica técnica clave para identificar la subpartida",
+                ]
         lines += ["", "Responde con los datos que tengas disponibles."]
         return "\n".join(lines)
 
@@ -729,7 +836,7 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "") 
 
     # Sugerencias de seguimiento sin detallar
     lines.append("---")
-    lines.append("Puedes preguntar: ¿Qué información falta?, ¿Por qué?, Dame un resumen.")
+    #lines.append("Puedes preguntar: ¿Qué información falta?, ¿Por qué?, Dame un resumen.")
     return "\n".join(lines)
 
 
@@ -843,7 +950,7 @@ def chat_minimal_validation(message: str, history: list, conv_id: str = "") -> T
         # Guardar la query real enviada para no perder contexto en los siguientes turnos
         conv_state.update(sent_query, data)
         # Usar el texto realmente enviado (incluye contexto) para personalizar missing_fields
-        formatted = _format_classification_simple(data, user_query=sent_query)
+        formatted = _format_classification_simple(data, user_query=sent_query, conv_state=conv_state)
         conv_state.add_turn(msg, formatted)
         conv_state.add_classification_summary(msg, data)
         return formatted, conv_id
@@ -1024,7 +1131,7 @@ with gr.Blocks(
     gr.Markdown(
         """
         ---
-        ⚙️ *Powered by Azure Document Intelligence + Google Gemini + OpenSearch*
+        ⚙️ *Powered by Azure Document Intelligence + Azure OpenAI + OpenSearch + Redis*
         """
     )
 

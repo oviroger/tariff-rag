@@ -9,23 +9,12 @@ import unicodedata
 import logging
 from typing import Dict, Any, List, Optional
 
-import google.generativeai as genai
 from openai import AzureOpenAI
 from app.config import get_settings
 from app.prompts import SYSTEM_INSTRUCTIONS, OUTPUT_SCHEMA, FOLLOWUP_SYSTEM_INSTRUCTIONS
 
 logger = logging.getLogger(__name__)
-
-# Config Gemini API key
 settings = get_settings()
-try:
-    if getattr(settings, "gemini_api_key", None):
-        genai.configure(api_key=settings.gemini_api_key)
-        logger.info("Gemini API key configured.")
-    else:
-        logger.warning("GEMINI_API_KEY missing - LLM generation will be offline.")
-except Exception as e:
-    logger.exception("Failed to configure Gemini: %s", e)
 
 
 def _offline_result(evidence: List[Dict[str, Any]] | None = None, reason: str = "LLM offline") -> Dict[str, Any]:
@@ -144,11 +133,8 @@ def _build_evidence_from_os_hits(context_docs: List[Dict[str, Any]]) -> List[Dic
 
 def generate_label(query: str, context_docs: list, max_candidates: int = 5, conversation_history: list = None) -> dict:
     """
-    Genera clasificación HS usando Gemini con contexto RAG.
+    Genera clasificación HS usando Azure OpenAI con contexto RAG.
     """
-    if not getattr(settings, "gemini_api_key", None):
-        logger.warning("GEMINI_API_KEY no configurada, usando resultado offline.")
-        return _offline_result(evidence=context_docs, reason="verifica GEMINI_API_KEY / conectividad")
 
     evidence = _build_evidence_from_os_hits(context_docs)
     context_text = "\n\n".join([
@@ -197,18 +183,19 @@ CONSULTA ACTUAL DEL USUARIO:
 
 INSTRUCCIONES CRÍTICAS:
  - **LEE EL HISTORIAL COMPLETO**: Si hay conversación previa, el usuario puede haber proporcionado información en turnos anteriores. NO vuelvas a pedir datos que ya fueron dados.
+ 
+ - **REGLA CRÍTICA - ESPECIFICACIONES SON CONTINUACIÓN**: Si el historial menciona un producto (ej: "laptop", "bus", "láminas de acero") y la consulta actual proporciona especificaciones técnicas (ej: "procesador X, RAM Y", "30 pasajeros", "espesor 5mm"), estas especificaciones son SIEMPRE ACERCA DEL MISMO PRODUCTO del historial. NO lo trates como producto diferente.
 
-- 🔍 **DETECCIÓN AUTOMÁTICA DE CAMBIO DE TEMA** (MUY IMPORTANTE):
+- 🔍 **DETECCIÓN AUTOMÁTICA DE CAMBIO DE TEMA** (SOLO para productos completamente diferentes):
   Si existe HISTORIAL DE CONVERSACIÓN (hay turnos previos):
      1. Compara el ÚLTIMO PRODUCTO del historial con la CONSULTA ACTUAL
-     2. Si son sobre TEMAS COMPLETAMENTE DIFERENTES:
-         → El usuario CAMBIÓ de producto/tema completamente
+     2. CAMBIO DE TEMA = usuario menciona un PRODUCTO DIFERENTE explícitamente
+         → Ejemplos de cambio: "laptop" → "ahora quiero clasificar un bus" | "láminas de acero" → "¿y los plátanos?"
          → ACCIÓN: IGNORA TODO el contexto anterior, procesa COMO SI FUERA PRIMERA VEZ
-         → Ejemplos de cambio: vehículos→acero | automóviles→textiles | acero→plátanos | metales→frutas
-     3. Si son el MISMO TEMA o RELACIONADOS:
-         → El usuario está refinando o completando información
-         → ACCIÓN: Usa el historial como contexto para refinar clasificación
-  IMPORTANTE: No uses palabras clave hardcodeadas. ANALIZA SEMÁNTICAMENTE la consulta actual.
+     3. MISMO TEMA = usuario proporciona specs, detalles, o clarifica el mismo producto
+         → Ejemplos: "laptop" → "procesador Snapdragon, 16GB RAM" | "bus" → "30 pasajeros, diesel" | "acero" → "espesor 5mm, galvanizado"
+         → ACCIÓN: Usa el historial como contexto, RECUERDA el producto mencionado previamente
+  **IMPORTANTE**: Especificaciones técnicas (procesador, RAM, espesor, pasajeros, cilindrada) NUNCA son cambio de tema - son completar información del producto ya mencionado.
 
 - CONSULTAS VAGAS = solo menciona categoría genérica sin detalles específicos:
     * "vehículos" (¿automóvil? ¿camión? ¿bus? ¿moto?)
@@ -316,6 +303,10 @@ RESPUESTA (solo JSON, sin explicaciones adicionales):"""
             for turn in conversation_history:
                 if isinstance(turn, (list, tuple)) and len(turn) >= 2:
                     text_blob += " " + _strip_accents(str(turn[0])).lower() + " " + _strip_accents(str(turn[1])).lower()
+                elif isinstance(turn, dict):
+                    user_msg = turn.get("user", "")
+                    asst_msg = turn.get("assistant", "")
+                    text_blob += " " + _strip_accents(str(user_msg)).lower() + " " + _strip_accents(str(asst_msg)).lower()
 
         before = list(res.get("missing_fields", []))
 
@@ -368,6 +359,56 @@ RESPUESTA (solo JSON, sin explicaciones adicionales):"""
             _remove_if_present("plazas")
             _remove_if_present("pasajeros")
 
+        # --- ACERO: Detectar recubrimiento (galvanizado, pintado, estañado, etc.) ---
+        if any(k in text_blob for k in ["galvanizado", "galvanizada", "galvanizadas", "pintura", "pintada", "pintado", "estanado", "cromado", "esmaltado", "cromada", "cromadas"]):
+            _remove_if_present("recubrimiento")
+            _remove_if_present("galvanizado")
+            _remove_if_present("pintado")
+            _remove_if_present("estanado")
+            # Elimina campos que mencionan recubrimiento/galvanizado de forma genérica
+            filtered = []
+            for m in res.get("missing_fields", []) or []:
+                m_norm = _strip_accents(m).lower()
+                # Si el field contiene "recubrimiento" y el usuario ya mencionó galvanizado, elímina
+                if "recubrimiento" in m_norm and any(k in text_blob for k in ["galvanizado", "galvanizada", "galvanizadas"]):
+                    continue
+                filtered.append(m)
+            res["missing_fields"] = filtered
+
+        # --- ACERO: Detectar proceso de laminado (caliente/frío) ---
+        # Variaciones de caliente y frío (con acentos y sin)
+        caliente_vars = ["laminada en caliente", "laminadas en caliente", "laminado en caliente", "laminacion en caliente", "laminacion caliente"]
+        frio_vars = ["laminada en frio", "laminadas en frio", "laminada en frío", "laminadas en frío", "laminado en frio", "laminado en frío", "laminacion en frio", "laminacion en frío", "laminacion frio", "laminacion frío"]
+        
+        if any(k in text_blob for k in caliente_vars + frio_vars):
+            _remove_if_present("proceso de laminado")
+            _remove_if_present("laminado en caliente")
+            _remove_if_present("laminado en frio")
+            _remove_if_present("laminado en frío")
+            # Elimina campos que mencionan proceso de laminado de forma genérica
+            filtered = []
+            for m in res.get("missing_fields", []) or []:
+                m_norm = _strip_accents(m).lower()
+                # Si el field contiene "laminado" y el usuario ya lo especificó, elímina
+                if ("laminado" in m_norm or "proceso de laminado" in m_norm) and any(k in text_blob for k in caliente_vars + frio_vars):
+                    continue
+                filtered.append(m)
+            res["missing_fields"] = filtered
+
+        # --- ACERO: Detectar espesor en mm ---
+        has_espesor = False
+        espesor_patterns = [
+            r"\b\d{1,4}(?:[\.,]\d{1,2})?\s*(?:mm|milímetros|milimetros)\b",
+            r"espesor\s*[:=]?\s*\d{1,4}\s*mm"
+        ]
+        for pat in espesor_patterns:
+            if re.search(pat, text_blob, flags=re.IGNORECASE):
+                has_espesor = True
+                break
+        if has_espesor:
+            _remove_if_present("espesor")
+            _remove_if_present("espesor en mm")
+
         # Quitar duplicados preservando orden
         seen = set()
         dedup = []
@@ -376,9 +417,43 @@ RESPUESTA (solo JSON, sin explicaciones adicionales):"""
                 seen.add(m)
                 dedup.append(m)
         res["missing_fields"] = dedup
+        
+        # Post-procesamiento agresivo: elimina campos que mencionan información ya dada
+        final_missing = []
+        for field in res.get("missing_fields", []):
+            field_lower = _strip_accents(field).lower()
+            skip = False
+            
+            # Variaciones de galvanizado
+            galv_keywords = ["galvanizado", "galvanizada", "galvanizadas", "galvanizados", "galvaniza", "pintada", "pintado", "pintadas", "pintados", "estanado", "estañado", "cromado", "cromada"]
+            
+            # Si el usuario mencionó galvanizado/pintado/etc y el field pide recubrimiento, sáltalo
+            if any(kw in field_lower for kw in ["recubrimiento", "galvanizado", "pintado", "estanado", "estañado", "cromado"]) and \
+               any(k in text_blob for k in galv_keywords):
+                logger.info(f"[PRUNE] Skipping field '{field}' because galvanizado/pintado detected in text_blob")
+                skip = True
+            
+            # Variaciones de laminado
+            laminado_keywords = ["laminada en caliente", "laminadas en caliente", "laminada en frio", "laminadas en frio", "laminada en frío", "laminadas en frío", "laminado en caliente", "laminado en frio", "laminado en frío", "laminacion", "laminacion en caliente", "laminacion en frio", "laminacion en frío"]
+            
+            # Si el usuario mencionó laminado en caliente/frío y el field pide proceso de laminado, sáltalo
+            if ("proceso de laminado" in field_lower) and any(k in text_blob for k in laminado_keywords):
+                logger.info(f"[PRUNE] Skipping field '{field}' because laminado process detected in text_blob")
+                skip = True
+            
+            if not skip:
+                final_missing.append(field)
+        
+        res["missing_fields"] = final_missing
+        
         after = list(res.get("missing_fields", []))
         if before != after:
             logger.info(f"Pruning missing_fields. Before: {before} | After: {after}")
+        
+        # Logging para debug
+        logger.info(f"[PRUNE DEBUG] text_blob: {text_blob[:300] if text_blob else 'empty'}")
+        logger.info(f"[PRUNE DEBUG] Final missing_fields after pruning: {after}")
+        
         return res
 
     def _normalize_result_fields(res: Dict[str, Any]) -> Dict[str, Any]:
@@ -413,39 +488,6 @@ RESPUESTA (solo JSON, sin explicaciones adicionales):"""
             ]
         return res
 
-    def _try_gemini() -> Optional[Dict[str, Any]]:
-        s = get_settings()
-        model_name = s.gemini_model
-        if not model_name.startswith("models/"):
-            model_name = f"models/{model_name}"
-        model = genai.GenerativeModel(
-            model_name=model_name,
-            generation_config=genai.GenerationConfig(
-                temperature=s.gemini_temperature,
-                top_p=s.gemini_top_p,
-                top_k=s.gemini_top_k,
-                max_output_tokens=s.gemini_max_output_tokens,
-                response_mime_type="application/json",
-                response_schema=OUTPUT_SCHEMA,
-            ),
-            safety_settings={
-                "HARM_CATEGORY_HARASSMENT": "BLOCK_NONE",
-                "HARM_CATEGORY_HATE_SPEECH": "BLOCK_NONE",
-                "HARM_CATEGORY_SEXUALLY_EXPLICIT": "BLOCK_NONE",
-                "HARM_CATEGORY_DANGEROUS_CONTENT": "BLOCK_NONE",
-            },
-            system_instruction=SYSTEM_INSTRUCTIONS,
-        )
-        logger.info(f"Llamando a Gemini {model_name} para generación...")
-        resp = model.generate_content(prompt)
-        if not getattr(resp, "parts", None):
-            finish = getattr(resp.candidates[0], "finish_reason", "unknown")
-            raise ValueError(f"Gemini bloqueó el contenido (finish_reason={finish})")
-        parsed = _normalize_gemini_json(resp.text or "")
-        norm = _normalize_result_fields(parsed)
-        norm = _prune_missing_fields(norm, query, conversation_history)
-        return norm
-
     def _try_azure() -> Optional[Dict[str, Any]]:
         s = get_settings()
         if not (s.azure_openai_endpoint and s.azure_openai_key and s.azure_openai_chat_deployment):
@@ -464,7 +506,7 @@ RESPUESTA (solo JSON, sin explicaciones adicionales):"""
                     {"role": "system", "content": SYSTEM_INSTRUCTIONS},
                     {"role": "user", "content": prompt},
                 ],
-                max_completion_tokens=get_settings().gemini_max_output_tokens,
+                max_tokens=get_settings().gemini_max_output_tokens,
                 response_format={"type": "json_object"},
             )
             choice = completion.choices[0].message.content if completion.choices else "{}"
@@ -476,13 +518,12 @@ RESPUESTA (solo JSON, sin explicaciones adicionales):"""
             logger.error(f"Error en generación con Azure OpenAI: {e}")
             return None
 
-    # Usar solo Azure OpenAI (Gemini deshabilitado)
     res_azure = _try_azure()
     if res_azure is not None:
         return res_azure
 
     # Último recurso: offline
-    return _offline_result(evidence=context_docs, reason="LLM offline o sin cuota disponible")
+    return _offline_result(evidence=context_docs, reason="LLM offline o sin cuota disponible (Azure)")
 
 
 def generate_structured(query: str, docs: list, versions: dict) -> dict:
@@ -549,29 +590,31 @@ def _fallback_followup_answer(question: str, previous_result: dict) -> str:
 
 def generate_followup_answer(question: str, previous_result: dict) -> str:
     """
-    Usa Gemini para responder una pregunta de seguimiento o reclasificar con nueva info.
+    Usa Azure OpenAI para responder una pregunta de seguimiento o reclasificar con nueva info.
     """
     if not question or not previous_result:
         return "No hay clasificación previa en contexto."
     try:
-        if not getattr(settings, "gemini_api_key", None):
+        s = get_settings()
+        if not (s.azure_openai_endpoint and s.azure_openai_key and s.azure_openai_chat_deployment):
             return _fallback_followup_answer(question, previous_result)
 
-        model = genai.GenerativeModel(
-            model_name="models/gemini-2.0-flash",
-            system_instruction=FOLLOWUP_SYSTEM_INSTRUCTIONS,
+        client = AzureOpenAI(
+            api_key=s.azure_openai_key,
+            azure_endpoint=s.azure_openai_endpoint,
+            api_version=s.azure_openai_api_version,
         )
-        
+
         # Construir prompt con historial y detectar si es reclasificación
         prompt_parts = []
-        
+
         # Agregar historial si existe
         conv_history = previous_result.get("conversation_history")
         if conv_history:
             prompt_parts.append("## Historial de conversación:\n")
             prompt_parts.append(conv_history)
             prompt_parts.append("\n---\n")
-        
+
         # Agregar clasificación actual
         prompt_parts.append("## Clasificación previa:\n")
         candidates = previous_result.get("top_candidates", [])
@@ -579,19 +622,19 @@ def generate_followup_answer(question: str, previous_result: dict) -> str:
             top = candidates[0]
             prompt_parts.append(f"**Código principal:** {top.get('code', 'N/A')}")
             prompt_parts.append(f"**Descripción:** {top.get('description', '')}")
-        
+
         # Agregar información faltante si existe
         missing = previous_result.get("missing_fields", [])
         if missing:
             prompt_parts.append("\n**Información que faltaba:**")
             for field in missing:
                 prompt_parts.append(f"- {field}")
-        
+
         prompt_parts.append("\n---\n")
-        
+
         # Pregunta/información del usuario
         prompt_parts.append(f"**Usuario dice:** {question}\n\n")
-        
+
         # Instrucciones adaptativas
         prompt_parts.append("**INSTRUCCIONES:**\n")
         prompt_parts.append("Si el usuario está proporcionando información adicional (estado, presentación, tipo):\n")
@@ -602,11 +645,19 @@ def generate_followup_answer(question: str, previous_result: dict) -> str:
         prompt_parts.append("Si es una pregunta de seguimiento normal:\n")
         prompt_parts.append("- Responde basándote solo en la clasificación previa\n\n")
         prompt_parts.append("Responde en español con Markdown simple.")
-        
+
         prompt = "".join(prompt_parts)
-        
-        resp = model.generate_content(prompt)
-        text = (getattr(resp, "text", None) or "").strip()
+
+        completion = client.chat.completions.create(
+            model=s.azure_openai_chat_deployment,
+            messages=[
+                {"role": "system", "content": FOLLOWUP_SYSTEM_INSTRUCTIONS},
+                {"role": "user", "content": prompt},
+            ],
+            response_format={"type": "text"},
+        )
+        text = completion.choices[0].message.content if completion.choices else ""
+        text = (text or "").strip()
         return text or _fallback_followup_answer(question, previous_result)
     except Exception as e:
         logger.exception("Error en generate_followup_answer: %s", e)

@@ -1,0 +1,654 @@
+
+      <html xmlns:o='urn:schemas-microsoft-com:office:office'
+            xmlns:w='urn:schemas-microsoft-com:office:word'
+            xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+          <meta charset="utf-8">
+          <title>Exported Document</title>
+          <style>
+              body { font-family: Arial, sans-serif; }
+          </style>
+      </head>
+      <body>
+          <h1 id="explicacincompletadelproyectotariffrag">Explicación Completa del Proyecto: Tariff RAG</h1>
+<h2 id="ndice">📋 Índice</h2>
+<ol>
+<li><a href="#qué-es-este-proyecto">¿Qué es este proyecto?</a></li>
+<li><a href="#arquitectura-general">Arquitectura general</a></li>
+<li><a href="#estructura-de-carpetas">Estructura de carpetas</a></li>
+<li><a href="#archivos-principales-y-su-función">Archivos principales y su función</a></li>
+<li><a href="#flujo-de-funcionamiento">Flujo de funcionamiento</a></li>
+<li><a href="#tecnologías-clave">Tecnologías clave</a></li>
+<li><a href="#cómo-usar-el-sistema">Cómo usar el sistema</a></li>
+</ol>
+<hr />
+<h2 id="quesesteproyecto">¿Qué es este proyecto?</h2>
+<p><strong>Tariff RAG</strong> es un sistema inteligente que ayuda a clasificar productos según el <strong>Sistema Armonizado (HS)</strong>, un código internacional usado en aduanas para identificar mercancías en importación y exportación.</p>
+<h3 id="quproblemaresuelve">¿Qué problema resuelve?</h3>
+<ul>
+<li>Clasificar productos correctamente es complejo y requiere conocimiento experto.</li>
+<li>Los documentos arancelarios son extensos y difíciles de buscar manualmente.</li>
+<li>Los errores de clasificación pueden causar multas o retrasos en aduanas.</li>
+</ul>
+<h3 id="cmoloresuelve">¿Cómo lo resuelve?</h3>
+<p>Este sistema usa <strong>inteligencia artificial</strong> y <strong>búsqueda avanzada</strong> para:</p>
+<ol>
+<li>Buscar información relevante en documentos oficiales.</li>
+<li>Sugerir códigos HS basados en la descripción del producto.</li>
+<li>Mostrar evidencia textual que justifica la clasificación.</li>
+<li>Indicar qué información falta para clasificar con mayor precisión.</li>
+</ol>
+<hr />
+<h2 id="arquitecturageneral">Arquitectura general</h2>
+<p>El proyecto se compone de <strong>5 servicios principales</strong> que trabajan juntos:</p>
+<pre><code>┌─────────────┐
+│   Usuario   │
+└──────┬──────┘
+       │
+       ├──────&gt; 🌐 UI (Gradio) - Puerto 7860
+       │        └──&gt; Interfaz web conversacional
+       │
+       └──────&gt; 🔧 API (FastAPI) - Puerto 8000
+                └──&gt; Procesa consultas y coordina todo
+                     │
+                     ├──&gt; 🔍 OpenSearch (Puerto 9200)
+                     │    └──&gt; Búsqueda semántica + léxica
+                     │
+                     ├──&gt; 🗄️ MySQL (Puerto 3306)
+                     │    └──&gt; Almacena corpus de productos
+                     │
+                     ├──&gt; 🤖 Gemini API (Google)
+                     │    └──&gt; Genera embeddings y clasificaciones
+                     │
+                     └──&gt; 📄 Azure Document Intelligence
+                          └──&gt; OCR de PDFs (opcional)
+</code></pre>
+<h3 id="componentesclave">Componentes clave:</h3>
+<ul>
+<li><strong>UI (Gradio)</strong>: Interfaz amigable para usuarios finales.</li>
+<li><strong>API (FastAPI)</strong>: Cerebro del sistema, orquesta todo el flujo.</li>
+<li><strong>OpenSearch</strong>: Motor de búsqueda híbrido (semántico + palabras clave).</li>
+<li><strong>MySQL</strong>: Base de datos con productos previamente clasificados.</li>
+<li><strong>Gemini</strong>: IA de Google para entender consultas y generar respuestas.</li>
+<li><strong>Azure DI</strong>: Extrae texto de documentos PDF (opcional).</li>
+</ul>
+<hr />
+<h2 id="estructuradecarpetas">Estructura de carpetas</h2>
+<pre><code>tariff-rag/
+│
+├── app/                          # Código principal de la aplicación
+│   ├── api.py                    # Endpoints REST (FastAPI)
+│   ├── chain_rag.py              # Lógica del pipeline RAG
+│   ├── config.py                 # Configuración y variables de entorno
+│   ├── schemas.py                # Modelos de datos (Pydantic)
+│   ├── generator_gemini.py       # Generación con IA (Gemini)
+│   ├── embedder_gemini.py        # Creación de embeddings
+│   ├── os_retrieval.py           # Búsqueda en OpenSearch
+│   ├── os_index.py               # Gestión de índices OpenSearch
+│   ├── os_ingest.py              # Ingesta de documentos
+│   ├── etl_mysql.py              # Conexión con MySQL
+│   ├── ocr_formrec.py            # OCR con Azure Document Intelligence
+│   ├── chunking.py               # División de textos en fragmentos
+│   ├── guardrails.py             # Validaciones y límites
+│   ├── prompts.py                # Plantillas de prompts para IA
+│   ├── rules.py                  # Reglas de negocio
+│   ├── metrics.py                # Métricas de Prometheus
+│   └── missing_fields_detector.py # Detecta información faltante
+│
+├── ui/                           # Interfaz de usuario
+│   └── gradio_app.py             # Aplicación web con Gradio
+│
+├── scripts/                      # Scripts de utilidad
+│   ├── init_index.py             # Crea el índice en OpenSearch
+│   ├── ingest_docs.py            # Ingesta documentos al índice
+│   ├── ingest_mysql.py           # Carga datos desde MySQL
+│   └── validate_search.py        # Pruebas de búsqueda
+│
+├── tests/                        # Pruebas automatizadas
+│   └── test_api.py               # Tests de la API
+│
+├── data/                         # Datos del proyecto
+│   ├── corpus/                   # Documentos fuente
+│   ├── afr/                      # Resultados de Azure DI
+│   └── gold/                     # Datos de evaluación
+│
+├── storage/                      # Volúmenes persistentes
+│   ├── os/                       # Datos de OpenSearch
+│   └── mysql/                    # Datos de MySQL
+│
+├── evaluation/                   # Scripts de evaluación
+│   ├── eval_clasificador.py     # Evalúa precisión de clasificación
+│   └── eval_retrieval.py        # Evalúa calidad de búsqueda
+│
+├── docker-compose.yml            # Orquestación de servicios
+├── Dockerfile                    # Imagen Docker para la API
+├── .env                          # Variables de entorno
+├── requirements.txt              # Dependencias Python
+└── README.md                     # Documentación principal
+</code></pre>
+<hr />
+<h2 id="archivosprincipalesysufuncin">Archivos principales y su función</h2>
+<h3 id="appapipyelpuntodeentradadelaapi">🔧 <strong>app/api.py</strong> - El punto de entrada de la API</h3>
+<p><strong>¿Qué hace?</strong></p>
+<ul>
+<li>Define los <strong>endpoints REST</strong> que reciben las consultas del usuario.</li>
+<li>Coordina el flujo completo: recibe → procesa → responde.</li>
+<li>Valida las entradas para evitar errores.</li>
+</ul>
+<p><strong>Endpoints principales:</strong></p>
+<pre><code class="python language-python">GET  /health          # Verifica que todos los servicios estén funcionando
+POST /classify        # Clasifica un producto y devuelve códigos HS
+GET  /metrics         # Métricas de uso (Prometheus)
+</code></pre>
+<p><strong>Flujo de /classify:</strong></p>
+<ol>
+<li>Recibe la descripción del producto (<code>query</code>).</li>
+<li>Valida que la consulta sea válida (mínimo 2 palabras, máximo 4000 caracteres).</li>
+<li>Llama al pipeline RAG (<code>chain_rag.py</code>).</li>
+<li>Devuelve: códigos candidatos, evidencia, información faltante, advertencias.</li>
+</ol>
+<p><strong>Ejemplo de validación:</strong></p>
+<pre><code class="python language-python">class ClassifyRequest(BaseModel):
+    query: str = Field(..., max_length=4000)  # Máximo 4000 caracteres
+    top_k: int = Field(default=5, ge=1, le=20)  # Entre 1 y 20 resultados
+</code></pre>
+<hr />
+<h3 id="appchain_ragpyelcerebrodelsistema">🧠 <strong>app/chain_rag.py</strong> - El cerebro del sistema</h3>
+<p><strong>¿Qué hace?</strong></p>
+<ul>
+<li>Implementa el <strong>pipeline RAG</strong> (Retrieval-Augmented Generation).</li>
+<li>Orquesta todos los pasos: búsqueda → validación → generación.</li>
+</ul>
+<p><strong>Pipeline paso a paso:</strong></p>
+<pre><code class="python language-python">def classify(text: str, file_url: Optional[str] = None, top_k: int = 5):
+    # 1. OCR (si hay PDF)
+    if file_url:
+        text += extract_text_from_pdf(file_url)
+
+    # 2. Búsqueda híbrida (semántica + léxica)
+    docs = retrieve_fragments(text, top_k=top_k * 2)
+
+    # 3. Validación de evidencia
+    valid_docs = filter_by_score(docs, min_score=0.30)
+    if len(valid_docs) &lt; 2:
+        return warning("Evidencia insuficiente")
+
+    # 4. Generación con Gemini
+    result = generate_label(text, valid_docs)
+
+    # 5. Enriquecimiento y respuesta
+    return format_response(result, evidence=valid_docs)
+</code></pre>
+<p><strong>Características clave:</strong></p>
+<ul>
+<li><strong>Guardrails</strong>: Valida que haya suficiente evidencia antes de clasificar.</li>
+<li><strong>Fallback</strong>: Si Gemini falla, usa candidatos derivados de metadatos.</li>
+<li><strong>Debug mode</strong>: Devuelve información adicional para diagnóstico.</li>
+</ul>
+<hr />
+<h3 id="appos_retrievalpybsquedainteligente">🔍 <strong>app/os_retrieval.py</strong> - Búsqueda inteligente</h3>
+<p><strong>¿Qué hace?</strong></p>
+<ul>
+<li>Busca fragmentos relevantes en <strong>OpenSearch</strong> usando dos métodos:</li>
+</ul>
+<ol>
+<li><strong>Búsqueda semántica (k-NN)</strong>: Entiende el significado usando embeddings.</li>
+<li><strong>Búsqueda léxica (BM25)</strong>: Busca palabras clave con boosts.</li>
+</ol>
+<p><strong>Estrategia híbrida:</strong></p>
+<pre><code class="python language-python">def hybrid_search_with_fallback(query: str, k: int = 5):
+    # 1. Intenta búsqueda semántica
+    results = knn_semantic_search(query, k)
+    if results:
+        return results
+
+    # 2. Si falla, usa BM25 con boosts
+    return bm25_search(query, k)
+</code></pre>
+<p><strong>Ventajas:</strong></p>
+<ul>
+<li><strong>Semántica</strong>: Encuentra textos similares aunque usen palabras diferentes.</li>
+<li><strong>Léxica</strong>: Útil cuando el usuario menciona códigos HS específicos.</li>
+<li><strong>Fallback</strong>: Siempre devuelve algo, incluso si un método falla.</li>
+</ul>
+<hr />
+<h3 id="appgenerator_geminipygeneracinconia">🤖 <strong>app/generator_gemini.py</strong> - Generación con IA</h3>
+<p><strong>¿Qué hace?</strong></p>
+<ul>
+<li>Usa <strong>Gemini</strong> (Google) para analizar evidencia y sugerir códigos HS.</li>
+<li>Genera respuestas estructuradas en formato JSON.</li>
+<li>Maneja consultas vagas y pide información adicional.</li>
+</ul>
+<p><strong>Flujo de generación:</strong></p>
+<pre><code class="python language-python">def generate_label(query: str, context_docs: list):
+    # 1. Construye el contexto con evidencia
+    context = format_evidence(context_docs)
+
+    # 2. Crea el prompt con instrucciones
+    prompt = f"""
+    CONTEXTO: {context}
+    CONSULTA: {query}
+
+    Si la consulta es vaga:
+      - NO propongas códigos
+      - Lista información faltante
+
+    Si tiene suficiente detalle:
+      - Propón códigos HS candidatos
+      - Indica confianza (0-1)
+      - Explica inclusiones/exclusiones
+    """
+
+    # 3. Llama a Gemini con schema estructurado
+    response = gemini.generate_content(prompt, schema=OUTPUT_SCHEMA)
+
+    # 4. Parsea y valida el JSON
+    return parse_and_validate(response.text)
+</code></pre>
+<p><strong>Características avanzadas:</strong></p>
+<ul>
+<li><strong>Structured output</strong>: Gemini devuelve JSON válido siguiendo un schema.</li>
+<li><strong>Safety settings</strong>: Desactiva filtros innecesarios para contenido técnico.</li>
+<li><strong>Fallback inteligente</strong>: Si Gemini se bloquea, infiere candidatos desde metadatos.</li>
+</ul>
+<hr />
+<h3 id="appschemaspymodelosdedatos">📊 <strong>app/schemas.py</strong> - Modelos de datos</h3>
+<p><strong>¿Qué hace?</strong></p>
+<ul>
+<li>Define la <strong>estructura de datos</strong> usando Pydantic.</li>
+<li>Valida automáticamente que los datos sean correctos.</li>
+</ul>
+<p><strong>Modelos principales:</strong></p>
+<pre><code class="python language-python"># Candidato de clasificación
+class Candidate(BaseModel):
+    code: str                    # Código HS (ej: "8517.12")
+    description: str             # Descripción del código
+    confidence: float            # Confianza 0-1
+    level: str                   # "HS2", "HS4", "HS6"
+
+# Respuesta completa
+class ClassifyResponse(BaseModel):
+    top_candidates: List[Candidate]      # Códigos sugeridos
+    evidence: List[Citation]             # Fragmentos recuperados
+    applied_rgi: List[str]               # Reglas aplicadas (ej: "RGI 1")
+    inclusions: List[str]                # Qué incluye la partida
+    exclusions: List[str]                # Qué excluye
+    missing_fields: List[str]            # Información faltante
+    warnings: List[str]                  # Advertencias
+</code></pre>
+<hr />
+<h3 id="uigradio_apppyinterfazdeusuario">🌐 <strong>ui/gradio_app.py</strong> - Interfaz de usuario</h3>
+<p><strong>¿Qué hace?</strong></p>
+<ul>
+<li>Proporciona una <strong>interfaz web conversacional</strong> fácil de usar.</li>
+<li>Gestiona el historial de conversación.</li>
+<li>Formatea las respuestas de forma legible.</li>
+</ul>
+<p><strong>Componentes de la UI:</strong></p>
+<pre><code class="python language-python"># 1. Interfaz de chat
+chatbot = gr.ChatInterface(
+    fn=chat_response,
+    title="Clasificador Arancelario HS",
+    description="Describe tu producto para obtener el código HS"
+)
+
+# 2. Gestión del historial
+class ConversationState:
+    def __init__(self):
+        self.last_classification = None
+        self.history = []
+
+    def add_turn(self, user_msg, assistant_msg):
+        self.history.append((user_msg, assistant_msg))
+</code></pre>
+<p><strong>Características:</strong></p>
+<ul>
+<li><strong>Formato mejorado</strong>: Usa Markdown con emojis y colores.</li>
+<li><strong>Seguimiento inteligente</strong>: Detecta preguntas de seguimiento.</li>
+<li><strong>Validación</strong>: Verifica que la consulta sea sobre aranceles.</li>
+<li><strong>Expandibles</strong>: Los fragmentos largos se pueden expandir.</li>
+</ul>
+<hr />
+<h3 id="appconfigpyconfiguracincentral">⚙️ <strong>app/config.py</strong> - Configuración central</h3>
+<p><strong>¿Qué hace?</strong></p>
+<ul>
+<li>Centraliza <strong>todas las variables de configuración</strong>.</li>
+<li>Lee desde variables de entorno (<code>.env</code> o Docker).</li>
+</ul>
+<p><strong>Configuración por categoría:</strong></p>
+<pre><code class="python language-python">class Settings(BaseSettings):
+    # OpenSearch
+    opensearch_host: str = "http://opensearch:9200"
+    opensearch_index: str = "tariff_fragments"
+    opensearch_emb_dim: int = 768
+
+    # MySQL
+    mysql_host: str = "mysql"
+    mysql_port: int = 3306
+    mysql_db: str = "corpusdb"
+
+    # Gemini
+    gemini_api_key: str
+    gemini_model: str = "gemini-2.5-flash"
+    gemini_temperature: float = 0.3
+
+    # Parámetros del RAG
+    final_pasages: int = 8
+    min_evidence: int = 2
+    min_score: float = 0.30
+    enable_retrieval_fallback: bool = False
+</code></pre>
+<hr />
+<h3 id="dockercomposeymlorquestacindeservicios">🐳 <strong>docker-compose.yml</strong> - Orquestación de servicios</h3>
+<p><strong>¿Qué hace?</strong></p>
+<ul>
+<li>Define y coordina los <strong>5 servicios</strong> del sistema.</li>
+<li>Configura redes, volúmenes y healthchecks.</li>
+</ul>
+<p><strong>Servicios configurados:</strong></p>
+<pre><code class="yaml language-yaml">services:
+  opensearch:           # Motor de búsqueda
+    image: opensearchproject/opensearch:2.13.0
+    ports: ["9200:9200"]
+    volumes: ["./storage/os:/usr/share/opensearch/data"]
+
+  dashboards:           # Visualización de OpenSearch
+    image: opensearchproject/opensearch-dashboards:2.13.0
+    ports: ["5601:5601"]
+
+  mysql:                # Base de datos
+    image: mysql:8.0
+    ports: ["3306:3306"]
+    volumes: ["mysql-data:/var/lib/mysql"]
+
+  api:                  # API FastAPI
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      - GEMINI_API_KEY=${GOOGLE_API_KEY}
+      - OPENSEARCH_HOST=http://opensearch:9200
+
+  ui:                   # Interfaz Gradio
+    build: .
+    ports: ["7860:7860"]
+    command: python ui/gradio_app.py
+</code></pre>
+<hr />
+<h2 id="flujodefuncionamiento">Flujo de funcionamiento</h2>
+<h3 id="escenario1consultadetallada">Escenario 1: Consulta detallada</h3>
+<p><strong>Usuario:</strong> "Smartphone con pantalla OLED de 6.1 pulgadas, 128GB, 5G, nuevo"</p>
+<pre><code>1. Usuario → UI Gradio
+   └─&gt; Envía consulta al endpoint POST /classify
+
+2. API FastAPI
+   └─&gt; Valida entrada (longitud, formato)
+   └─&gt; Llama a chain_rag.classify()
+
+3. Chain RAG
+   └─&gt; Llama a os_retrieval.retrieve_fragments()
+       ├─&gt; OpenSearch: Búsqueda k-NN con embeddings de Gemini
+       └─&gt; Devuelve 10 fragmentos relevantes (score &gt; 0.30)
+
+   └─&gt; Filtra evidencia (mínimo 2 fragmentos válidos)
+
+   └─&gt; Llama a generator_gemini.generate_label()
+       ├─&gt; Construye prompt con evidencia
+       ├─&gt; Llama a Gemini con schema estructurado
+       └─&gt; Parsea JSON de respuesta
+
+4. Gemini API
+   └─&gt; Analiza evidencia y genera respuesta:
+       {
+         "top_candidates": [
+           {"code": "8517.12", "confidence": 0.95, "level": "HS6"}
+         ],
+         "applied_rgi": ["RGI 1"],
+         "inclusions": ["Smartphones", "Teléfonos móviles"],
+         "missing_fields": ["¿Es nuevo o usado?"]
+       }
+
+5. API → UI
+   └─&gt; Formatea respuesta en Markdown con emojis
+   └─&gt; Muestra al usuario:
+       - Código: 8517.12 (95% confianza)
+       - Evidencia: 5 fragmentos relevantes
+       - Falta: Indicar si es nuevo/usado
+</code></pre>
+<hr />
+<h3 id="escenario2consultavaga">Escenario 2: Consulta vaga</h3>
+<p><strong>Usuario:</strong> "¿Cuál es la partida arancelaria de los vehículos?"</p>
+<pre><code>1. Usuario → UI → API
+
+2. Chain RAG
+   └─&gt; Recupera fragmentos sobre "vehículos"
+   └─&gt; Llama a Gemini
+
+3. Gemini detecta consulta vaga
+   └─&gt; Devuelve:
+       {
+         "top_candidates": [],  # NO propone códigos
+         "missing_fields": [
+           "Tipo de vehículo (automóvil, camión, motocicleta)",
+           "Uso (personas, mercancías, especial)",
+           "Características técnicas (cilindrada, peso)",
+           "Nuevo o usado"
+         ],
+         "warnings": ["Descripción muy general"]
+       }
+
+4. UI muestra al usuario:
+   ⚠️ No se pueden sugerir códigos.
+   🔍 Información adicional requerida:
+   - Tipo de vehículo
+   - Uso del vehículo
+   - ...
+</code></pre>
+<hr />
+<h3 id="escenario3seguimientoconversacional">Escenario 3: Seguimiento conversacional</h3>
+<p><strong>Usuario 1:</strong> "Vehículo para transporte de personas"</p>
+<pre><code>Sistema → "Tipo de vehículo? Cilindrada? Nuevo/usado?"
+</code></pre>
+<p><strong>Usuario 2:</strong> "Es un automóvil, gasolina, 1600cc, nuevo"</p>
+<pre><code>1. UI detecta que hay contexto previo
+   └─&gt; Enriquece la consulta: "automóvil gasolina 1600cc nuevo"
+
+2. Reclasifica con información completa
+   └─&gt; Gemini ahora puede proponer código específico:
+       8703.23 (Automóvil gasolina 1000-1500cc) - 90% confianza
+</code></pre>
+<hr />
+<h2 id="tecnologasclave">Tecnologías clave</h2>
+<h3 id="1opensearchmotordebsquedahbrido">1. <strong>OpenSearch</strong> - Motor de búsqueda híbrido</h3>
+<p><strong>¿Por qué se usa?</strong></p>
+<ul>
+<li>Combina búsqueda semántica (k-NN) y léxica (BM25).</li>
+<li>Escala a millones de documentos.</li>
+<li>Compatible con Elasticsearch pero de código abierto.</li>
+</ul>
+<p><strong>Configuración del índice:</strong></p>
+<pre><code class="python language-python">{
+  "mappings": {
+    "properties": {
+      "text": {"type": "text"},          # Para búsqueda BM25
+      "embedding": {                      # Para búsqueda k-NN
+        "type": "knn_vector",
+        "dimension": 768,                 # Dimensión de embeddings
+        "method": {
+          "name": "hnsw",                 # Algoritmo HNSW (rápido)
+          "space_type": "cosinesimil"     # Similitud del coseno
+        }
+      }
+    }
+  }
+}
+</code></pre>
+<hr />
+<h3 id="2geminiiadegoogle">2. <strong>Gemini</strong> - IA de Google</h3>
+<p><strong>¿Por qué se usa?</strong></p>
+<ul>
+<li><strong>Embeddings</strong>: Convierte texto en vectores para búsqueda semántica.</li>
+<li><strong>Generación</strong>: Analiza evidencia y sugiere códigos HS.</li>
+<li><strong>Structured output</strong>: Devuelve JSON estructurado automáticamente.</li>
+</ul>
+<p><strong>Modelos utilizados:</strong></p>
+<ul>
+<li><code>text-embedding-004</code>: Crea embeddings de 768 dimensiones.</li>
+<li><code>gemini-2.5-flash</code>: Genera clasificaciones rápidas y precisas.</li>
+</ul>
+<hr />
+<h3 id="3fastapiframeworkwebmoderno">3. <strong>FastAPI</strong> - Framework web moderno</h3>
+<p><strong>¿Por qué se usa?</strong></p>
+<ul>
+<li><strong>Rápido</strong>: Asíncrono y de alto rendimiento.</li>
+<li><strong>Validación automática</strong>: Usa Pydantic para validar datos.</li>
+<li><strong>Documentación automática</strong>: Genera <code>/docs</code> (Swagger UI).</li>
+<li><strong>Type hints</strong>: Detecta errores antes de ejecutar.</li>
+</ul>
+<hr />
+<h3 id="4gradiointerfazdeusuariofcil">4. <strong>Gradio</strong> - Interfaz de usuario fácil</h3>
+<p><strong>¿Por qué se usa?</strong></p>
+<ul>
+<li><strong>Rápido de implementar</strong>: Pocas líneas de código.</li>
+<li><strong>Conversacional</strong>: Soporta chat con historial.</li>
+<li><strong>Markdown</strong>: Formatea respuestas con colores y emojis.</li>
+</ul>
+<hr />
+<h3 id="5dockercontenedores">5. <strong>Docker</strong> - Contenedores</h3>
+<p><strong>¿Por qué se usa?</strong></p>
+<ul>
+<li><strong>Portabilidad</strong>: Funciona igual en cualquier computadora.</li>
+<li><strong>Aislamiento</strong>: Cada servicio tiene su entorno.</li>
+<li><strong>Reproducibilidad</strong>: Mismas versiones siempre.</li>
+</ul>
+<hr />
+<h2 id="cmousarelsistema">Cómo usar el sistema</h2>
+<h3 id="opcin1apirestparadesarrolladores">Opción 1: API REST (para desarrolladores)</h3>
+<p><strong>1. Verificar salud:</strong></p>
+<pre><code class="bash language-bash">curl http://localhost:8000/health
+</code></pre>
+<p><strong>2. Clasificar producto:</strong></p>
+<pre><code class="bash language-bash">curl -X POST http://localhost:8000/classify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "Smartphone con pantalla OLED de 6.1 pulgadas",
+    "top_k": 5
+  }'
+</code></pre>
+<p><strong>3. Ver documentación interactiva:</strong></p>
+<pre><code>http://localhost:8000/docs
+</code></pre>
+<hr />
+<h3 id="opcin2interfazwebparausuariosfinales">Opción 2: Interfaz web (para usuarios finales)</h3>
+<p><strong>1. Abrir navegador:</strong></p>
+<pre><code>http://localhost:7860
+</code></pre>
+<p><strong>2. Escribir descripción del producto:</strong></p>
+<pre><code>"Ventilador USB de escritorio, 12cm, 5V"
+</code></pre>
+<p><strong>3. Revisar respuesta:</strong></p>
+<ul>
+<li>Código HS sugerido</li>
+<li>Nivel de confianza</li>
+<li>Evidencia textual</li>
+<li>Información faltante</li>
+</ul>
+<p><strong>4. Hacer preguntas de seguimiento:</strong></p>
+<ul>
+<li>"¿Por qué ese código?"</li>
+<li>"¿Qué información falta?"</li>
+<li>"¿Hay alternativas?"</li>
+</ul>
+<hr />
+<h2 id="puntostcnicosdestacados">Puntos técnicos destacados</h2>
+<h3 id="1bsquedahbridaconfallback">1. <strong>Búsqueda híbrida con fallback</strong></h3>
+<ul>
+<li><strong>Primero</strong>: Búsqueda semántica (k-NN con embeddings).</li>
+<li><strong>Si falla</strong>: Búsqueda léxica (BM25 con boosts).</li>
+<li><strong>Resultado</strong>: Siempre encuentra algo relevante.</li>
+</ul>
+<h3 id="2guardrailsdecalidad">2. <strong>Guardrails de calidad</strong></h3>
+<ul>
+<li><strong>MIN_EVIDENCE</strong>: Mínimo 2 fragmentos con score &gt; 0.30.</li>
+<li><strong>MAX_LENGTH</strong>: Consultas limitadas a 4000 caracteres.</li>
+<li><strong>TOP_K</strong>: Entre 1 y 20 resultados.</li>
+</ul>
+<h3 id="3fallbackporrecuperacin">3. <strong>Fallback por recuperación</strong></h3>
+<ul>
+<li>Si Gemini falla, infiere candidatos desde metadatos (chapter/heading).</li>
+<li>Activable con <code>ENABLE_RETRIEVAL_FALLBACK=1</code>.</li>
+</ul>
+<h3 id="4validacinestricta">4. <strong>Validación estricta</strong></h3>
+<ul>
+<li>Pydantic valida todos los datos de entrada/salida.</li>
+<li>FastAPI rechaza peticiones inválidas con error 422.</li>
+</ul>
+<h3 id="5mtricasyobservabilidad">5. <strong>Métricas y observabilidad</strong></h3>
+<ul>
+<li><strong>Prometheus</strong>: Expone métricas en <code>/metrics</code>.</li>
+<li><strong>Logs estructurados</strong>: Toda actividad se registra.</li>
+<li><strong>Debug mode</strong>: Devuelve información adicional de diagnóstico.</li>
+</ul>
+<hr />
+<h2 id="resumenejecutivo">Resumen ejecutivo</h2>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Objetivo</strong></td>
+<td>Clasificar productos según el Sistema Armonizado (HS)</td>
+</tr>
+<tr>
+<td><strong>Método</strong></td>
+<td>RAG (Retrieval-Augmented Generation) con búsqueda híbrida</td>
+</tr>
+<tr>
+<td><strong>IA</strong></td>
+<td>Google Gemini para embeddings y generación</td>
+</tr>
+<tr>
+<td><strong>Búsqueda</strong></td>
+<td>OpenSearch con k-NN (semántico) + BM25 (léxico)</td>
+</tr>
+<tr>
+<td><strong>Interfaces</strong></td>
+<td>API REST + UI web conversacional</td>
+</tr>
+<tr>
+<td><strong>Lenguaje</strong></td>
+<td>Python 3.11</td>
+</tr>
+<tr>
+<td><strong>Infraestructura</strong></td>
+<td>Docker Compose (5 servicios)</td>
+</tr>
+<tr>
+<td><strong>Precisión</strong></td>
+<td>Variable según detalle de consulta (50-95% confianza)</td>
+</tr>
+<tr>
+<td><strong>Velocidad</strong></td>
+<td>2-5 segundos por consulta</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="prximospasosopcional">Próximos pasos (opcional)</h2>
+<ul>
+<li><strong>Evaluación</strong>: Implementar split 70/15/15 para train/val/test.</li>
+<li><strong>Métricas</strong>: Agregar accuracy@1, MRR@3, F1 macro/micro.</li>
+<li><strong>Fine-tuning</strong>: Ajustar embeddings con datos del dominio.</li>
+<li><strong>UI mejorada</strong>: Agregar filtros por capítulo/sección.</li>
+<li><strong>Caché</strong>: Guardar consultas frecuentes para mayor velocidad.</li>
+</ul>
+<hr />
+<p><strong>Autor</strong>: Sistema Tariff RAG<br />
+<strong>Fecha</strong>: Noviembre 2025<br />
+<strong>Licencia</strong>: [Indicar licencia del proyecto]</p>
+      </body>
+      </html>
+    

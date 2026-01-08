@@ -265,6 +265,30 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
                 warnings=["Query too short: se requiere al menos 3 caracteres"],
                 versions={"hs_edition": "HS_2022"}
             )
+        
+        # 0.5) Construir texto contextual para el sanitizer (incluye últimas 2-3 interacciones)
+        contextual_query = query_text
+        logger.info(f"[SANITIZER DEBUG] query_text: {query_text}")
+        logger.info(f"[SANITIZER DEBUG] history length: {len(history)}")
+        if history and len(history) > 0:
+            # Tomar las últimas 2-3 preguntas del usuario para dar contexto
+            recent_user_queries = []
+            for msg in reversed(history[-6:]):  # Últimos 6 mensajes (3 turnos)
+                if isinstance(msg, dict):
+                    # El historial puede tener formato {"role": "user", "content": "..."} o {"user": "...", "assistant": "..."}
+                    user_content = msg.get("content") if msg.get("role") == "user" else msg.get("user")
+                    if user_content:
+                        recent_user_queries.insert(0, user_content)
+                if len(recent_user_queries) >= 3:
+                    break
+            # Combinar: queries anteriores + query actual
+            logger.info(f"[SANITIZER DEBUG] recent_user_queries: {recent_user_queries}")
+            all_queries = recent_user_queries + [query_text]
+            contextual_query = " ".join(all_queries)
+            logger.info(f"[SANITIZER DEBUG] Contextual query built: {contextual_query[:200]}")
+        else:
+            contextual_query = query_text
+            logger.info(f"[SANITIZER DEBUG] No history, using query_text only")
 
         # 1) retrieval con fallback
         try:
@@ -302,90 +326,65 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
             result_dict["evidence"] = []
 
         # 3.5) Normalización/Corrección de missing_fields genéricos según contexto
-        def _is_vehicle_query(t: str) -> bool:
-            t = (t or "").lower()
-            vehicle_terms = [
-                "vehículo", "vehiculo", "vehículos", "vehiculos",
-                "auto", "automóvil", "automovil", "coche", "carro",
-                "camión", "camion", "camioneta", "pickup",
-                "motocicleta", "moto", "bus", "autobús", "autobus", "microbús", "microbus",
-            ]
-            return any(w in t for w in vehicle_terms)
-
         def _has_generic_missing(missing_list):
+            """Detecta si el LLM devolvió campos genéricos prohibidos."""
             banned = [
-                "tipo de producto y su uso",
+                "tipo de producto",
+                "tipo de dispositivo",
                 "material o composición",
-                "características técnicas relevantes",
+                "características técnicas",  # Captura "relevantes", "adicionales", etc.
+                "característica adicional",  # Específico para laptop
                 "presentación/estado",
+                "dimensiones",
+                "proceso de fabricación",
+                "norma aplicable",
+                "cualquier característica",
+                "descripción del artículo",
+                "estado del artículo",
+                "detalles del procesador",
+                "como procesador, ram, almacenamiento",
+                "uso principal",  # Nuevo: detectar "¿Cuál es su uso principal?"
             ]
             ml = [str(m).lower() for m in (missing_list or [])]
             return any(any(b in m for b in banned) for m in ml)
 
-        def _vehicle_missing_by_text(t: str):
-            tl = (t or "").lower()
-            motor_terms = ["diésel", "diesel", "gasolina", "eléctrico", "electrico", "híbrido", "hibrido"]
-            estado_terms = ["nuevo", "nueva", "usado", "usada"]
-            import re
-            has_bus = any(w in tl for w in ["bus", "autobús", "autobus", "microbús", "microbus"])
-            # Detectar subtipos comunes de vehículo
-            has_auto = any(w in tl for w in ["automóvil", "automovil", "auto", "coche", "carro"])
-            has_camion = any(w in tl for w in ["camión", "camion", "camioneta", "pickup"])
-            has_moto = any(w in tl for w in ["motocicleta", "moto"])
-            has_motor = any(w in tl for w in motor_terms)
-            has_plazas = bool(re.search(r"\b(\d{1,3})\s*(plazas|personas|pasajeros)\b", tl))
-            has_estado = any(w in tl for w in estado_terms)
-
-            # Si ya hay contexto de bus + motor, limitar a estos 2-3 puntos
-            if has_bus and has_motor:
-                lst = []
-                if not has_plazas:
-                    lst.append("Número de plazas o pasajeros (define si va en 87.02 o 87.03 y afina subpartida)")
-                lst.append("Cilindrada del motor en cm³ (si aplica, para afinar subpartida)")
-                if not has_estado:
-                    lst.append("Si es nuevo o usado")
-                return lst or [
-                    "Número de plazas o pasajeros",
-                    "Cilindrada del motor en cm³",
-                    "Si es nuevo o usado",
-                ]
-
-            # Vehículo genérico: pedir tipo, uso, motor+cilindrada, plazas
-            return [
-                "Tipo de vehículo (automóvil, camión, motocicleta, autobús, etc.)",
-                "Uso principal (transporte de personas, mercancías, uso especial)",
-                "Tipo de motor (gasolina, diésel, eléctrico, híbrido) y cilindrada (cm³)",
-                "Número de plazas o pasajeros (si es para personas)",
-            ]
-
         try:
             mf = result_dict.get("missing_fields") or []
-            is_veh = _is_vehicle_query(query_text)
             has_gen = _has_generic_missing(mf)
-            logger.info(f"Sanitizer: is_vehicle={is_veh}, has_generic={has_gen}, missing_fields={mf}")
-            # Regla 1: Si es vehículo y Azure devolvió campos genéricos prohibidos → reemplazar por específicos
-            if is_veh and has_gen:
-                new_mf = _vehicle_missing_by_text(query_text)
-                logger.info(f"Sanitizer: replacing generic with {new_mf}")
-                result_dict["missing_fields"] = new_mf
-            # Regla 2: Si es una consulta genérica de vehículo (sin subtipo detectado), SIEMPRE priorizar pedir "Tipo de vehículo"
-            else:
-                tl = (query_text or "").lower()
-                has_any_subtype = any(w in tl for w in [
-                    "automóvil", "automovil", "auto", "coche", "carro",
-                    "camión", "camion", "camioneta", "pickup",
-                    "motocicleta", "moto",
-                    "bus", "autobús", "autobus", "microbús", "microbus"
-                ])
-                mentions_vehicle = any(w in tl for w in ["vehículo", "vehiculos", "vehículos", "vehiculo"]) or not has_any_subtype
-                if is_veh and not has_any_subtype and mentions_vehicle:
-                    new_mf = _vehicle_missing_by_text(query_text)
-                    # Asegurarse que el primer campo sea "Tipo de vehículo..."
-                    if not new_mf or "tipo de vehículo" not in new_mf[0].lower():
-                        # Reordenar para poner tipo primero
-                        new_mf = sorted(new_mf, key=lambda x: 0 if "tipo de vehículo" in str(x).lower() else 1)
-                    logger.info(f"Sanitizer: enforcing type-first missing_fields {new_mf}")
-                    result_dict["missing_fields"] = new_mf
+            
+            logger.info(f"[SANITIZER] contextual_query: {contextual_query[:150]}")
+            logger.info(f"[SANITIZER] has_generic_fields={has_gen}")
+            logger.info(f"[SANITIZER] missing_fields from LLM: {mf}")
+            
+            # ÚNICA REGLA: Si el LLM devolvió campos genéricos prohibidos, limpiarlos
+            if has_gen:
+                logger.warning(f"[SANITIZER] Detected generic fields. Filtering them out.")
+                # Usar la MISMA lista de banned phrases que en _has_generic_missing
+                filtered_mf = [
+                    field for field in mf 
+                    if not any(banned in str(field).lower() for banned in [
+                        "tipo de producto",
+                        "tipo de dispositivo",
+                        "material o composición",
+                        "características técnicas",
+                        "característica adicional",
+                        "presentación/estado",
+                        "dimensiones",
+                        "proceso de fabricación",
+                        "norma aplicable",
+                        "cualquier característica",
+                        "descripción del artículo",
+                        "estado del artículo",
+                        "detalles del procesador",
+                        "como procesador, ram, almacenamiento",
+                        "uso principal",
+                        "es portátil o de escritorio",  # Específico para laptops donde ya se estableció el tipo
+                    ])
+                ]
+                result_dict["missing_fields"] = filtered_mf
+                logger.info(f"[SANITIZER] Filtered missing_fields: {filtered_mf}")
+
+                
         except Exception as e:
             # No interrumpir si el saneamiento falla
             logger.exception(f"Sanitizer failed: {e}")
