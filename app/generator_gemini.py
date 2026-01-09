@@ -127,6 +127,7 @@ def _build_evidence_from_os_hits(context_docs: List[Dict[str, Any]]) -> List[Dic
             "chapter": source.get("chapter", ""),
             "heading": source.get("heading", ""),
             "subheading": source.get("subheading", ""),
+            "year": source.get("year"),  # Incluir año
         })
     return evidence
 

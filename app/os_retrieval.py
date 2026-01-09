@@ -31,8 +31,21 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
     # Si no se especifica índice, usar la lista de índices configurada
     if index is None:
         settings = get_settings()
-        # Usar opensearch_indices si está configurado, sino opensearch_index
-        index = settings.opensearch_indices if hasattr(settings, 'opensearch_indices') and settings.opensearch_indices else settings.opensearch_index
+        # Si se especifican años, mapear años a índices específicos
+        if years:
+            year_to_index = {
+                2025: "tariff_fragments",
+                2026: "tariff_fragments_2026"
+            }
+            selected_indices = [year_to_index[y] for y in years if y in year_to_index]
+            index = ",".join(selected_indices) if selected_indices else settings.opensearch_index
+            logger.info(f"[DEBUG] Years provided: {years} → Selected indices: {index}")
+        else:
+            # Usar opensearch_indices si está configurado, sino opensearch_index
+            index = settings.opensearch_indices if hasattr(settings, 'opensearch_indices') and settings.opensearch_indices else settings.opensearch_index
+            logger.info(f"[DEBUG] No years provided → Using all indices: {index}")
+    else:
+        logger.info(f"[DEBUG] Index already specified: {index}")
     
     # Actualizar métrica de retrieval_k
     RETRIEVAL_K.labels(strategy="hybrid").set(top_k)
@@ -40,7 +53,7 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
     # Generar embedding para la query
     query_vector = embedder.embed_texts([query_text])[0]
     
-    # Construir query con filtro de años si se especifica
+    # Construir query kNN (el filtro de años se maneja vía selección de índices)
     query_obj = {
         "knn": {
             "embedding": {
@@ -49,19 +62,6 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
             }
         }
     }
-    
-    # Si se especifica años, añadir filtro
-    if years:
-        query_obj = {
-            "bool": {
-                "must": query_obj,
-                "filter": {
-                    "terms": {
-                        "year": years
-                    }
-                }
-            }
-        }
     
     # Búsqueda kNN nativa de OpenSearch
     body = {
@@ -83,8 +83,11 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
     }
     
     try:
+        logger.info(f"[DEBUG] Executing OpenSearch query on index: '{index}' with years: {years}")
         response = client.search(index=index, body=body)
+        logger.info(f"[DEBUG] OpenSearch response: {len(response.get('hits', {}).get('hits', []))} hits found")
         hits = response.get("hits", {}).get("hits", [])
+        logger.info(f"[DEBUG] Results from years {years}: {[h.get('_source', {}).get('fragment_id') + ':' + str(h.get('_source', {}).get('year')) for h in hits[:3]]}")
         # Return raw OpenSearch hits to match chain_rag expectations:
         # each hit has: "_id", "_score", and "_source" with "text", etc.
         return hits
@@ -128,7 +131,7 @@ def retrieve_support_for_code(os_client, index_name: str, code: str, k: int = 5,
     body = {
         "size": k,
         "query": {"bool": {"should": should, "minimum_should_match": 1}},
-        "_source": ["fragment_id", "text", "bucket", "unit", "doc_id"],
+        "_source": ["fragment_id", "text", "bucket", "unit", "doc_id", "year"],
     }
     try:
         resp = os_client.search(index=index_name, body=body)
@@ -189,7 +192,7 @@ def knn_semantic_search(os_client, index: str, query_text: str, k: int = 5) -> L
                 }
             }
         },
-        "_source": ["fragment_id","text","bucket","unit","doc_id","chapter","heading","subheading"]
+        "_source": ["fragment_id","text","bucket","unit","doc_id","chapter","heading","subheading","year"]
     }
     resp = os_client.search(index=index, body=body)
     return resp.get("hits", {}).get("hits", [])
@@ -216,7 +219,7 @@ def _bm25_body(query_text: str, k: int = 5) -> Dict:
     return {
         "size": k,
         "query": {"bool": {"should": should, "minimum_should_match": 1}},
-        "_source": ["fragment_id","text","bucket","unit","doc_id","chapter","heading","subheading"],
+        "_source": ["fragment_id","text","bucket","unit","doc_id","chapter","heading","subheading","year"],
     }
 
 
@@ -261,29 +264,46 @@ def ensure_index_exists(os_client, index_name: str):
     os_client.indices.create(index=index_name, body=mapping)
     logger.info(f"Created index: {index_name}")
 
-def hybrid_search_with_fallback(os_client, index: str, query_text: str, k: int = 5, years: Optional[List[int]] = None) -> List[Dict]:
+def hybrid_search_with_fallback(os_client, index: Optional[str], query_text: str, k: int = 5, years: Optional[List[int]] = None) -> List[Dict]:
     """
     1) Intenta KNN semántico con embeddings.
     2) Si vacío o falla, cae a BM25 con boosts de dominio.
     
     Args:
         os_client: Cliente OpenSearch
-        index: Nombre del índice o índices (puede ser "index1,index2" para múltiples)
+        index: Nombre del índice o índices (puede ser "index1,index2" para múltiples). Si es None, se usa la lógica de años.
         query_text: Texto a buscar
         k: Número de resultados
         years: Lista de años para filtrar (ej: [2025, 2026])
     """
-    # Asegurar que el índice existe
-    if "," not in index:  # Si es un solo índice, verificar que existe
+    # Asegurar que el índice existe (solo si no es None)
+    if index and "," not in index:  # Si es un solo índice, verificar que existe
         ensure_index_exists(os_client, index)
 
     try:
         hits = retrieve_fragments(query_text, top_k=k, index=index, years=years)
         if hits:
             return hits
-    except Exception:
+    except Exception as e:
+        logger.warning(f"KNN search failed: {e}. Falling back to BM25.")
         # Fallback a BM25
         pass
 
-    # Fallback a BM25 léxico (sin soporte de años en la búsqueda BM25)
-    return bm25_search(os_client, index, query_text, k)
+    # Fallback a BM25 léxico
+    # Determinar el índice para BM25 usando la misma lógica que retrieve_fragments
+    if index is None:
+        settings = get_settings()
+        if years:
+            year_to_index = {
+                2025: "tariff_fragments",
+                2026: "tariff_fragments_2026"
+            }
+            selected_indices = [year_to_index[y] for y in years if y in year_to_index]
+            bm25_index = ",".join(selected_indices) if selected_indices else settings.opensearch_index
+        else:
+            bm25_index = settings.opensearch_indices if hasattr(settings, 'opensearch_indices') and settings.opensearch_indices else settings.opensearch_index
+        logger.info(f"[BM25 FALLBACK] Using index: {bm25_index} for years: {years}")
+    else:
+        bm25_index = index
+        
+    return bm25_search(os_client, bm25_index, query_text, k)

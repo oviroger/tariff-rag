@@ -294,9 +294,12 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
         # 1) retrieval con fallback
         try:
             # Pasar años si se especifican, sino buscar en todos los índices configurados
+            # Si se especifican años, NO pasar index_name para que retrieve_fragments() haga la selección
+            index_for_search = None if req.years else index_name
+            logger.info(f"[ROUTING DEBUG] req.years={req.years}, index_for_search={index_for_search}")
             hits = hybrid_search_with_fallback(
                 os_client, 
-                index_name, 
+                index_for_search, 
                 query_text, 
                 k=req.top_k or 5,
                 years=req.years
@@ -326,6 +329,7 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
                 "unit": (src or {}).get("unit"),
                 "doc_id": (src or {}).get("doc_id"),
                 "reason": h.get("reason") or "retrieved_by_search",
+                "year": (src or {}).get("year"),  # Incluir año
             }
         try:
             result_dict["evidence"] = [_norm(h) for h in hits]
