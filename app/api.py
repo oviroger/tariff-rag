@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, model_validator
 from contextlib import asynccontextmanager
-from typing import Optional, Any, Dict
+from typing import Optional, Any, Dict, List
 import os
 from time import perf_counter
 import logging
@@ -134,6 +134,7 @@ class ClassifyRequest(BaseModel):
     conversation_history: Optional[list] = []
     conversation_id: Optional[str] = None
     top_k: Optional[int] = 5
+    years: Optional[List[int]] = None  # Filtrar por años: [2025], [2026], o [2025, 2026]
 
     @model_validator(mode='after')
     def check_query_provided(self):
@@ -292,7 +293,14 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
 
         # 1) retrieval con fallback
         try:
-            hits = hybrid_search_with_fallback(os_client, index_name, query_text, k=req.top_k or 5) or []
+            # Pasar años si se especifican, sino buscar en todos los índices configurados
+            hits = hybrid_search_with_fallback(
+                os_client, 
+                index_name, 
+                query_text, 
+                k=req.top_k or 5,
+                years=req.years
+            ) or []
         except Exception as e:
             logger.warning(f"Retrieval failed: {e}. Using empty hits.")
             hits = []

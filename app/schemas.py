@@ -10,6 +10,7 @@ class Fragment(BaseModel):
     text: str
     metadata: Dict[str, Any] = Field(default_factory=dict)
     embedding: Optional[List[float]] = None
+    year: Optional[int] = None  # Año de la fuente (2025, 2026, etc.)
 
 class Citation(BaseModel):
     """Evidencia recuperada del retriever"""
@@ -27,6 +28,7 @@ class EvidenceFragment(BaseModel):
     unit: Optional[str] = None
     doc_id: Optional[str] = None
     reason: Optional[str] = None
+    year: Optional[int] = None  # Año de la fuente (2025, 2026, etc.)
 
 HSLevel = Literal["HS6", "NANDINA8", "NATIONAL10"]
 
@@ -63,6 +65,7 @@ class Settings(BaseSettings):
     # OpenSearch (alineado con .env / docker-compose)
     opensearch_host: str = "http://opensearch:9200"
     opensearch_index: str = "tariff_fragments"
+    opensearch_indices: str = "tariff_fragments,tariff_fragments_2026"  # Índices separados por coma para consultas multi-año
     opensearch_knn_space: str = "cosinesimil"
     opensearch_emb_dim: int = 768
 

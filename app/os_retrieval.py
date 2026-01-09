@@ -12,34 +12,61 @@ from app.embedder_gemini import GeminiEmbedder
 
 logger = logging.getLogger(__name__)
 
-def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = None) -> list:
+def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = None, years: Optional[List[int]] = None) -> list:
     """
     Recupera fragmentos relevantes usando búsqueda semántica (kNN + embeddings).
-    """
-    if index is None:
-        settings = get_settings()
-        index = settings.opensearch_index
     
+    Args:
+        query_text: Texto de la consulta
+        top_k: Número de resultados a retornar
+        index: Índice específico (si es None, usa opensearch_indices para multi-año)
+        years: Años a filtrar (ej: [2025, 2026]). Si es None, busca en todos los disponibles
+    
+    Returns:
+        Lista de hits con metadata de año incluida
+    """
     client = get_os_client()
     embedder = GeminiEmbedder()
+    
+    # Si no se especifica índice, usar la lista de índices configurada
+    if index is None:
+        settings = get_settings()
+        # Usar opensearch_indices si está configurado, sino opensearch_index
+        index = settings.opensearch_indices if hasattr(settings, 'opensearch_indices') and settings.opensearch_indices else settings.opensearch_index
     
     # Actualizar métrica de retrieval_k
     RETRIEVAL_K.labels(strategy="hybrid").set(top_k)
     
     # Generar embedding para la query
     query_vector = embedder.embed_texts([query_text])[0]
-
+    
+    # Construir query con filtro de años si se especifica
+    query_obj = {
+        "knn": {
+            "embedding": {
+                "vector": query_vector,
+                "k": top_k
+            }
+        }
+    }
+    
+    # Si se especifica años, añadir filtro
+    if years:
+        query_obj = {
+            "bool": {
+                "must": query_obj,
+                "filter": {
+                    "terms": {
+                        "year": years
+                    }
+                }
+            }
+        }
+    
     # Búsqueda kNN nativa de OpenSearch
     body = {
         "size": top_k,
-        "query": {
-            "knn": {
-                "embedding": {
-                    "vector": query_vector,
-                    "k": top_k
-                }
-            }
-        },
+        "query": query_obj,
         "_source": [
             "fragment_id",
             "text",
@@ -50,7 +77,8 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
             "filename",
             "chapter",
             "heading",
-            "subheading"
+            "subheading",
+            "year"  # Incluir año en resultados
         ]
     }
     
@@ -233,20 +261,29 @@ def ensure_index_exists(os_client, index_name: str):
     os_client.indices.create(index=index_name, body=mapping)
     logger.info(f"Created index: {index_name}")
 
-def hybrid_search_with_fallback(os_client, index: str, query_text: str, k: int = 5) -> List[Dict]:
+def hybrid_search_with_fallback(os_client, index: str, query_text: str, k: int = 5, years: Optional[List[int]] = None) -> List[Dict]:
     """
     1) Intenta KNN semántico con embeddings.
     2) Si vacío o falla, cae a BM25 con boosts de dominio.
+    
+    Args:
+        os_client: Cliente OpenSearch
+        index: Nombre del índice o índices (puede ser "index1,index2" para múltiples)
+        query_text: Texto a buscar
+        k: Número de resultados
+        years: Lista de años para filtrar (ej: [2025, 2026])
     """
     # Asegurar que el índice existe
-    ensure_index_exists(os_client, index)
+    if "," not in index:  # Si es un solo índice, verificar que existe
+        ensure_index_exists(os_client, index)
 
     try:
-        hits = knn_semantic_search(os_client, index, query_text, k)
+        hits = retrieve_fragments(query_text, top_k=k, index=index, years=years)
         if hits:
             return hits
     except Exception:
-        # log outside if you prefer; silence to fall back
+        # Fallback a BM25
         pass
 
+    # Fallback a BM25 léxico (sin soporte de años en la búsqueda BM25)
     return bm25_search(os_client, index, query_text, k)
