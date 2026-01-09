@@ -965,7 +965,9 @@ def render_evidence_markdown(result: dict) -> str:
     if support:
         lines.append("### 📌 Evidencia del código principal\n")
         for ev in support:
-            lines.append(f"- ({float(ev.get('score',0)):0.3f}) {ev.get('text','')[:240]}…  \n  `frag:` {ev.get('fragment_id')}")
+            year = ev.get('year')
+            year_str = f" | 📅 {year}" if year else ""
+            lines.append(f"- ({float(ev.get('score',0)):0.3f}) {ev.get('text','')[:240]}…  \n  `frag:` {ev.get('fragment_id')}{year_str}")
 
     if generic:
         lines.append("\n### 📚 Evidencia recuperada por la consulta\n")
@@ -973,7 +975,9 @@ def render_evidence_markdown(result: dict) -> str:
             text = ev.get("text") or (ev.get("_source", {}) or {}).get("text", "")
             score = ev.get("score") or ev.get("_score", 0)
             frag = ev.get("fragment_id") or (ev.get("_source", {}) or {}).get("fragment_id")
-            lines.append(f"- ({float(score):0.3f}) {text[:240]}…  \n  `frag:` {frag}")
+            year = ev.get("year") or (ev.get("_source", {}) or {}).get("year")
+            year_str = f" | 📅 {year}" if year else ""
+            lines.append(f"- ({float(score):0.3f}) {text[:240]}…  \n  `frag:` {frag}{year_str}")
 
     if not lines:
         return "🟡 No se recuperó evidencia.\n\nSugerencias:\n- Ingerir documentos del Capítulo/Partida (e.g., 4011)\n- Aumentar top_k\n- Verificar índice con scripts/init_index.py e ingest_docs.py"
