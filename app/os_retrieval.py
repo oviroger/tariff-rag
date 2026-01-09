@@ -39,13 +39,9 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
             }
             selected_indices = [year_to_index[y] for y in years if y in year_to_index]
             index = ",".join(selected_indices) if selected_indices else settings.opensearch_index
-            logger.info(f"[DEBUG] Years provided: {years} → Selected indices: {index}")
         else:
             # Usar opensearch_indices si está configurado, sino opensearch_index
             index = settings.opensearch_indices if hasattr(settings, 'opensearch_indices') and settings.opensearch_indices else settings.opensearch_index
-            logger.info(f"[DEBUG] No years provided → Using all indices: {index}")
-    else:
-        logger.info(f"[DEBUG] Index already specified: {index}")
     
     # Actualizar métrica de retrieval_k
     RETRIEVAL_K.labels(strategy="hybrid").set(top_k)
@@ -83,11 +79,8 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
     }
     
     try:
-        logger.info(f"[DEBUG] Executing OpenSearch query on index: '{index}' with years: {years}")
         response = client.search(index=index, body=body)
-        logger.info(f"[DEBUG] OpenSearch response: {len(response.get('hits', {}).get('hits', []))} hits found")
         hits = response.get("hits", {}).get("hits", [])
-        logger.info(f"[DEBUG] Results from years {years}: {[h.get('_source', {}).get('fragment_id') + ':' + str(h.get('_source', {}).get('year')) for h in hits[:3]]}")
         # Return raw OpenSearch hits to match chain_rag expectations:
         # each hit has: "_id", "_score", and "_source" with "text", etc.
         return hits
@@ -302,7 +295,6 @@ def hybrid_search_with_fallback(os_client, index: Optional[str], query_text: str
             bm25_index = ",".join(selected_indices) if selected_indices else settings.opensearch_index
         else:
             bm25_index = settings.opensearch_indices if hasattr(settings, 'opensearch_indices') and settings.opensearch_indices else settings.opensearch_index
-        logger.info(f"[BM25 FALLBACK] Using index: {bm25_index} for years: {years}")
     else:
         bm25_index = index
         
