@@ -30,6 +30,12 @@ data/originales/
 data/afr/
 data/corpus/
 
+# Additional local AFR data (ignore)
+data/afr_2025_partes_only/
+data/afr_2026_partes_only/
+data/afr_done_2026/
+data/afr_done_filtered/
+
 # Optional: if the full corpus is large, consider ignoring it too
 data/corpus/
 
