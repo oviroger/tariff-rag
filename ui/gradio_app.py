@@ -357,16 +357,29 @@ def format_classification_markdown(result: Dict[str, Any]) -> str:
     md = ""
     candidates = result.get("top_candidates") or result.get("candidates") or []
     
-    # Recolectar TODOS los años únicos de las evidencias
+    # Recolectar TODOS los años únicos de las evidencias Y del campo years directo
     years_found = set()
+    
+    # Opción 1: Usar el campo 'years' directo de la respuesta
+    if result.get("years"):
+        years_found.update(result.get("years"))
+    
+    # Opción 2: Buscar en support_evidence
     for ev in (result.get("support_evidence") or []):
         y = ev.get("year")
         if y:
             years_found.add(y)
+    
+    # Opción 3: Buscar en evidence/context_docs
     for ev in (result.get("evidence") or result.get("context_docs") or []):
         y = ev.get("year") or (ev.get("_source", {}) or {}).get("year")
         if y:
             years_found.add(y)
+    
+    # Opción 4: Buscar en años de candidatos
+    for cand in candidates:
+        if cand.get("years"):
+            years_found.update(cand.get("years"))
     
     # Formatear años ordenados
     years_str = ""

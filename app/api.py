@@ -536,10 +536,34 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
         
         # Extraer años de los hits y incluirlos en la respuesta
         years_set = set()
+        
+        # Opción 1: Buscar en hits (evidencia recuperada)
         for hit in hits:
             year = (hit.get("_source") or {}).get("year")
             if year:
                 years_set.add(year)
+        
+        # Opción 2: Si no hay hits pero hay evidencia en result_dict, extraer de ahí
+        if not years_set and result_dict.get("evidence"):
+            for ev in result_dict.get("evidence", []):
+                year = ev.get("year")
+                if year:
+                    years_set.add(year)
+        
+        # Opción 3: Si no hay años aún, buscar en support_evidence
+        if not years_set and result_dict.get("support_evidence"):
+            for ev in result_dict.get("support_evidence", []):
+                year = ev.get("year")
+                if year:
+                    years_set.add(year)
+        
+        # Determinar año por defecto basado en sistema (2025/2026 están activos)
+        if not years_set:
+            # Si no hay hits con año, asumir que el código viene del arancel más reciente
+            # Esto es útil para fallback LLM sin contexto OpenSearch
+            years_set = {2026, 2025}  # Ambos están disponibles
+            logger.info(f"[YEARS] No hay años de evidencia. Asumiendo años activos: {years_set}")
+        
         result_dict["years"] = sorted(list(years_set)) if years_set else None
         
         # Agregar años a cada candidato propuesto
