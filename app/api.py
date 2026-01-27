@@ -378,6 +378,7 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
                 "detalles del procesador",
                 "como procesador, ram, almacenamiento",
                 "uso principal",  # Nuevo: detectar "¿Cuál es su uso principal?"
+                "mueble contenedor accesorio",  # Genérico y fuera de contexto para electrodomésticos
             ]
             ml = [str(m).lower() for m in (missing_list or [])]
             # IMPORTANTE: Solo marcar como genérico si coincide exactamente o contiene la frase completa
@@ -452,6 +453,33 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
             if len(pruned_mf) != len(mf_list):
                 logger.info("[PRUNE] Removing generic 'tipo de electrodoméstico' because user specified appliance")
                 result_dict["missing_fields"] = pruned_mf
+
+        # 3.6.2) Contexto lavadora (8450): podar campos genéricos no críticos
+        # Evita solicitar material/dimensiones/composición/potencia cuando ya se tienen
+        # detalles clave del aparato, permitiendo alcanzar mayor confianza.
+        cands_ctx = result_dict.get("top_candidates") or []
+        if cands_ctx:
+            top_code_ctx = (cands_ctx[0].get("code") or "").replace(" ", "")
+            code_clean_ctx = top_code_ctx.replace(".", "")
+            if code_clean_ctx.startswith("8450"):
+                mf_list = result_dict.get("missing_fields") or []
+                banned_ctx = [
+                    "que material", "qué material", "material",
+                    "composicion", "composición",
+                    "dimensiones", "dimension", "tamaño",
+                    "potencia",
+                    "laminado en caliente", "laminado en frio", "laminado en frío",
+                    "recubrimiento", "galvanizado", "pintado",
+                    "mueble", "objeto decorativo", "herramienta", "equipo"
+                ]
+                filtered = [f for f in mf_list if not any(b in str(f).lower() for b in banned_ctx)]
+                if len(filtered) != len(mf_list):
+                    logger.info("[PRUNE-8450] Removing non-critical generic fields for washing machines")
+                    result_dict["missing_fields"] = filtered
+                    # Si ya no hay campos faltantes, elevar confianza del candidato principal (hasta 0.90)
+                    c0 = result_dict.get("top_candidates") or []
+                    if c0:
+                        c0[0]["confidence"] = max(float(c0[0].get("confidence", 0.0)), 0.90)
 
         # 3.7) FALLBACK: Si LLM no propuso candidatos pero HAY documentos, proponer automáticamente
         cands_before_fallback = result_dict.get("top_candidates") or []

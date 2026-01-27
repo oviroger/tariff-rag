@@ -1162,6 +1162,41 @@ RESPUESTA (JSON):
                 top_cand["code"] = refined_code
                 top_cand["level"] = refined_level
                 logger.info(f"LOG_CODE_REFINED: {original_code} ({original_level}) → {refined_code} ({refined_level})")
+
+            # PRESERVAR EL CÓDIGO MÁS ESPECÍFICO DEL HISTORIAL PARA EVITAR REGRESIONES
+            try:
+                prev_code = None
+                if conversation_history:
+                    # Buscar el último código propuesto por el asistente en el historial
+                    for turn in reversed(conversation_history):
+                        if isinstance(turn, dict):
+                            prev_code = turn.get("assistant") or prev_code
+                        elif isinstance(turn, (list, tuple)) and len(turn) >= 2:
+                            prev_code = turn[1] or prev_code
+                        if prev_code:
+                            break
+                if prev_code:
+                    # Normalizar y comparar especificidad (cantidad de dígitos sin puntos)
+                    import re as _re
+                    def _digits(c: str):
+                        return ''.join(_re.findall(r"\d", c or ""))
+                    prev_digits = _digits(prev_code)
+                    curr_digits = _digits(top_cand.get("code") or "")
+                    # Si pertenecen al mismo capítulo y el previo es más largo (más específico), conservarlo
+                    if prev_digits[:4] == curr_digits[:4] and len(prev_digits) > len(curr_digits):
+                        logger.info(f"LOG_PRESERVE_SPECIFIC: Keeping previous more specific code {prev_code} over {top_cand.get('code')}")
+                        top_cand["code"] = prev_code
+                        # Ajustar nivel según longitud
+                        if len(prev_digits) >= 10:
+                            top_cand["level"] = "NATIONAL10"
+                        elif len(prev_digits) >= 8:
+                            top_cand["level"] = "NANDINA8"
+                        else:
+                            top_cand["level"] = "HS6"
+                        # Recalcular confianza tras preservación
+                        top_cand["confidence"] = _calculate_confidence_from_details(blob, top_cand["code"], original_mf)
+            except Exception as _e:
+                logger.warning(f"LOG_PRESERVE_SPECIFIC_FAILED: {_e}")
         
         logger.info(f"LOG_LLM_FINAL: top_candidates={len(norm.get('top_candidates', []))} items")
         return norm
