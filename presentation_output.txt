@@ -1,0 +1,46 @@
+
+
++==============================================================================+
+|                                                                              |
+|           TARIFF CLASSIFICATION SYSTEM - THREE COMPLETE USE CASES            |
+|                                                                              |
++==============================================================================+
+
+Generated: 2026-01-27 16:25:36
+
+================================================================================
+ USE CASE: WASHING MACHINE (LAVADORA) - Import Classification
+================================================================================
+
+Description: A customer wants to import a washing machine and needs to determine the correct HS code for customs declaration. The system progressively refines the classification as more details are provided.
+
+
+[TURN 1]
+User Input: "Quiero importar un electrodom�stico para la tienda"
+--------------------------------------------------------------------------------
+Context: Initial inquiry - customer mentions appliance import
+
+Traceback (most recent call last):
+  File "D:\MAESTRIA - copia\tariff-rag\presentation_demo.py", line 91, in test_use_case
+    if format_response(data):
+       ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\MAESTRIA - copia\tariff-rag\presentation_demo.py", line 39, in format_response
+    print(f"\n\U0001f4e6 CLASSIFICATION RESULT:")
+  File "C:\Users\rpaton\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4e6' in position 2: character maps to <undefined>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MAESTRIA - copia\tariff-rag\presentation_demo.py", line 254, in <module>
+    main()
+  File "D:\MAESTRIA - copia\tariff-rag\presentation_demo.py", line 147, in main
+    test_use_case(
+  File "D:\MAESTRIA - copia\tariff-rag\presentation_demo.py", line 100, in test_use_case
+    print(f"\u274c ERROR: {e}")
+  File "C:\Users\rpaton\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u274c' in position 0: character maps to <undefined>
