@@ -759,7 +759,13 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "", 
         "camión", "camion", "camioneta", "pickup", "bus", "autobús", "autobus",
         "microbús", "microbus", "moto", "motocicleta"
     ]
+    appliance_terms = [
+        "lavadora", "refrigerador", "microondas", "horno", "lavavajillas", "secadora",
+        "licuadora", "batidora", "plancha", "aspiradora", "lavaseca", "lava seca",
+        "electrodoméstico", "electrodomestico", "aparato", "equipo"
+    ]
     has_vehicle_type = any(t in uq for t in vehicle_terms)
+    has_appliance_type = any(t in uq for t in appliance_terms)
     has_motor_type = any(t in uq for t in ["diesel", "gasolina", "electrico", "electrica", "electric", "hibrido", "hibrida", "hev", "phev", "ev"])
     is_new_or_used = any(t in uq for t in ["nuevo", "nueva", "usado", "usada"]) 
 
@@ -773,6 +779,12 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "", 
             filtered.append(m)
         clean_missing = filtered
 
+    # Si es un electrodoméstico, quitar campos de vehículos
+    if has_appliance_type:
+        _drop_if_matches(["tipo de motor", "motor (gasolina", "motor (diésel", "motor (diesel", 
+                          "cilindrada", "eléctrico", "híbrido", "hibrido", "numero de plazas",
+                          "pasajeros", "traccion", "eje", "suspension", "freno"]) 
+    
     if has_vehicle_type:
         _drop_if_matches(["tipo de vehículo", "tipo de vehiculo"]) 
     if has_motor_type:
