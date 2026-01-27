@@ -423,7 +423,14 @@ def hybrid_search_with_fallback(os_client, index: Optional[str], query_text: str
     
     # Ordenar por score RRF y tomar top-k
     ranked = sorted(scores.values(), key=lambda x: x["score"], reverse=True)
-    final_hits = [item["hit"] for item in ranked[:k]]
+    
+    # CRÍTICO: Actualizar _score del hit con el score RRF normalizado
+    final_hits = []
+    for item in ranked[:k]:
+        hit = item["hit"]
+        # Reemplazar _score original con score RRF normalizado (0-1)
+        hit["_score"] = item["score"]
+        final_hits.append(hit)
     
     logger.info(f"RRF fusion: Combined {len(bm25_hits)} BM25 + {len(knn_hits)} kNN -> {len(final_hits)} final results")
     

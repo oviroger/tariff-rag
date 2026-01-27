@@ -7,6 +7,7 @@ import gradio as gr
 import requests
 from typing import Any, Tuple, Dict, Optional
 import json
+import re
 from uuid import uuid4
 
 API_URL = "http://api:8000"
@@ -769,12 +770,13 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "", 
     # Deduplicate after pruning
     clean_missing = list(dict.fromkeys(clean_missing))
 
-    # Si no hay candidates pero SÍ hay evidencia, mostrar la evidencia disponible
+    # Si no hay candidates pero SÍ hay evidencia, mostrarla
+    # NOTA: El backend ya filtró evidencia relevante
     evidence = result.get("evidence") or result.get("context_docs") or []
     
     if not candidates and evidence:
-        lines = ["### 📚 Información disponible (sin clasificación automática)", ""]
-        lines.append("Se encontraron los siguientes documentos relevantes:")
+        lines = ["### 📚 Información encontrada", ""]
+        lines.append("Se encontró la siguiente información relacionada:")
         lines.append("")
         
         for i, ev in enumerate(evidence[:5], 1):
@@ -785,7 +787,7 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "", 
             
             year_str = f" | 📅 {year}" if year else ""
             lines.append(f"{i}. **(Score: {score:.2f})**{year_str}")
-            lines.append(f"   {text}")
+            lines.append(f"   {text[:300]}")
             if bucket:
                 lines.append(f"   _Fuente: {bucket}_")
             lines.append("")
@@ -796,14 +798,15 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "", 
                 lines.append(f"- {m}")
             lines.append("")
         
-        lines.append("Responde con los datos que tengas disponibles.")
+        lines.append("Por favor, proporciona más detalles para una clasificación precisa.")
         return "\n".join(lines)
 
     if not candidates:
         lines = ["### 🔍 Necesito más información para clasificar", ""]
         if clean_missing:
             lines += [f"- {m}" for m in clean_missing[:5]]
-        lines.append("Responde con los datos que tengas disponibles.")
+        lines.append("")
+        lines.append("Por favor, proporciona los datos solicitados para una clasificación precisa.")
         return "\n".join(lines)
 
     # Extraer años de la evidence para mostrar referencias

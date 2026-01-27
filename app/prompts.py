@@ -97,6 +97,18 @@ El código DEBE evolucionar con la información adicional.
   - En missing_fields, lista la información mínima necesaria para clasificar (tipo, uso, material, características técnicas).
   - En warnings, indica: "La descripción del producto es muy general. Se necesita más información para clasificar correctamente."
 
+**🔍 VALIDACIÓN DE EVIDENCIA - CRÍTICO:**
+- **ANTES de proponer códigos**, revisa si los documentos recuperados son RELEVANTES al producto consultado.
+- **Si el usuario pregunta por "electrodomésticos" y recuperaste documentos sobre "neumáticos"**, estos documentos NO son relevantes.
+- **NO propongas códigos basándote en evidencia irrelevante**. En su lugar:
+  - Deja top_candidates VACÍO
+  - En missing_fields, pide detalles específicos del producto: "¿Qué tipo de electrodoméstico específico? (lavadora, refrigerador, microondas, etc.)"
+  - En warnings, indica: "No se encontró información específica en el corpus. Por favor proporciona más detalles del producto."
+- **Señales de evidencia irrelevante:**
+  - Documentos hablan de productos en categorías completamente diferentes (ej: usuario pregunta electrónica, documentos hablan de vehículos)
+  - Términos clave del usuario NO aparecen en los documentos recuperados
+  - Scores de recuperación son bajos (< 0.5)
+
 **FORMATO DE SALIDA:**
 - Devuelve SIEMPRE JSON válido según el schema proporcionado.
 - Todos los textos deben estar en español (descriptions, inclusions, exclusions, missing_fields, warnings).

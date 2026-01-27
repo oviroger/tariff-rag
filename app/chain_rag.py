@@ -107,22 +107,32 @@ def classify(
     # === 3. Guardrail: Evidencia insuficiente ===
     min_evidence = getattr(settings, "min_evidence", 2)
     min_score = getattr(settings, "min_score", 0.3)
+    min_score_for_display = getattr(settings, "min_score_for_display", 0.5)
     
     valid_docs = [d for d in docs if d.get("_score", 0.0) >= min_score]
     
     if len(valid_docs) < min_evidence:
         logger.warning(f"Evidencia insuficiente: {len(valid_docs)} < {min_evidence}")
-        return ClassifyResponse(
-            evidence=[
+        
+        # Filtrar evidencia para display: solo mostrar si score >= min_score_for_display
+        displayable_docs = [d for d in docs if d.get("_score", 0.0) >= min_score_for_display]
+        
+        # Si no hay evidencia suficientemente relevante, NO mostrarla (evitar mostrar neumáticos cuando preguntan por electrodomésticos)
+        evidence_for_response = []
+        if displayable_docs:
+            evidence_for_response = [
                 Citation(
                     fragment_id=d.get("_id", "unknown"),
                     score=d.get("_score", 0.0),
-                    text=d.get("_source", {}).get("text", "")[:200],
-                    reason="score_bajo"
-                ) for d in docs[:3]
-            ],
+                    text=d.get("_source", {}).get("text", "")[:300],
+                    reason="baja_confianza"
+                ) for d in displayable_docs[:3]
+            ]
+        
+        return ClassifyResponse(
+            evidence=evidence_for_response,
             warnings=["Evidencia insuficiente para clasificación confiable"],
-            missing_fields=["material", "uso", "presentación"],
+            missing_fields=["Descripción precisa del producto (material, uso, presentación)", "Características técnicas clave", "Estado o presentación (nuevo/usado)"],
             applied_rgi=["RGI 1"],
             debug_info=debug_info
         )
@@ -167,14 +177,24 @@ def classify(
     # === 5. Validación de salida ===
     try:
         candidates = [Candidate(**c) for c in result.get("top_candidates", [])]
-        evidence = [
-            Citation(
-                fragment_id=d.get("_id", ""),
-                score=d.get("_score", 0.0),
-                text=d.get("_source", {}).get("text", "")[:300],
-                reason="retrieved_by_hybrid_search"
-            ) for d in valid_docs[:top_k]
-        ]
+        
+        # CRÍTICO: Filtrar evidencia por min_score_for_display antes de mostrar
+        # Si no hay candidatos y la evidencia tiene score bajo, no mostrarla
+        displayable_docs = [d for d in valid_docs[:top_k] if d.get("_score", 0.0) >= min_score_for_display]
+        
+        # Si no hay candidatos Y no hay evidencia relevante, usar lista vacía
+        if not candidates and not displayable_docs:
+            evidence = []
+        else:
+            # Si hay candidatos O evidencia relevante, mostrar la evidencia
+            evidence = [
+                Citation(
+                    fragment_id=d.get("_id", ""),
+                    score=d.get("_score", 0.0),
+                    text=d.get("_source", {}).get("text", "")[:300],
+                    reason="retrieved_by_hybrid_search"
+                ) for d in displayable_docs
+            ]
         
         response = ClassifyResponse(
             top_candidates=candidates,

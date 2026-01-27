@@ -336,6 +336,20 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
             logger.exception("evidence normalization failed")
             result_dict["evidence"] = []
 
+        # 3.1) FILTRAR evidencia irrelevante por score
+        # Si no hay candidatos y la evidencia tiene score bajo, NO mostrarla
+        settings = get_settings()
+        min_score_for_display = getattr(settings, "min_score_for_display", 0.5)
+        
+        candidates = result_dict.get("top_candidates", [])
+        evidence = result_dict.get("evidence", [])
+        
+        if not candidates and evidence:
+            # Filtrar evidencia con score < umbral
+            relevant_evidence = [ev for ev in evidence if (ev.get("score") or 0) >= min_score_for_display]
+            result_dict["evidence"] = relevant_evidence
+            logger.info(f"Filtered evidence: {len(evidence)} -> {len(relevant_evidence)} (threshold={min_score_for_display})")
+
         # 3.5) Normalización/Corrección de missing_fields genéricos según contexto
         def _has_generic_missing(missing_list):
             """Detecta si el LLM devolvió campos genéricos prohibidos."""
