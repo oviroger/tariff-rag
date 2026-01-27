@@ -38,6 +38,7 @@ class Candidate(BaseModel):
     description: Optional[str] = Field(None, description="Descripción del código")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Confianza [0-1]")
     level: HSLevel = Field(..., description="Nivel: HS6 | NANDINA8 | NATIONAL10")
+    years: Optional[List[int]] = Field(None, description="Años de las fuentes que soportan este código [2025, 2026, etc.]")
 class ClassifyResponse(BaseModel):
     """Respuesta del endpoint /classify"""
     top_candidates: List[Candidate] = Field(default_factory=list)
@@ -51,6 +52,7 @@ class ClassifyResponse(BaseModel):
     versions: Dict[str, str] = Field(default_factory=dict)
     debug_info: Optional[Dict[str, Any]] = None
     conversation_id: Optional[str] = None
+    years: Optional[List[int]] = Field(None, description="Años de las fuentes encontradas en OpenSearch [2025, 2026, etc.]")
 
 class HealthResponse(BaseModel):
     """Respuesta del health check"""

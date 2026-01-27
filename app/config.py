@@ -48,9 +48,9 @@ class Settings(BaseSettings):
     final_pasages: int = 6
     min_evidence: int = 2
     min_score: float = 0.35
-    # Umbral para mostrar evidencia en UI cuando no hay candidatos
-    # Si score < min_score_for_display, se oculta evidencia irrelevante
-    min_score_for_display: float = 0.5
+    # Umbral para mostrar evidencia / alimentar el prompt.
+    # RRF produce scores bajos (~0.0x). Usamos un valor bajo pero mayor que el ruido.
+    min_score_for_display: float = 0.02
     enable_retrieval_fallback: bool = False
 
     # Redis

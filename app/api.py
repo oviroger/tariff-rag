@@ -307,6 +307,17 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
             logger.warning(f"Retrieval failed: {e}. Using empty hits.")
             hits = []
 
+        # 1.1) Si el mejor score es muy bajo, tratar como sin contexto para evitar ruido
+        settings = get_settings()
+        min_score_for_display = getattr(settings, "min_score_for_display", 0.02)
+        if hits:
+            best_score = max((h.get("_score") or h.get("score") or 0) for h in hits)
+            if best_score < min_score_for_display:
+                logger.info(
+                    f"[RETRIEVAL FILTER] best_score={best_score:.4f} < threshold={min_score_for_display}; dropping context hits"
+                )
+                hits = []
+
         # 2) generación (asegúrate dict)
         result_dict = generate_label(
             query=query_text, 
@@ -338,9 +349,7 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
 
         # 3.1) FILTRAR evidencia irrelevante por score
         # Si no hay candidatos y la evidencia tiene score bajo, NO mostrarla
-        settings = get_settings()
-        min_score_for_display = getattr(settings, "min_score_for_display", 0.5)
-        
+        # min_score_for_display ya cargado arriba
         candidates = result_dict.get("top_candidates", [])
         evidence = result_dict.get("evidence", [])
         
@@ -354,14 +363,14 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
         def _has_generic_missing(missing_list):
             """Detecta si el LLM devolvió campos genéricos prohibidos."""
             banned = [
-                "tipo de producto",
-                "tipo de dispositivo",
-                "material o composición",
-                "características técnicas",  # Captura "relevantes", "adicionales", etc.
+                "tipo de producto",  # Demasiado genérico
+                "tipo de dispositivo",  # Demasiado genérico
+                "material o composición",  # Demasiado genérico
+                "características técnicas relevantes",  # Con "relevantes" es genérico
+                "características técnicas adicionales",  # Con "adicionales" es genérico
                 "característica adicional",  # Específico para laptop
-                "presentación/estado",
-                "dimensiones",
-                "proceso de fabricación",
+                "dimensiones relevantes",  # Con "relevantes" es genérico
+                "proceso de fabricación",  # Demasiado genérico
                 "norma aplicable",
                 "cualquier característica",
                 "descripción del artículo",
@@ -371,7 +380,9 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
                 "uso principal",  # Nuevo: detectar "¿Cuál es su uso principal?"
             ]
             ml = [str(m).lower() for m in (missing_list or [])]
-            return any(any(b in m for b in banned) for m in ml)
+            # IMPORTANTE: Solo marcar como genérico si coincide exactamente o contiene la frase completa
+            # NO eliminar campos útiles como "¿Es nuevo o usado?" que son específicos
+            return any(any(b in m and len(m) < len(b) + 30 for b in banned) for m in ml)
 
         try:
             mf = result_dict.get("missing_fields") or []
@@ -384,17 +395,18 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
             # ÚNICA REGLA: Si el LLM devolvió campos genéricos prohibidos, limpiarlos
             if has_gen:
                 logger.warning(f"[SANITIZER] Detected generic fields. Filtering them out.")
-                # Usar la MISMA lista de banned phrases que en _has_generic_missing
+                # Filtrar SOLO campos genéricos, mantener campos específicos útiles
                 filtered_mf = [
                     field for field in mf 
-                    if not any(banned in str(field).lower() for banned in [
+                    if not any(banned in str(field).lower() and len(str(field)) < len(banned) + 30 
+                              for banned in [
                         "tipo de producto",
                         "tipo de dispositivo",
                         "material o composición",
-                        "características técnicas",
+                        "características técnicas relevantes",
+                        "características técnicas adicionales",
                         "característica adicional",
-                        "presentación/estado",
-                        "dimensiones",
+                        "dimensiones relevantes",
                         "proceso de fabricación",
                         "norma aplicable",
                         "cualquier característica",
@@ -408,12 +420,38 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
                 ]
                 result_dict["missing_fields"] = filtered_mf
                 logger.info(f"[SANITIZER] Filtered missing_fields: {filtered_mf}")
-
                 
         except Exception as e:
             # No interrumpir si el saneamiento falla
             logger.exception(f"Sanitizer failed: {e}")
             pass
+
+        # 3.6) Si NO hay candidatos y missing_fields está vacío o genérico, usar defaults contextuales
+        candidates = result_dict.get("top_candidates", [])
+        current_mf = result_dict.get("missing_fields", [])
+        
+        if not candidates and len(current_mf) <= 3:
+            # Intentar generar campos específicos basados en la query
+            from app.generator_gemini import _default_missing_fields
+            contextual_mf = _default_missing_fields(query_text)
+            
+            # Si los defaults son más específicos que los actuales, usarlos
+            if contextual_mf and contextual_mf != current_mf:
+                logger.info(f"[OVERRIDE] Using contextual missing_fields: {contextual_mf}")
+                result_dict["missing_fields"] = contextual_mf
+
+        # 3.6.1) Si el usuario ya especificó un electrodoméstico concreto, no repetir la pregunta genérica
+        appliance_kws = [
+            "lavadora", "refrigerador", "microondas", "horno", "lavavajillas", "secadora",
+            "licuadora", "batidora", "plancha", "aspiradora", "lavaseca", "lava seca"
+        ]
+        q_norm = query_text.lower()
+        if any(kw in q_norm for kw in appliance_kws):
+            mf_list = result_dict.get("missing_fields") or []
+            pruned_mf = [f for f in mf_list if "electrodom" not in str(f).lower()]
+            if len(pruned_mf) != len(mf_list):
+                logger.info("[PRUNE] Removing generic 'tipo de electrodoméstico' because user specified appliance")
+                result_dict["missing_fields"] = pruned_mf
 
         # 3.7) FALLBACK: Si LLM no propuso candidatos pero HAY documentos, proponer automáticamente
         cands_before_fallback = result_dict.get("top_candidates") or []
@@ -495,6 +533,48 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
         
         # Añadir conversation_id a la respuesta
         result_dict["conversation_id"] = conv_id
+        
+        # Extraer años de los hits y incluirlos en la respuesta
+        years_set = set()
+        for hit in hits:
+            year = (hit.get("_source") or {}).get("year")
+            if year:
+                years_set.add(year)
+        result_dict["years"] = sorted(list(years_set)) if years_set else None
+        
+        # Agregar años a cada candidato propuesto
+        if result_dict.get("top_candidates"):
+            for cand in result_dict["top_candidates"]:
+                if not cand.get("years"):
+                    cand["years"] = sorted(list(years_set)) if years_set else None
+        
+        # Rastrear progreso hacia HS10: cuáles son los detalles faltantes
+        cands = result_dict.get("top_candidates") or []
+        if cands:
+            top_code = cands[0].get("code", "")
+            top_level = cands[0].get("level", "HS6")
+            missing = result_dict.get("missing_fields") or []
+            
+            # Determinar qué falta para llegar a HS10
+            hs10_requirements = {
+                "8450": ["¿Es nueva o usada?"],  # Lavadora
+                "8703": ["Cilindrada en cc", "¿Es nueva o usada?"],  # Automóvil
+                "8702": ["Cilindrada en cc", "¿Es nueva o usada?"],  # Autobús
+                "8704": ["Cilindrada en cc", "¿Es nueva o usada?"],  # Camión
+            }
+            
+            # Buscar el capítulo (primeros 4 dígitos)
+            code_clean = top_code.replace(".", "").replace(" ", "")
+            chapter = code_clean[:4] if len(code_clean) >= 4 else ""
+            
+            # Si el código está en la lista de refinables y aún es HS6, informar qué falta
+            if chapter in hs10_requirements and top_level == "HS6":
+                required = hs10_requirements[chapter]
+                missing_for_hs10 = [r for r in required if r not in str(missing).lower()]
+                if missing_for_hs10:
+                    note = f"Para refinar a HS10 ({chapter}xx.xx.xx), se necesita: {', '.join(missing_for_hs10)}"
+                    result_dict.setdefault("warnings", []).append(note)
+                    logger.info(f"[HS10_TRACKING] {note}")
 
         return ClassifyResponse(**result_dict)
 

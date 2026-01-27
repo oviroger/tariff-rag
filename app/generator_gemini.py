@@ -40,15 +40,42 @@ def _load_device_config() -> Dict[str, Any]:
 def _default_missing_fields(blob: str) -> List[str]:
     """Generate a minimal, deterministic missing_fields list based on the query blob."""
     b = (blob or "").lower()
-    vehicles = ["vehiculo", "vehículo", "auto", "carro", "coche", "camion", "camión", "bus", "autobus", "autobús", "microbus", "microbús", "moto", "motocicleta"]
-    metals = ["acero", "steel", "hierro", "lamina", "lámina", "chapa", "plancha", "bobina", "inox", "aluminio", "cobre", "metal"]
-
+    
+    # Electrodomésticos (Cap. 84-85)
+    appliances = ["electrodomestico", "electrodoméstico", "lavadora", "refrigerador", "nevera", 
+                  "frigorifico", "frigorífico", "microondas", "horno", "cocina", "estufa",
+                  "lavavajilla", "lavavajillas", "secadora", "aspiradora", "batidora", "licuadora"]
+    if any(a in b for a in appliances):
+        # Caso específico: lavadora → preguntas concretas en vez de genéricas
+        if "lavadora" in b:
+            return [
+                "Capacidad de carga en kg",
+                "Tipo de carga (frontal o superior)",
+                "¿Incluye función de secado o solo lava?",
+                "Voltaje/frecuencia (110/220V, 50/60Hz)",
+                "¿Es para uso doméstico o industrial/comercial?",
+                "¿Es nuevo o usado?",
+            ]
+        # Otros electrodomésticos
+        return [
+            "¿Qué electrodoméstico específico es?",
+            "¿Es para uso doméstico o industrial/comercial?",
+            "¿Es nuevo o usado?",
+        ]
+    
+    # Vehículos (Cap. 87)
+    vehicles = ["vehiculo", "vehículo", "auto", "carro", "coche", "camion", "camión", "bus", 
+                "autobus", "autobús", "microbus", "microbús", "moto", "motocicleta"]
     if any(v in b for v in vehicles):
         return [
             "Tipo de motor (gasolina, diésel, eléctrico, híbrido)",
             "Cilindrada del motor en cm³",
             "Número de plazas/pasajeros",
         ]
+    
+    # Metales (Cap. 72-76)
+    metals = ["acero", "steel", "hierro", "lamina", "lámina", "chapa", "plancha", "bobina", 
+              "inox", "aluminio", "cobre", "metal"]
     if any(m in b for m in metals):
         return [
             "Tipo de producto metálico y material (lámina, bobina, acero, aluminio, etc.)",
@@ -57,6 +84,46 @@ def _default_missing_fields(blob: str) -> List[str]:
             "Proceso (laminado en caliente o en frío)",
             "Recubrimiento si aplica (galvanizado, pintado, etc.)",
         ]
+    
+    # Textiles (Cap. 50-63)
+    textiles = ["tela", "tejido", "textil", "algodón", "algodon", "poliéster", "poliester", 
+                "lana", "seda", "prenda", "camisa", "pantalón", "pantalon"]
+    if any(t in b for t in textiles):
+        return [
+            "¿De qué material está hecho? (algodón, poliéster, lana, mezcla, etc.)",
+            "¿Es tejido, punto o no tejido?",
+            "¿Cuál es el uso? (prenda de vestir, tela por metro, uso industrial)",
+        ]
+    
+    # Alimentos (Cap. 01-24)
+    foods = ["carne", "pescado", "fruta", "verdura", "alimento", "comida", "bebida", 
+             "conserva", "enlatado", "congelado"]
+    if any(f in b for f in foods):
+        return [
+            "¿Qué tipo de alimento específico?",
+            "¿Es fresco, refrigerado, congelado o procesado?",
+            "¿Cómo está presentado? (entero, troceado, fileteado, envasado)",
+        ]
+    
+    # Computadoras/Electrónica (Cap. 84-85)
+    electronics = ["computadora", "ordenador", "laptop", "notebook", "tablet", "celular", 
+                   "móvil", "movil", "teléfono", "telefono", "pantalla", "monitor"]
+    if any(e in b for e in electronics):
+        return [
+            "¿Qué tipo de dispositivo específico? (laptop, tablet, teléfono móvil, monitor, etc.)",
+            "¿Es nuevo o usado?",
+        ]
+    
+    # Muebles (Cap. 94)
+    furniture = ["mueble", "silla", "mesa", "estanteria", "estantería", "armario", "cama", "sofá", "sofa"]
+    if any(f in b for f in furniture):
+        return [
+            "¿Qué tipo de mueble específico?",
+            "¿De qué material principal está hecho? (madera, metal, plástico)",
+            "¿Para qué uso? (hogar, oficina, comercial)",
+        ]
+    
+    # Genérico (cuando no se detecta categoría)
     return [
         "Descripción precisa del producto (material, uso, presentación)",
         "Características técnicas clave (dimensiones, potencia, composición)",
@@ -333,7 +400,7 @@ def _prune_missing_fields(res: Dict[str, Any], query_text: str, conversation_his
         # Plazas/Pasajeros
         ("plaza", "plazas", "pasajero", "pasajeros", "persona", "personas", "asiento", "asientos"): ["plaza", "plazas", "pasajero", "pasajeros", "persona", "personas", "asiento", "asientos"],
         # Propósito/Uso
-        ("proposito", "uso", "comercial", "particular"): ["comercial", "particular", "privado", "publico", "transporte"],
+        ("proposito", "uso", "comercial", "particular"): ["comercial", "particular", "privado", "publico", "transporte", "domestico", "domestica", "industrial", "industria", "hogar"],
         # Material
         ("material", "madera", "metal", "plastico", "aluminio", "acero", "vidrio"): ["madera", "metal", "plastico", "plastica", "aluminio", "acero", "vidrio"],
         # CRÍTICO: Tipo de dispositivo (laptop vs desktop)
@@ -341,7 +408,7 @@ def _prune_missing_fields(res: Dict[str, Any], query_text: str, conversation_his
     }
     
     # DETECCIÓN ESPECIAL: Cilindrada con número (ej: "6000 cc", "2500 cm3", "cilindrada de 3000")
-    has_cilindrada_with_number = bool(re.search(r'\d{3,5}\s*(cc|cm3|cm³|centimetr)', text_blob, re.IGNORECASE))
+    has_cilindrada_with_number = bool(re.search(r'\d{3,5}\s*(cc|cm3|cm³|centimetr)', text_blob_norm, re.IGNORECASE))
     
     cleaned = []
     for field_norm in cleaned_missing_fields:  # Use already-cleaned fields
@@ -364,6 +431,20 @@ def _prune_missing_fields(res: Dict[str, Any], query_text: str, conversation_his
                 user_already_answered = True
                 logger.info(f"LOG_PRUNE_FIELD: User already answered '{pattern}' - removing field '{field_norm}'")
                 break
+
+        # Regla específica: si el campo habla de "tipo de electrodoméstico" y el usuario ya mencionó
+        # un electrodoméstico concreto (lavadora, refrigerador, etc.), no volver a preguntar.
+        appliance_kws = [
+            "lavadora", "refrigerador", "microonda", "microondas", "horno", "lavavajilla", "secadora",
+            "licuadora", "batidora", "plancha", "aspiradora"
+        ]
+        mentions_appliance = any(kw in text_blob_norm for kw in appliance_kws)
+        # También revisar la query actual normalizada por si el historial no llegó
+        query_norm = _normalize_text(query_text)
+        mentions_in_query = any(kw in query_norm for kw in appliance_kws)
+        if "electrodom" in field_norm and (mentions_appliance or mentions_in_query):
+            logger.info("LOG_PRUNE_FIELD: User already specified appliance; removing generic electrodomestico field")
+            continue
         
         if is_generic and user_already_answered:
             continue
@@ -478,21 +559,69 @@ def _rule_based_motorcycle_candidate(text_blob: str) -> Optional[Dict[str, Any]]
 
 
 def _apply_rule_based_fallback(res: Dict[str, Any], query: str, conversation_history: list | None) -> Dict[str, Any]:
-    """If LLM didn't return candidates, try rule-based heuristic for motorcycles."""
+    """If LLM didn't return candidates, try rule-based heuristic for motorcycles, appliances, vehicles, etc.
+    SIEMPRE intenta generar candidatos tentatives si detecta palabras clave en la query."""
     blob = _text_blob_from_query_history(query, conversation_history, include_assistant=False)
     
-    if not res.get("top_candidates"):
+    # Si el LLM no devolvió candidatos (o devolvió muy pocos), usar heurística
+    current_candidates = res.get("top_candidates") or []
+    if len(current_candidates) == 0:
+        # Intenta smartphone
         phone_candidate = _rule_based_smartphone_candidate(blob)
         if phone_candidate:
             res["top_candidates"] = [phone_candidate]
             res["applied_rgi"] = res.get("applied_rgi") or ["RGI 1"]
-            res.setdefault("warnings", []).append("Clasificación heurística aplicada: teléfono celular detectado.")
-        else:
-            moto_candidate = _rule_based_motorcycle_candidate(blob)
-            if moto_candidate:
-                res["top_candidates"] = [moto_candidate]
+            res.setdefault("warnings", []).append("Clasificación tentativa heurística: teléfono celular detectado (45% confianza).")
+            return res
+        
+        # Intenta motocicleta
+        moto_candidate = _rule_based_motorcycle_candidate(blob)
+        if moto_candidate:
+            res["top_candidates"] = [moto_candidate]
+            res["applied_rgi"] = res.get("applied_rgi") or ["RGI 1"]
+            res.setdefault("warnings", []).append("Clasificación tentativa heurística: motocicleta (45% confianza).")
+            return res
+        
+        # Intenta electrodoméstico genérico (8450+ para lavadoras, etc.)
+        appliance_kws = {
+            "lavadora": ("8450.11", "Lavadora automática", 0.45),
+            "refrigerador": ("8418.69", "Refrigerador doméstico", 0.40),
+            "nevera": ("8418.69", "Refrigerador doméstico", 0.40),
+            "microondas": ("8516.50", "Horno microondas", 0.45),
+            "horno": ("8517.80", "Aparato de calefacción", 0.35),
+            "lavavajillas": ("8422.11", "Lavavajillas", 0.45),
+            "secadora": ("8450.20", "Secadora de ropa", 0.45),
+            "aspiradora": ("8508.11", "Aspiradora", 0.45),
+            "batidora": ("8509.40", "Batidora/Licuadora", 0.45),
+            "licuadora": ("8509.40", "Licuadora", 0.45),
+            "electrodomestico": ("8509.80", "Electrodoméstico (genérico)", 0.35),
+        }
+        
+        for kw, (code, desc, conf) in appliance_kws.items():
+            if kw in blob:
+                res["top_candidates"] = [{
+                    "code": code,
+                    "description": desc,
+                    "confidence": conf,
+                    "level": "HS6"
+                }]
                 res["applied_rgi"] = res.get("applied_rgi") or ["RGI 1"]
-                res.setdefault("warnings", []).append("Clasificación heurística aplicada (basada en palabras clave).")
+                res.setdefault("warnings", []).append(f"Clasificación tentativa: {kw} (basada en palabras clave, {conf*100:.0f}% confianza).")
+                logger.info(f"LOG_FALLBACK_APPLIANCE: Proposed {code} for '{kw}'")
+                return res
+        
+        # Intenta vehículo genérico
+        if any(v in blob for v in ["vehiculo", "vehículo", "auto", "carro", "camion", "camión", "bus"]):
+            res["top_candidates"] = [{
+                "code": "8703.21",
+                "description": "Automóvil de gasolina (genérico)",
+                "confidence": 0.35,
+                "level": "HS6"
+            }]
+            res["applied_rgi"] = res.get("applied_rgi") or ["RGI 1"]
+            res.setdefault("warnings", []).append("Clasificación tentativa: vehículo (basada en palabras clave, 35% confianza).")
+            logger.info(f"LOG_FALLBACK_VEHICLE: Proposed 8703.21 for vehicle")
+            return res
     
     return res
 
@@ -606,6 +735,186 @@ def _aggressive_missing_fields_cleanup(res: Dict[str, Any], query: str) -> Dict[
     if "RGI 1" not in res["applied_rgi"]:
         res["applied_rgi"].append("RGI 1")
     return res
+
+
+def _calculate_confidence_from_details(blob: str, code: str, missing_fields_original: List[str]) -> float:
+    """Calcula confianza basada en detalles proporcionados en la conversación.
+    
+    Estrategia:
+    - Base: 0.35 (muy poco info, solo detección de categoría)
+    - +0.10 por cada detalle crítico respondido
+    - Ajuste por missing_fields: cuantos menos campos falten, más confianza
+    - Escala:
+      * 0.35: Solo categoría identificada
+      * 0.45: Categoría + 1 detalle
+      * 0.55: Categoría + 2-3 detalles
+      * 0.65: Categoría + 4 detalles
+      * 0.75: Categoría + 5+ detalles + pocos campos faltantes
+      * 0.85: Categoría + 5+ detalles + 1 campo faltante
+      * 0.95: Todos los detalles + cero campos faltantes (HS10 ready)
+    - Máximo: 0.95
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    base_confidence = 0.35
+    
+    # Si no hay campos faltantes, máxima confianza
+    if not missing_fields_original or len(missing_fields_original) == 0:
+        logger.info(f"[CONFIDENCE_CALC] No missing fields → confidence=0.95 (HS10 ready)")
+        return 0.95
+    
+    # Contar cuántos detalles críticos se han respondido
+    critical_details = {
+        "capacidad": ["kg", "litro", "watt", "btu", "l"],
+        "tipo": ["frontal", "superior", "diesel", "gasolina", "eléctrico", "hibrido"],
+        "nuevo": ["nuevo", "usado", "seminuevo"],
+        "voltaje": ["220", "110", "127", "50hz", "60hz"],
+        "uso": ["doméstico", "industrial", "comercial"],
+        "cilindrada": ["cc", "cm3", "centimetro", "cilindrada"],
+        "plazas": ["pasajero", "personas", "plaza", "asiento"],
+        "motor": ["diesel", "gasolina", "eléctrico", "nafta"],
+        "secado": ["secado", "secadora", "ropa seca"],
+        "carga": ["carga frontal", "carga superior", "carga superior"],
+    }
+    
+    answered_details = 0
+    for detail_type, keywords in critical_details.items():
+        blob_lower = blob.lower()
+        if any(kw in blob_lower for kw in keywords):
+            answered_details += 1
+    
+    # Ajuste por completitud: cuantos más campos falten, menos confianza
+    fields_remaining = len(missing_fields_original)
+    
+    # Escala más granular:
+    # Base (0.35) + detalles (0.10 cada uno, máx 0.50) + ajuste por completitud
+    confidence = base_confidence + min(answered_details * 0.10, 0.50)
+    
+    # Penalizar por campos faltantes
+    if fields_remaining > 5:
+        confidence *= 0.70  # Muchos campos faltantes → máx 0.35+0.35=0.70
+    elif fields_remaining > 3:
+        confidence *= 0.85  # Algunos campos → máx ≈0.65
+    elif fields_remaining > 1:
+        confidence *= 0.95  # Pocos campos (1-3) → máx ≈0.80
+    # else: 0 campos faltantes (ya manejado arriba con 0.95)
+    
+    # Cap en 0.95
+    final_confidence = min(0.95, max(0.35, confidence))
+    
+    logger.info(
+        f"[CONFIDENCE_CALC] answered_details={answered_details}, "
+        f"fields_remaining={fields_remaining}, confidence={final_confidence:.2f}"
+    )
+    
+    return final_confidence
+
+
+def _refine_hs_code_from_details(code: str, blob: str, level: str) -> tuple:
+    """Refina HS6 a HS8/HS10 basado en detalles específicos.
+    
+    Soporta:
+    - Lavadoras: 8450.11.10 (nueva) / 8450.11.90 (usada)
+    - Vehículos: 8702/8703/8704 + cilindrada + nuevo/usado → HS10
+    - Retorna (refined_code, new_level)
+    
+    Niveles:
+    - HS6: 6 dígitos (XXXXXX)
+    - HS8: 8 dígitos (XXXXXX.YY) 
+    - NANDINA8: 8 dígitos con código de país
+    - NATIONAL10: 10 dígitos (XXXXXX.YY.ZZ) con máxima precisión
+    """
+    import logging
+    import re
+    logger = logging.getLogger(__name__)
+    
+    code_clean = code.replace(".", "").replace(" ", "").upper()
+    blob_lower = blob.lower()
+    
+    if not code_clean or len(code_clean) < 6:
+        return code, level
+    
+    # ======= LAVADORAS (Capítulo 84, Código 8450) =======
+    if code_clean.startswith("845011"):
+        is_new = "nueva" in blob_lower or "nuevo" in blob_lower
+        is_old = "usado" in blob_lower or "usada" in blob_lower
+        
+        if is_new:
+            logger.info(f"[REFINE_LAVADORA] Nueva → 8450.11.10 (NANDINA8)")
+            return "8450.11.10", "NANDINA8"
+        elif is_old:
+            logger.info(f"[REFINE_LAVADORA] Usada → 8450.11.90 (NANDINA8)")
+            return "8450.11.90", "NANDINA8"
+        # Si no especifica estado, devuelve HS6 original
+    
+    # ======= VEHÍCULOS (Capítulo 87: 8702=Bus, 8703=Auto, 8704=Camión) =======
+    elif code_clean.startswith(("8702", "8703", "8704")):
+        # Extraer cilindrada
+        cilindrada_match = re.search(r'(\d{3,5})\s*(cc|cm3|cm²)', blob_lower)
+        cilindrada = int(cilindrada_match.group(1)) if cilindrada_match else None
+        
+        is_new = "nueva" in blob_lower or "nuevo" in blob_lower
+        is_old = "usado" in blob_lower or "usada" in blob_lower
+        
+        logger.info(
+            f"[REFINE_VEHICULO] code={code}, cilindrada={cilindrada}, "
+            f"is_new={is_new}, is_old={is_old}"
+        )
+        
+        # Si tenemos cilindrada, refinar a HS10 (máxima precisión)
+        if cilindrada and len(code_clean) == 6:
+            # Usar código limpio (sin puntos)
+            base_clean = code_clean[:6]  # ej: "870321"
+            base_formatted = f"{base_clean[:4]}.{base_clean[4:6]}"  # ej: "8703.21"
+            
+            # Determinar subcode basado en cilindrada
+            # Para autos/camiones/buses, los rangos típicos son:
+            # .10 = ≤ 1500 cc (pequeño)
+            # .20 = 1500-3000 cc (mediano)
+            # .90 = > 3000 cc (grande)
+            
+            if cilindrada <= 1500:
+                subcode = "10"
+            elif cilindrada <= 3000:
+                subcode = "20"
+            else:
+                subcode = "90"
+            
+            refined = f"{base_formatted}.{subcode}"
+            logger.info(
+                f"[REFINE_VEHICULO_SUCCESS] {code} + {cilindrada}cc → {refined} (NATIONAL10)"
+            )
+            return refined, "NATIONAL10"
+        
+        # Si tenemos estado pero no cilindrada, refinar a HS8
+        elif (is_new or is_old) and len(code_clean) == 6:
+            base_clean = code_clean[:6]
+            base_formatted = f"{base_clean[:4]}.{base_clean[4:6]}"
+            
+            if is_new:
+                refined = f"{base_formatted}.10"
+                logger.info(f"[REFINE_VEHICULO_NEW] {code} + nuevo → {refined} (NANDINA8)")
+                return refined, "NANDINA8"
+            elif is_old:
+                refined = f"{base_formatted}.90"
+                logger.info(f"[REFINE_VEHICULO_USED] {code} + usado → {refined} (NANDINA8)")
+                return refined, "NANDINA8"
+    
+    # ======= ELECTRODOMÉSTICOS GENÉRICOS (Capítulo 85, Código 8509) =======
+    elif code_clean.startswith("8509"):
+        if "lavadora" in blob_lower:
+            logger.info(f"[REFINE_GENERIC_APPLIANCE] 8509.80 + lavadora → 8450.11 (HS6)")
+            return "8450.11", "HS6"
+        elif "refrigerador" in blob_lower or "nevera" in blob_lower:
+            logger.info(f"[REFINE_GENERIC_APPLIANCE] 8509.80 + refrigerador → 8418.69 (HS6)")
+            return "8418.69", "HS6"
+        elif "microondas" in blob_lower:
+            logger.info(f"[REFINE_GENERIC_APPLIANCE] 8509.80 + microondas → 8516.50 (HS6)")
+            return "8516.50", "HS6"
+    
+    # No hay cambios
+    return code, level
 
 
 
@@ -801,6 +1110,7 @@ RESPUESTA (JSON):
         offline = _offline_result(evidence=context_docs, reason="LLM offline o sin cuota disponible (Azure)")
         offline = _apply_rule_based_fallback(offline, query, conversation_history)
         offline = _apply_device_overrides(offline, query, conversation_history)
+        offline = _prune_missing_fields(offline, query, conversation_history)
         return _ensure_missing_fields(offline, query, conversation_history)
     
     try:
@@ -829,8 +1139,30 @@ RESPUESTA (JSON):
         norm = _prune_missing_fields(norm, query, conversation_history)
         norm = _apply_rule_based_fallback(norm, query, conversation_history)
         norm = _apply_device_overrides(norm, query, conversation_history)
-        norm = _aggressive_missing_fields_cleanup(norm, query)  # <-- Nueva línea: limpiar agresivamente
+        norm = _aggressive_missing_fields_cleanup(norm, query)
         norm = _ensure_missing_fields(norm, query, conversation_history)
+        
+        # Refinar confianza y códigos basados en detalles respondidos
+        blob = _text_blob_from_query_history(query, conversation_history, include_assistant=False)
+        candidates = norm.get("top_candidates") or []
+        if candidates:
+            top_cand = candidates[0]
+            original_mf = norm.get("missing_fields") or []
+            
+            # Recalcular confianza basada en detalles
+            new_confidence = _calculate_confidence_from_details(blob, top_cand.get("code"), original_mf)
+            top_cand["confidence"] = new_confidence
+            logger.info(f"LOG_CONFIDENCE_REFINED: {top_cand.get('code')} → {new_confidence:.0%}")
+            
+            # Refinar código a HS8/HS10 si hay detalles
+            original_code = top_cand.get("code")
+            original_level = top_cand.get("level", "HS6")
+            refined_code, refined_level = _refine_hs_code_from_details(original_code, blob, original_level)
+            if refined_code != original_code:
+                top_cand["code"] = refined_code
+                top_cand["level"] = refined_level
+                logger.info(f"LOG_CODE_REFINED: {original_code} ({original_level}) → {refined_code} ({refined_level})")
+        
         logger.info(f"LOG_LLM_FINAL: top_candidates={len(norm.get('top_candidates', []))} items")
         return norm
     except Exception as e:
@@ -841,6 +1173,7 @@ RESPUESTA (JSON):
         offline = _offline_result(evidence=context_docs, reason=f"Error en Azure OpenAI: {e}")
         offline = _apply_rule_based_fallback(offline, query, conversation_history)
         offline = _apply_device_overrides(offline, query, conversation_history)
+        offline = _prune_missing_fields(offline, query, conversation_history)
         return _ensure_missing_fields(offline, query, conversation_history)
 
 
