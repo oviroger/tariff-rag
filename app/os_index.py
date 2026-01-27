@@ -21,10 +21,22 @@ def ensure_index(index_name: str | None = None, dim: int | None = None, space: s
     s = get_settings()
     client = get_os_client()
     index = index_name or s.opensearch_index
-    if client.indices.exists(index):
-        return
-    dim_val = int(dim or getattr(s, "opensearch_emb_dim", 768))
+    dim_val = int(dim or getattr(s, "opensearch_emb_dim", 1536))
     space_val = str(space or getattr(s, "opensearch_knn_space", "cosinesimil"))
+    if client.indices.exists(index):
+        try:
+            mapping = client.indices.get(index)
+            props = mapping.get(index, {}).get("mappings", {}).get("properties", {})
+            current_dim = props.get("embedding", {}).get("dimension")
+            if current_dim and int(current_dim) != dim_val:
+                raise RuntimeError(
+                    f"Index {index} has embedding dim {current_dim}, expected {dim_val}. "
+                    "Recreate the index with the correct dimension and reingest documents."
+                )
+        except Exception as e:
+            # If mapping fetch fails, surface the error to avoid silent mismatches
+            raise
+        return
     body = {
         "settings": {"index": {"knn": True}},
         "mappings": {

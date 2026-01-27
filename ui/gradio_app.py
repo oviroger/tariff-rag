@@ -68,6 +68,65 @@ def reset_conversation_state(conv_id: str):
 # Legacy: for backward compatibility with chat_response() function
 conv_state = ConversationState()
 
+
+def _history_to_api_format(history: list) -> list:
+    """Convierte historial de Gradio [(user, assistant), ...] a formato esperado por la API."""
+    from datetime import datetime
+    formatted = []
+    for turn in history or []:
+        if isinstance(turn, (list, tuple)) and len(turn) >= 2:
+            u, a = turn[0], turn[1]
+        else:
+            continue
+        formatted.append({
+            "user": u or "",
+            "assistant": a or "",
+            "timestamp": datetime.now().isoformat()
+        })
+    return formatted
+
+
+def _strip_accents_ui(s: str) -> str:
+    try:
+        import unicodedata
+        return unicodedata.normalize('NFD', s or '').encode('ascii', 'ignore').decode('utf-8')
+    except Exception:
+        return s or ""
+
+
+def _prune_missing_fields_ui(result: Dict[str, Any], message: str, history: list) -> Dict[str, Any]:
+    """Prune missing_fields in UI when the user already provided data in the latest turn/history."""
+    text_parts = [message or ""]
+    for turn in history or []:
+        if isinstance(turn, (list, tuple)) and len(turn) >= 2:
+            text_parts.append(turn[0] or "")
+            # No agregamos la respuesta del asistente para evitar reinsertar las preguntas
+    blob = _strip_accents_ui(" ".join(text_parts).lower())
+
+    motor_keywords = [
+        "diesel", "diesl", "diessel", "diseel", "dieesl", "disel",
+        "gasolina", "electrico", "electrica", "electric", "electr",
+        "hibrido", "hibrida", "hibrid"
+    ]
+    has_motor = any(k in blob for k in motor_keywords)
+    has_seats = bool(
+        re.search(r"\b\d{1,3}\s*(pasajero|pasajeros|plaza|plazas)\b", blob)
+        or re.search(r"\b(un|una|uno)\s+(pasajero|pasajeros|plaza|plazas)\b", blob)
+        or re.search(r"para\s+(un|una|uno)\s+(pasajero|pasajeros|plaza|plazas)\b", blob)
+    )
+
+    pruned = []
+    for field in result.get("missing_fields", []) or []:
+        f_norm = _strip_accents_ui(str(field)).lower()
+        if has_motor and "motor" in f_norm:
+            continue
+        if has_seats and ("plaza" in f_norm or "pasajero" in f_norm):
+            continue
+        pruned.append(field)
+
+    result["missing_fields"] = pruned
+    return result
+
 def is_tariff_related(text: str) -> Tuple[bool, str]:
     """Valida si el texto parece relacionado con clasificación arancelaria. Devuelve (ok, mensaje)."""
     text_lower = (text or "").lower().strip()
@@ -296,6 +355,24 @@ def format_classification_markdown(result: Dict[str, Any]) -> str:
     """Construye un markdown detallado a partir del resultado de /classify."""
     md = ""
     candidates = result.get("top_candidates") or result.get("candidates") or []
+    
+    # Recolectar TODOS los años únicos de las evidencias
+    years_found = set()
+    for ev in (result.get("support_evidence") or []):
+        y = ev.get("year")
+        if y:
+            years_found.add(y)
+    for ev in (result.get("evidence") or result.get("context_docs") or []):
+        y = ev.get("year") or (ev.get("_source", {}) or {}).get("year")
+        if y:
+            years_found.add(y)
+    
+    # Formatear años ordenados
+    years_str = ""
+    if years_found:
+        sorted_years = sorted(years_found)
+        years_str = f" | 📅 Referencia: {', '.join(map(str, sorted_years))}"
+    
     if candidates:
         md += "## 🎯 Clasificación sugerida\n\n"
         incisos = ["a", "b", "c"]
@@ -318,7 +395,7 @@ def format_classification_markdown(result: Dict[str, Any]) -> str:
                 conf_emoji = "🔴"
 
             inciso = incisos[idx] if idx < len(incisos) else str(idx + 1)
-            md += f"{conf_emoji} **{inciso}) {hs_code}** (Confianza: {confidence:.1%})\n"
+            md += f"{conf_emoji} **{inciso}) {hs_code}**{years_str} (Confianza: {confidence:.1%})\n"
             if description and description.strip():
                 md += f"   *{description}*\n"
             if level:
@@ -382,7 +459,7 @@ def classify(description: str, hs: str):
         err = str(e)
         return [], [], [], [], [f"Error al llamar API: {err}"]
 
-def chat_response(message: str, history: list) -> str:
+def chat_response(message: str, history: list, years: Optional[list] = None) -> str:
     """
     Main chatbot response function.
     Handles both classification requests and follow-up questions.
@@ -392,6 +469,16 @@ def chat_response(message: str, history: list) -> str:
     
     message = message.strip()
     message_lower = message.lower()
+    
+    # Convertir años de string a int si es necesario (Gradio pasa como strings)
+    years_list = None
+    if years:
+        try:
+            years_list = [int(y) if isinstance(y, str) else y for y in years if str(y).strip()]
+            if not years_list:  # Si la lista quedó vacía, buscar en todos los años
+                years_list = None
+        except (ValueError, TypeError):
+            years_list = None
     
     # Detectar comandos de reset/nueva conversación
     reset_keywords = [
@@ -483,11 +570,13 @@ def chat_response(message: str, history: list) -> str:
             payload = {
                 "user_query": improved_query, 
                 "top_k": 5,
-                "conversation_history": conv_state.get_history_for_api()
+                "conversation_history": _history_to_api_format(history)
             }
+            if years_list:
+                payload["years"] = years_list
             resp = requests.post(f"{API_URL}/classify", json=payload, timeout=60)
             resp.raise_for_status()
-            data = resp.json()
+            data = _prune_missing_fields_ui(resp.json(), message, history)
 
             conv_state.update(improved_query, data)
             response = format_classification_markdown(data)
@@ -518,11 +607,13 @@ def chat_response(message: str, history: list) -> str:
         payload = {
             "user_query": improved_query, 
             "top_k": 5,
-            "conversation_history": conv_state.get_history_for_api()
+            "conversation_history": _history_to_api_format(history)
         }
+        if years_list:
+            payload["years"] = years_list
         resp = requests.post(f"{API_URL}/classify", json=payload, timeout=60)
         resp.raise_for_status()
-        data = resp.json()
+        data = _prune_missing_fields_ui(resp.json(), message, history)
 
         # Update conversation state (global)
         conv_state.update(message, data)
@@ -538,8 +629,8 @@ def chat_response(message: str, history: list) -> str:
         response += "- ¿Hay alternativas?\n"
         response += "- Dame un resumen\n"
         
-        # Guardar turno en el historial con resumen
-        conv_state.add_classification_summary(message, data)
+        # Guardar turno en el historial con el texto completo para mantener contexto
+        conv_state.add_turn(message, response)
 
         return response
 
@@ -618,6 +709,18 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "", 
     missing = result.get("missing_fields", [])
     warnings = result.get("warnings", [])
 
+    # Obtener hint de año desde la evidencia disponible
+    year_hint = None
+    for ev in (result.get("support_evidence") or []):
+        year_hint = ev.get("year")
+        if year_hint:
+            break
+    if not year_hint:
+        for ev in (result.get("evidence") or result.get("context_docs") or []):
+            year_hint = ev.get("year") or (ev.get("_source", {}) or {}).get("year")
+            if year_hint:
+                break
+
     # Filtrar mensajes técnicos de errores de LLM (en warnings Y missing_fields)
     technical_keywords = ["llm", "generador", "gemini", "finish_reason", "bloqueó", "blocked"]
     clean_warnings = [w for w in warnings if not any(x in str(w).lower() for x in technical_keywords)]
@@ -636,19 +739,25 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "", 
             contextual_query = " ".join(recent_user_queries + [user_query])
     
     # Prune vehicle-related missing fields if user_query already contains them
-    uq = contextual_query.lower()  # Usar contexto completo
+    uq = _strip_accents_ui(contextual_query).lower()  # Usar contexto completo sin acentos
     vehicle_terms = [
         "vehículo", "vehiculo", "auto", "automóvil", "automovil", "coche", "carro",
         "camión", "camion", "camioneta", "pickup", "bus", "autobús", "autobus",
         "microbús", "microbus", "moto", "motocicleta"
     ]
     has_vehicle_type = any(t in uq for t in vehicle_terms)
-    has_motor_type = any(t in uq for t in ["diesel", "diésel", "gasolina", "eléctrico", "electrico", "híbrido", "hibrido", "hev", "phev", "ev"]) 
+    has_motor_type = any(t in uq for t in ["diesel", "gasolina", "electrico", "electrica", "electric", "hibrido", "hibrida", "hev", "phev", "ev"])
     is_new_or_used = any(t in uq for t in ["nuevo", "nueva", "usado", "usada"]) 
 
     def _drop_if_matches(predicates):
         nonlocal clean_missing
-        clean_missing = [m for m in clean_missing if not any(p in str(m).lower() for p in predicates)]
+        filtered = []
+        for m in clean_missing:
+            m_norm = _strip_accents_ui(str(m)).lower()
+            if any(p in m_norm for p in predicates):
+                continue
+            filtered.append(m)
+        clean_missing = filtered
 
     if has_vehicle_type:
         _drop_if_matches(["tipo de vehículo", "tipo de vehiculo"]) 
@@ -657,178 +766,92 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "", 
     if is_new_or_used:
         _drop_if_matches(["nuevo", "usado"]) 
 
-    # Prune metal-related missing fields if already provided
-    metal_terms = ["acero", "steel", "hierro", "inox", "inoxidable", "lámina", "lamina", "chapa", "plancha", "bobina", "laminado", "frío", "frio", "caliente", "aluminio", "aluminum", "cobre", "copper"]
-    has_metal = any(t in uq for t in metal_terms)
-    has_process = any(t in uq for t in ["laminado en caliente", "laminado en frío", "laminado en frio", "en caliente", "en frío", "en frio", "caliente", "frío", "frio", "hot rolled", "cold rolled"])
-    has_thickness = any(tok.endswith("mm") or " mm" in tok for tok in uq.split()) or any(k in uq for k in ["mm", "milimetro", "milímetro", "espesor", "grosor"])
-    has_dims = any(k in uq for k in ["ancho", "largo", "bobina", "metro", "metros", "cm", "centímetro", "centimetro", "dimensiones"])
-    has_coating = any(k in uq for k in ["galvanizado", "pintado", "recubierto", "estañado", "coated", "galvanized", "painted"])
-    has_grade = any(k in uq for k in ["aisi", "astm", "en ", "sae", "iso", "grado", "norma"])
-    no_norm = any(phrase in uq for phrase in ["no tiene norma", "sin norma", "no se norma", "no sé norma", "no tiene ninguna norma", "ninguna norma"])
-    no_process = any(phrase in uq for phrase in ["no se proceso", "no sé proceso", "no tiene proceso", "sin proceso", "no sé el proceso", "no se el proceso"])
+    # Deduplicate after pruning
+    clean_missing = list(dict.fromkeys(clean_missing))
 
-    if has_metal:
-        _drop_if_matches(["tipo de producto", "tipo de producto específico", "tipo de producto (vehículo", "tipo de producto específico (ej.", "tipo de metal"])
-    if has_process or no_process:
-        _drop_if_matches(["proceso de laminado", "laminado en caliente", "laminado en frío", "laminado en frio", "proceso: laminado", "proceso (caliente", "proceso (frío"])
-    if has_thickness:
-        _drop_if_matches(["espesor", "grosor", "espesor en mm", "grosor en mm"])
-    if has_dims:
-        _drop_if_matches(["ancho", "largo", "dimensiones", "ancho y largo", "ancho si es bobina", "dimensiones (ancho"])
-    if has_coating:
-        _drop_if_matches(["recubrimiento", "galvanizado", "pintado", "estañado", "coated"])
-    if has_grade or no_norm:
-        _drop_if_matches(["norma", "grado", "aisi", "astm", "grado o norma"])
-
-    if not candidates:
-        # No candidates: reutiliza únicamente missing_fields del backend sin sobre-especificaciones en UI
-        first = clean_missing[0] if clean_missing else None
-        question = f"¿Puedes confirmar {first.lower()}?" if first else None
-
-        extras = [m for m in clean_missing[1:3]]
-
-        # Si el backend no trajo missing_fields, ofrecer guía específica por categoría
-        if not extras and not clean_missing:
-            cat = _detect_category(contextual_query)  # Usar contexto completo
-            # uq ya está definido arriba como contextual_query.lower()
-            metals_terms = ["acero", "inox", "inoxidable", "lámina", "lamina", "chapa", "plancha", "hoja", "bobina", "coil", "sheet", "plate", "aluminio", "aluminum", "cobre", "copper", "hierro", "metal"]
-            is_metals = (cat == "metal") or any(t in uq for t in metals_terms)
+    # Si no hay candidates pero SÍ hay evidencia, mostrar la evidencia disponible
+    evidence = result.get("evidence") or result.get("context_docs") or []
+    
+    if not candidates and evidence:
+        lines = ["### 📚 Información disponible (sin clasificación automática)", ""]
+        lines.append("Se encontraron los siguientes documentos relevantes:")
+        lines.append("")
+        
+        for i, ev in enumerate(evidence[:5], 1):
+            score = ev.get("score") or 0
+            text = ev.get("text") or ""
+            year = ev.get("year")
+            bucket = ev.get("bucket")
             
-            vehicles_terms = ["vehículo", "vehiculo", "auto", "automóvil", "automovil", "carro", "coche", "bus", "autobús", "autobus", "camión", "camion", "motocicleta", "moto", "jeep", "camioneta", "minibús", "minibus", "microbús", "microbus"]
-            is_vehicles = (cat == "vehicle") or any(t in uq for t in vehicles_terms)
-
-            # Detectar si ya se ha dado información específica
-            import re
-            has_thickness = bool(re.search(r"\b(\d+\.?\d*)\s*(mm|milímetro|milimetro)", uq))
-            has_dimensions = bool(re.search(r"\b(\d+\.?\d*)\s*(m|metro|cm|centímetro|centimetro)", uq)) or any(w in uq for w in ["ancho", "largo"])
-            has_process = any(w in uq for w in ["laminado en caliente", "laminado en frío", "laminado en frio", "hot rolled", "cold rolled"])
-            no_process = any(phrase in uq for phrase in ["no se proceso", "no sé proceso", "no tiene proceso", "sin proceso", "no sé el proceso"])
-            no_norm = any(phrase in uq for phrase in ["no tiene norma", "sin norma", "no se norma", "no sé norma", "no tiene ninguna norma"])
-
-            if is_metals:
-                # Si ya tiene espesor + dimensiones, información suficiente
-                if has_thickness and has_dimensions:
-                    specific_extras = []
-                    if not has_process and not no_process:
-                        specific_extras.append("Proceso: laminado en caliente o laminado en frío")
-                    if not no_norm:
-                        specific_extras.append("Norma o grado (AISI, ASTM) si está disponible")
-                    specific_extras.append("Recubrimiento si existe (galvanizado, pintado, etc.)")
-                    # Si no hay extras necesarios, no pedir nada más
-                    if not specific_extras or (no_process and no_norm):
-                        question = None
-                        extras = []
-                    else:
-                        if not question:
-                            question = f"¿Puedes confirmar {specific_extras[0].lower()}?" if specific_extras else None
-                        extras = specific_extras[:2]
-                else:
-                    # Información incompleta
-                    specific_extras = []
-                    if not has_thickness:
-                        specific_extras.append("Espesor en mm")
-                    if not has_dimensions:
-                        specific_extras.append("Dimensiones (ancho y largo en metros)")
-                    if not has_process and not no_process:
-                        specific_extras.append("Proceso: laminado en caliente o laminado en frío")
-                    if not question and specific_extras:
-                        question = f"¿Puedes confirmar {specific_extras[0].lower()}?"
-                    extras = specific_extras[:3]
-            
-            elif is_vehicles:
-                # Detectar información ya proporcionada sobre vehículos
-                for_persons = any(w in uq for w in ["personas", "pasajeros", "transporte de personas", "para personas"])
-                for_cargo = any(w in uq for w in ["mercancías", "mercancias", "carga", "para carga"])
-                has_vehicle_type = any(w in uq for w in ["automóvil", "automovil", "auto", "carro", "coche", "bus", "autobús", "autobus", "camión", "camion", "motocicleta", "moto", "jeep", "camioneta", "minibús", "minibus", "microbús", "microbus"])
-                has_motor = any(w in uq for w in ["gasolina", "diesel", "diésel", "eléctrico", "electrico", "híbrido", "hibrido"])
-                has_displacement = bool(re.search(r"\b(\d+)\s*(cm³|cm3|cc|centímetros cúbicos)", uq))
-                has_seats = bool(re.search(r"\b(\d+)\s*(plazas|pasajeros|personas)", uq))
-                is_new_or_used = any(w in uq for w in ["nuevo", "nueva", "usado", "usada", "usado"])
-                
-                specific_extras = []
-                
-                # Si solo dice "vehículos" (muy genérico)
-                if not has_vehicle_type and not for_persons and not for_cargo:
-                    specific_extras.append("Tipo específico de vehículo (automóvil, autobús, camión, motocicleta, etc.)")
-                    specific_extras.append("Uso principal (transporte de personas, mercancías, uso especial)")
-                    question = "¿Qué tipo de vehículo es?"
-                # Si ya sabe que es para personas pero no el tipo específico
-                elif for_persons and not has_vehicle_type:
-                    specific_extras.append("Tipo específico (automóvil, autobús, microbús, minibús, jeep, camioneta)")
-                    if not has_motor:
-                        specific_extras.append("Tipo de motor (gasolina, diésel, eléctrico, híbrido) y cilindrada en cm³")
-                    if not has_seats:
-                        specific_extras.append("Número de plazas o pasajeros (≤9 plazas → 87.03, ≥10 plazas → 87.02)")
-                    question = "¿Qué tipo específico de vehículo es?"
-                # Si ya tiene tipo de vehículo
-                else:
-                    if not has_motor:
-                        specific_extras.append("Tipo de motor (gasolina, diésel, eléctrico, híbrido)")
-                        if not has_displacement:
-                            specific_extras.append("Cilindrada del motor en cm³ (si aplica)")
-                    elif has_motor and not has_displacement:
-                        specific_extras.append("Cilindrada del motor en cm³ (afina la subpartida)")
-                    
-                    if (for_persons or has_vehicle_type) and not has_seats:
-                        specific_extras.append("Número de plazas o pasajeros (≤9 → 87.03, ≥10 → 87.02)")
-                    
-                    if not is_new_or_used:
-                        specific_extras.append("Si es nuevo o usado")
-                    
-                    if specific_extras:
-                        question = f"¿Puedes confirmar {specific_extras[0].lower()}?"
-                
-                extras = specific_extras[:4]
-
-        lines = [
-            "### 🔍 Necesito más información para clasificar",
-            "",
-        ]
-        if question:
-            lines.append(question)
-        if extras:
-            lines += ["", "También ayuda:"]
-            lines += [f"- {m}" for m in extras]
-        # Fallback mínimo cuando no hay extras ni missing_fields
-        # PERO: Si detectamos contexto de vehículos o metales, NO usar fallback genérico
-        if not extras and not clean_missing:
-            # Detectar si hay contexto de vehículos o metales en toda la conversación
-            all_user_queries = ""
-            if conv_state and hasattr(conv_state, 'history') and conv_state.history:
-                all_user_queries = " ".join([turn[0] for turn in conv_state.history[-5:] if isinstance(turn, tuple)])
-            all_user_queries += " " + (user_query or "")
-            all_lower = all_user_queries.lower()
-            
-            is_vehicle_context = any(w in all_lower for w in ["vehículo", "vehiculo", "auto", "automóvil", "coche", "carro", "bus", "autobús", "camión", "moto"])
-            is_metal_context = any(w in all_lower for w in ["acero", "metal", "lámina", "lamina", "chapa", "aluminio", "cobre"])
-            
-            # Solo usar fallback genérico si NO es vehículo ni metal
-            if not is_vehicle_context and not is_metal_context:
-                lines += [
-                    "",
-                    "También ayuda:",
-                    "- Dimensiones relevantes (medidas y unidades)",
-                    "- Proceso de fabricación o norma aplicable",
-                    "- Cualquier característica técnica clave para identificar la subpartida",
-                ]
-        lines += ["", "Responde con los datos que tengas disponibles."]
+            year_str = f" | 📅 {year}" if year else ""
+            lines.append(f"{i}. **(Score: {score:.2f})**{year_str}")
+            lines.append(f"   {text}")
+            if bucket:
+                lines.append(f"   _Fuente: {bucket}_")
+            lines.append("")
+        
+        if clean_missing:
+            lines.append("### 🔍 Información adicional que ayudaría a clasificar")
+            for m in clean_missing[:5]:
+                lines.append(f"- {m}")
+            lines.append("")
+        
+        lines.append("Responde con los datos que tengas disponibles.")
         return "\n".join(lines)
 
-    # Mostrar hasta 3 códigos, sin confianza ni evidencia
+    if not candidates:
+        lines = ["### 🔍 Necesito más información para clasificar", ""]
+        if clean_missing:
+            lines += [f"- {m}" for m in clean_missing[:5]]
+        lines.append("Responde con los datos que tengas disponibles.")
+        return "\n".join(lines)
+
+    # Extraer años de la evidence para mostrar referencias
+    evidence = result.get("evidence") or result.get("context_docs") or []
+    years_in_evidence = set()
+    for ev in evidence:
+        year = ev.get("year")
+        if year:
+            years_in_evidence.add(int(year) if isinstance(year, (int, str)) else year)
+    years_sorted = sorted(years_in_evidence) if years_in_evidence else []
+    years_str = ", ".join(str(y) for y in years_sorted) if years_sorted else ""
+
+    # Mostrar hasta 3 códigos con año de referencia
     lines = ["## 🎯 Clasificación sugerida", ""]
     incisos = ["a", "b", "c"]
+    
+    # Check if top candidate is sufficiently specific to skip missing_fields
+    top_cand = candidates[0] if candidates else {}
+    top_code = top_cand.get("code") or top_cand.get("hs_code") or ""
+    top_confidence = float(top_cand.get("confidence") or 0)
+    top_code_digits = len(top_code.replace(".", "").replace(" ", ""))
+    
+    # Only suppress missing_fields if code is HS10 (10 digits) with 90%+ confidence
+    # This ensures we keep asking guiding questions until we reach maximum precision
+    should_suppress_missing = (top_code_digits >= 10 and top_confidence >= 0.90)
+    
     for i, cand in enumerate(candidates[:3]):
         code = cand.get("code") or cand.get("hs_code") or "N/A"
         desc = (cand.get("description") or cand.get("desc") or "").strip()
+        confidence = cand.get("confidence") or 0
         inciso = incisos[i] if i < len(incisos) else str(i + 1)
-        lines.append(f"**{inciso}) {code}**")
+        
+        # Mostrar año(s) de referencia basados en evidence
+        if years_str:
+            year_ref = f" | 📅 Referencia: {years_str}"
+        else:
+            year_ref = f" | 📅 {year_hint}" if year_hint else ""
+        
+        # Mostrar confianza también
+        conf_str = f" | 🎯 {confidence:.0%}" if confidence else ""
+        
+        lines.append(f"**{inciso}) {code}**{year_ref}{conf_str}")
         if desc:
             lines.append(f"   {desc}")
         lines.append("")
 
-    # Si faltan datos, sugerirlos de forma breve
-    if clean_missing:
+    # Si faltan datos, sugerirlos de forma breve (PERO no si ya tenemos código muy refinado)
+    if clean_missing and not should_suppress_missing:
         lines.append("### 🔍 Información adicional sugerida")
         for m in clean_missing[:5]:
             lines.append(f"- {m}")
@@ -879,7 +902,7 @@ def _handle_followup_simple(question: str, last_result: Dict[str, Any]) -> str:
     return "No entendí. Intenta: ¿Qué información falta?, ¿Por qué?, alternativas, resumen."
 
 
-def chat_minimal_validation(message: str, history: list, conv_id: str = "") -> Tuple[str, str]:
+def chat_minimal_validation(message: str, history: list, conv_id: str = "", years: Optional[list] = None) -> Tuple[str, str]:
     """
     Modo simple: funciona como el chatbot, pero sin confianza, evidencia ni detalles extensos.
     Responde siempre con códigos y razones breves.
@@ -934,10 +957,18 @@ def chat_minimal_validation(message: str, history: list, conv_id: str = "") -> T
             "conversation_history": conv_state.get_history_for_api(), 
             "conversation_id": conv_id
         }
+        if years:
+            years_int = [int(y) for y in years if str(y).isdigit()]
+            if years_int:
+                payload["years"] = years_int
         sent_query = msg
     else:
         # Primera consulta o sin contexto
         payload = {"user_query": msg, "top_k": 5, "conversation_history": conv_state.get_history_for_api(), "conversation_id": conv_id}
+        if years:
+            years_int = [int(y) for y in years if str(y).isdigit()]
+            if years_int:
+                payload["years"] = years_int
         sent_query = msg
 
     # Clasificación normal, formato simple
@@ -1008,16 +1039,22 @@ with gr.Blocks(
             # )
 
             conv_id_state = gr.State(value="")
+            years_selector_min = gr.CheckboxGroup(
+                choices=["2025", "2026"],
+                value=["2025", "2026"],
+                label="Filtrar por año",
+                info="Selecciona uno o ambos años; vaciar seleccion busca en todos"
+            )
             
             chatbot_minimal = gr.ChatInterface(
                 fn=chat_minimal_validation,
                 chatbot=gr.Chatbot(height=500),
-                additional_inputs=[conv_id_state],
+                additional_inputs=[conv_id_state, years_selector_min],
                 additional_outputs=[conv_id_state],
                 examples=[
-                    ["¿Cuál es la partida arancelaria de los vehículos?"],
-                    ["Quiero clasificar láminas de acero"],
-                    ["Necesito el código HS de un ventilador"],
+                    ["¿Cuál es la partida arancelaria de los vehículos?", "", ["2025", "2026"]],
+                    ["Quiero clasificar láminas de acero", "", ["2025", "2026"]],
+                    ["Necesito el código HS de un ventilador", "", ["2025", "2026"]],
                 ],
                 title=None,
                 description=None,
@@ -1037,18 +1074,25 @@ with gr.Blocks(
 
             # Chatbot por defecto (compatible con versiones sin parámetro 'type')
             chatbot_component = gr.Chatbot()
+            years_selector_full = gr.CheckboxGroup(
+                choices=["2025", "2026"],
+                value=["2025", "2026"],
+                label="Filtrar por año",
+                info="Selecciona uno o ambos años; vaciar seleccion busca en todos"
+            )
             chatbot = gr.ChatInterface(
                 fn=chat_response,
                 chatbot=chatbot_component,
                 examples=[
-                    "Láminas de acero laminadas en caliente, 2mm de espesor, para construcción",
-                    "Smartphone con pantalla OLED de 6.5 pulgadas, 128GB almacenamiento",
-                    "Café tostado en grano, origen colombiano, sin descafeinar",
-                    "Neumáticos radiales nuevos para automóvil de pasajeros, tamaño 205/55R16",
-                    "¿Cuál es la partida arancelaria de los vehículos?",
+                    ["Láminas de acero laminadas en caliente, 2mm de espesor, para construcción", ["2025", "2026"]],
+                    ["Smartphone con pantalla OLED de 6.5 pulgadas, 128GB almacenamiento", ["2025", "2026"]],
+                    ["Café tostado en grano, origen colombiano, sin descafeinar", ["2025", "2026"]],
+                    ["Neumáticos radiales nuevos para automóvil de pasajeros, tamaño 205/55R16", ["2025", "2026"]],
+                    ["¿Cuál es la partida arancelaria de los vehículos?", ["2025", "2026"]],
                 ],
                 title=None,
                 description=None,
+                additional_inputs=[years_selector_full],
             )
 
 

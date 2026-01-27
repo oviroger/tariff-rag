@@ -1,0 +1,71 @@
+{
+  "smartphones": {
+    "keywords": [
+      "smartphone",
+      "telefono celular",
+      "teléfono celular",
+      "telefono movil",
+      "teléfono móvil",
+      "celular",
+      "movil",
+      "móvil",
+      "gsm",
+      "4g",
+      "5g",
+      "telefono inteligente",
+      "teléfono inteligente"
+    ],
+    "exclude_keywords": [
+      "laptop",
+      "portatil",
+      "portátil",
+      "notebook",
+      "computadora"
+    ],
+    "hs_code": "8517.13",
+    "description": "Aparatos telefónicos para redes celulares u otras redes inalámbricas",
+    "confidence": 0.82,
+    "level": "HS6"
+  },
+  "motorcycles": {
+    "keywords": [
+      "moto",
+      "motocicleta",
+      "motocicletas"
+    ],
+    "exclude_keywords": [],
+    "hs_code_base": "8711",
+    "level": "HS6",
+    "electric_keyword": ["electrica", "electrico", "eléctrica", "eléctrico"],
+    "electric_code": "8711.60",
+    "electric_description": "Motocicletas con motor eléctrico",
+    "cc_ranges": [
+      {
+        "min": 0,
+        "max": 50,
+        "code": "8711.10",
+        "description": "Motocicletas con motor de pistón, ≤50 cc"
+      },
+      {
+        "min": 50,
+        "max": 250,
+        "code": "8711.20",
+        "description": "Motocicletas con motor de pistón, >50 cc y ≤250 cc"
+      },
+      {
+        "min": 250,
+        "max": 500,
+        "code": "8711.30",
+        "description": "Motocicletas con motor de pistón, >250 cc y ≤500 cc"
+      },
+      {
+        "min": 500,
+        "max": null,
+        "code": "8711.50",
+        "description": "Motocicletas con motor de pistón, >500 cc"
+      }
+    ],
+    "default_code": "8711.90",
+    "default_description": "Motocicletas; otras"
+  }
+}

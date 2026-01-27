@@ -28,20 +28,31 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
     client = get_os_client()
     embedder = GeminiEmbedder()
     
-    # Si no se especifica índice, usar la lista de índices configurada
+    # Determinar qué índices usar
+    indices_to_search = []
     if index is None:
         settings = get_settings()
         # Si se especifican años, mapear años a índices específicos
         if years:
             year_to_index = {
-                2025: "tariff_fragments",
+                2025: "tariff_fragments_2025",
                 2026: "tariff_fragments_2026"
             }
-            selected_indices = [year_to_index[y] for y in years if y in year_to_index]
-            index = ",".join(selected_indices) if selected_indices else settings.opensearch_index
+            indices_to_search = [year_to_index[y] for y in years if y in year_to_index]
+            if not indices_to_search:
+                indices_to_search = [settings.opensearch_index]
+            logger.info(f"Year filter: {years} -> indices: {indices_to_search}")
         else:
-            # Usar opensearch_indices si está configurado, sino opensearch_index
-            index = settings.opensearch_indices if hasattr(settings, 'opensearch_indices') and settings.opensearch_indices else settings.opensearch_index
+            # Usar opensearch_indices si está configurado (múltiples), sino opensearch_index
+            if hasattr(settings, 'opensearch_indices') and settings.opensearch_indices:
+                indices_to_search = settings.opensearch_indices.split(",")
+            else:
+                indices_to_search = [settings.opensearch_index]
+            logger.info(f"No year filter -> indices: {indices_to_search}")
+    else:
+        # Índice especificado: puede ser uno solo o múltiples separados por coma
+        indices_to_search = [idx.strip() for idx in index.split(",")]
+        logger.info(f"Specified index -> indices: {indices_to_search}")
     
     # Actualizar métrica de retrieval_k
     RETRIEVAL_K.labels(strategy="hybrid").set(top_k)
@@ -49,7 +60,7 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
     # Generar embedding para la query
     query_vector = embedder.embed_texts([query_text])[0]
     
-    # Construir query kNN (el filtro de años se maneja vía selección de índices)
+    # Construir query kNN
     query_obj = {
         "knn": {
             "embedding": {
@@ -59,7 +70,7 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
         }
     }
     
-    # Búsqueda kNN nativa de OpenSearch
+    # Body de búsqueda
     body = {
         "size": top_k,
         "query": query_obj,
@@ -79,11 +90,64 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
     }
     
     try:
-        response = client.search(index=index, body=body)
-        hits = response.get("hits", {}).get("hits", [])
-        # Return raw OpenSearch hits to match chain_rag expectations:
-        # each hit has: "_id", "_score", and "_source" with "text", etc.
-        return hits
+        # Usar OpenSearch native cross-index search
+        index_str = ",".join(indices_to_search)
+        
+        # Si hay múltiples índices, solicitar más hits para balanceo entre índices
+        k_adjusted = top_k
+        if len(indices_to_search) > 1:
+            # Solicitar al menos 2x para garantizar representación de cada índice
+            k_adjusted = top_k * len(indices_to_search)
+            logger.info(f"Multi-index search: requested {k_adjusted} hits to balance {len(indices_to_search)} indices")
+        
+        body["size"] = k_adjusted
+        response = client.search(index=index_str, body=body)
+        all_hits = response.get("hits", {}).get("hits", [])
+        logger.info(f"OpenSearch returned {len(all_hits)} total hits from {index_str}")
+        
+        # LOG: Mostrar distribución de hits por índice
+        hits_distribution = {}
+        for hit in all_hits:
+            idx = hit.get("_index")
+            year = hit.get("_source", {}).get("year")
+            hits_distribution[idx] = hits_distribution.get(idx, 0) + 1
+        logger.info(f"Hits distribution: {hits_distribution}")
+        
+        # Si hay múltiples índices, balancear para asegurar representación de cada uno
+        if len(indices_to_search) > 1 and len(all_hits) > 0:
+            # Agrupar por índice
+            hits_by_index = {}
+            for hit in all_hits:
+                idx = hit.get("_index")
+                if idx not in hits_by_index:
+                    hits_by_index[idx] = []
+                hits_by_index[idx].append(hit)
+            
+            # Redistribuir para que cada índice tenga representación proporcional
+            final_hits = []
+            slots_per_index = {}
+            for idx in indices_to_search:
+                slots_per_index[idx] = max(1, top_k // len(indices_to_search))
+            
+            # Llenar slots usando round-robin por score
+            available = {idx: list(hits_by_index.get(idx, [])) for idx in indices_to_search}
+            while len(final_hits) < top_k:
+                filled_any = False
+                for idx in indices_to_search:
+                    if len(final_hits) >= top_k:
+                        break
+                    if available[idx] and slots_per_index[idx] > 0:
+                        final_hits.append(available[idx].pop(0))
+                        slots_per_index[idx] -= 1
+                        filled_any = True
+                if not filled_any:
+                    break
+            
+            logger.info(f"Balanced result: {len(final_hits)} hits with representation from {len([i for i in indices_to_search if i in hits_by_index])} indices")
+            return final_hits
+        
+        logger.info(f"Retrieved {len(all_hits[:top_k])} hits from {len(indices_to_search)} indices")
+        return all_hits[:top_k]
     except Exception as e:
         raise RuntimeError(f"Error en recuperación: {e}")
 
@@ -217,18 +281,40 @@ def _bm25_body(query_text: str, k: int = 5) -> Dict:
 
 
 def bm25_search(os_client, index: str, query_text: str, k: int = 5) -> List[Dict]:
+    """
+    BM25 léxico sobre uno o múltiples índices.
+    Si index contiene múltiples índices (separados por coma), usa OpenSearch native cross-index search.
+    """
     body = _bm25_body(query_text, k=k)
-    resp = os_client.search(index=index, body=body)
-    return resp.get("hits", {}).get("hits", [])
+    
+    try:
+        # OpenSearch soporta búsquedas cross-index directamente con coma
+        resp = os_client.search(index=index, body=body)
+        hits = resp.get("hits", {}).get("hits", [])
+        logger.info(f"BM25: Retrieved {len(hits)} hits from indices '{index}'")
+        return hits
+    except Exception as e:
+        logger.warning(f"BM25 search failed for index '{index}': {e}")
+        return []
 
 
 def ensure_index_exists(os_client, index_name: str):
     """Crea el índice si no existe."""
-    if os_client.indices.exists(index=index_name):
-        return
-    
-    emb_dim = int(os.getenv('OPENSEARCH_EMB_DIM', '768'))
+    emb_dim = int(os.getenv('OPENSEARCH_EMB_DIM', '1536'))
     knn_space = os.getenv('OPENSEARCH_KNN_SPACE', 'cosinesimil')
+    if os_client.indices.exists(index=index_name):
+        try:
+            mapping = os_client.indices.get(index_name)
+            props = mapping.get(index_name, {}).get("mappings", {}).get("properties", {})
+            current_dim = props.get("embedding", {}).get("dimension")
+            if current_dim and int(current_dim) != emb_dim:
+                raise RuntimeError(
+                    f"Index {index_name} has embedding dim {current_dim}, expected {emb_dim}. "
+                    "Recreate the index with the correct dimension and reingest documents."
+                )
+        except Exception:
+            raise
+        return
     
     mapping = {
         "settings": {
@@ -259,8 +345,10 @@ def ensure_index_exists(os_client, index_name: str):
 
 def hybrid_search_with_fallback(os_client, index: Optional[str], query_text: str, k: int = 5, years: Optional[List[int]] = None) -> List[Dict]:
     """
-    1) Intenta KNN semántico con embeddings.
-    2) Si vacío o falla, cae a BM25 con boosts de dominio.
+    ESTRATEGIA MEJORADA:
+    1) Ejecuta BM25 y kNN en paralelo
+    2) Combina resultados usando Reciprocal Rank Fusion (RRF)
+    3) Si ambos fallan, intenta con un solo método
     
     Args:
         os_client: Cliente OpenSearch
@@ -273,29 +361,70 @@ def hybrid_search_with_fallback(os_client, index: Optional[str], query_text: str
     if index and "," not in index:  # Si es un solo índice, verificar que existe
         ensure_index_exists(os_client, index)
 
-    try:
-        hits = retrieve_fragments(query_text, top_k=k, index=index, years=years)
-        if hits:
-            return hits
-    except Exception as e:
-        logger.warning(f"KNN search failed: {e}. Falling back to BM25.")
-        # Fallback a BM25
-        pass
-
-    # Fallback a BM25 léxico
-    # Determinar el índice para BM25 usando la misma lógica que retrieve_fragments
+    # Determinar el índice para búsqueda usando la misma lógica que retrieve_fragments
     if index is None:
         settings = get_settings()
         if years:
             year_to_index = {
-                2025: "tariff_fragments",
+                2025: "tariff_fragments_2025",
                 2026: "tariff_fragments_2026"
             }
             selected_indices = [year_to_index[y] for y in years if y in year_to_index]
-            bm25_index = ",".join(selected_indices) if selected_indices else settings.opensearch_index
+            search_index = ",".join(selected_indices) if selected_indices else settings.opensearch_index
         else:
-            bm25_index = settings.opensearch_indices if hasattr(settings, 'opensearch_indices') and settings.opensearch_indices else settings.opensearch_index
+            search_index = settings.opensearch_indices if hasattr(settings, 'opensearch_indices') and settings.opensearch_indices else settings.opensearch_index
     else:
-        bm25_index = index
-        
-    return bm25_search(os_client, bm25_index, query_text, k)
+        search_index = index
+    
+    logger.info(f"Hybrid search on index: {search_index} with years: {years}")
+    
+    # Ejecutar BM25 y kNN en paralelo (pedir más resultados para fusión)
+    k_retrieval = k * 3  # Pedir 3x para tener pool más grande
+    
+    bm25_hits = []
+    knn_hits = []
+    
+    # 1. BM25
+    try:
+        bm25_hits = bm25_search(os_client, search_index, query_text, k=k_retrieval)
+        logger.info(f"BM25 returned {len(bm25_hits)} hits")
+    except Exception as e:
+        logger.warning(f"BM25 failed: {e}")
+    
+    # 2. kNN
+    try:
+        knn_hits = retrieve_fragments(query_text, top_k=k_retrieval, index=search_index, years=years)
+        logger.info(f"kNN returned {len(knn_hits)} hits")
+    except Exception as e:
+        logger.warning(f"kNN failed: {e}")
+    
+    # 3. Si ambos fallan, devolver lista vacía
+    if not bm25_hits and not knn_hits:
+        logger.warning("Both BM25 and kNN failed to return results")
+        return []
+    
+    # 4. Reciprocal Rank Fusion (RRF)
+    # Score = 1 / (rank + k) donde k=60 es estándar
+    RRF_K = 60
+    scores = {}
+    
+    for rank, hit in enumerate(bm25_hits, 1):
+        doc_id = hit.get("_id")
+        scores[doc_id] = scores.get(doc_id, {"hit": hit, "score": 0})
+        scores[doc_id]["score"] += 1.0 / (rank + RRF_K)
+        scores[doc_id]["bm25_rank"] = rank
+    
+    for rank, hit in enumerate(knn_hits, 1):
+        doc_id = hit.get("_id")
+        if doc_id not in scores:
+            scores[doc_id] = {"hit": hit, "score": 0}
+        scores[doc_id]["score"] += 1.0 / (rank + RRF_K)
+        scores[doc_id]["knn_rank"] = rank
+    
+    # Ordenar por score RRF y tomar top-k
+    ranked = sorted(scores.values(), key=lambda x: x["score"], reverse=True)
+    final_hits = [item["hit"] for item in ranked[:k]]
+    
+    logger.info(f"RRF fusion: Combined {len(bm25_hits)} BM25 + {len(knn_hits)} kNN -> {len(final_hits)} final results")
+    
+    return final_hits

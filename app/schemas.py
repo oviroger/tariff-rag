@@ -64,10 +64,10 @@ class Settings(BaseSettings):
 
     # OpenSearch (alineado con .env / docker-compose)
     opensearch_host: str = "http://opensearch:9200"
-    opensearch_index: str = "tariff_fragments"
-    opensearch_indices: str = "tariff_fragments,tariff_fragments_2026"  # Índices separados por coma para consultas multi-año
+    opensearch_index: str = "tariff_fragments_2025"
+    opensearch_indices: str = "tariff_fragments_2025,tariff_fragments_2026"  # Índices separados por coma para consultas multi-año
     opensearch_knn_space: str = "cosinesimil"
-    opensearch_emb_dim: int = 768
+    opensearch_emb_dim: int = 1536
 
     # MySQL
     mysql_host: str = "mysql"

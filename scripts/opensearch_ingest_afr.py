@@ -54,7 +54,17 @@ def build_metadata(doc_id: str, source: str, api_version: Optional[str], model_i
             m[k] = v
     return m
 
-def transform_analyze_result(ar: Dict[str, Any], source_name: str) -> List[Dict[str, Any]]:
+def extract_year_from_filename(filename: str) -> Optional[int]:
+    """
+    Extrae el año del nombre del archivo.
+    Ej: "Arancel_Boliviano_2025_Parte_1.json" -> 2025
+         "Arancel 2026_1.pdf.json" -> 2026
+    """
+    import re
+    match = re.search(r'20\d{2}', filename)
+    return int(match.group()) if match else None
+
+def transform_analyze_result(ar: Dict[str, Any], source_name: str, year: Optional[int] = None) -> List[Dict[str, Any]]:
     doc_id = sha16(source_name)
     api_version = ar.get("apiVersion")
     model_id   = ar.get("modelId")
@@ -73,7 +83,7 @@ def transform_analyze_result(ar: Dict[str, Any], source_name: str) -> List[Dict[
             "type": "text",
             "text": text,
             "metadata": build_metadata(doc_id, source_name, api_version, model_id,
-                                       page_num=page_num, index=i, role=role, span=span, kind="paragraph"),
+                                       page_num=page_num, index=i, role=role, span=span, kind="paragraph", year=year),
         })
 
     for ti, tbl in enumerate(ar.get("tables", []) or []):
@@ -104,7 +114,7 @@ def transform_analyze_result(ar: Dict[str, Any], source_name: str) -> List[Dict[
             "text": table_text,
             "metadata": build_metadata(doc_id, source_name, api_version, model_id,
                                        page_num=page_num, index=ti, kind="table",
-                                       shape={"rows": nrows, "cols": ncols}),
+                                       shape={"rows": nrows, "cols": ncols}, year=year),
         })
 
     for fi, fig in enumerate(ar.get("figures", []) or []):
@@ -269,7 +279,8 @@ def iter_chunks_from_afr_dir(dir_path: str, tracking: dict = None, force: bool =
                 ar = detect_analyze_result(obj)
                 if ar:
                     source_name = os.path.splitext(fname)[0]
-                    for ch in transform_analyze_result(ar, source_name):
+                    year = extract_year_from_filename(fname)
+                    for ch in transform_analyze_result(ar, source_name, year=year):
                         yield ch
                 else:
                     if isinstance(obj, dict) and "text" in obj:

@@ -8,9 +8,10 @@ class Settings(BaseSettings):
 
     # OpenSearch
     opensearch_host: str = "http://opensearch:9200"
-    opensearch_index: str = "tariff_fragments"
+    opensearch_index: str = "tariff_fragments_2025"
+    opensearch_indices: str = "tariff_fragments_2025,tariff_fragments_2026"
     opensearch_knn_space: str = "cosinesimil"
-    opensearch_emb_dim: int = 768
+    opensearch_emb_dim: int = 1536
 
     # MySQL
     mysql_host: str = "mysql"

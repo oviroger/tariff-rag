@@ -85,6 +85,11 @@
       - GEMINI_MODEL=${GEMINI_GEN_MODEL}
       - AZURE_FORMREC_ENDPOINT=${AZURE_FR_ENDPOINT}
       - AZURE_FORMREC_KEY=${AZURE_FR_KEY}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}
+      - AZURE_OPENAI_API_VERSION=${AZURE_OPENAI_API_VERSION}
+      - AZURE_OPENAI_CHAT_DEPLOYMENT=${AZURE_OPENAI_CHAT_DEPLOYMENT}
+      - AZURE_OPENAI_EMBED_DEPLOYMENT=${AZURE_OPENAI_EMBED_DEPLOYMENT}
       - MIN_CANDIDATE_CONFIDENCE=${MIN_CANDIDATE_CONFIDENCE:-0.7}
       # App
       - FINAL_PASAGES=${FINAL_PASAGES}
@@ -97,7 +102,7 @@
       - ./ui:/app/ui
     ports:
       - "${PORT_API}:8000"
-    command: python -m uvicorn app.api:app --host 0.0.0.0 --port 8000 --reload
+    command: python -m uvicorn app.api:app --host 0.0.0.0 --port 8000
     networks: [ragnet]
     healthcheck:
       # Usa Python en vez de curl (python:3.11-slim no trae curl)

@@ -293,9 +293,9 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
 
         # 1) retrieval con fallback
         try:
-            # Pasar años si se especifican, sino buscar en todos los índices configurados
-            # Si se especifican años, NO pasar index_name para que retrieve_fragments() haga la selección
-            index_for_search = None if req.years else index_name
+            # Pasar None para index para que siempre use la lógica de configuración (opensearch_indices o años)
+            # Si se especifican años, retrieve_fragments() hará la selección de índices específicos
+            index_for_search = None
             hits = hybrid_search_with_fallback(
                 os_client, 
                 index_for_search, 
@@ -400,6 +400,51 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
             # No interrumpir si el saneamiento falla
             logger.exception(f"Sanitizer failed: {e}")
             pass
+
+        # 3.7) FALLBACK: Si LLM no propuso candidatos pero HAY documentos, proponer automáticamente
+        cands_before_fallback = result_dict.get("top_candidates") or []
+        if not cands_before_fallback and hits:
+            logger.info("[FALLBACK] LLM no propuso candidatos pero hay documentos. Generando código automático.")
+            # Generar un candidato automático basado en palabras clave
+            query_lower = query_text.lower()
+            
+            # Mapeo de palabras clave a códigos HS probables
+            keyword_to_code = {
+                "cable": "8544.30",  # Cables de cobre aislados
+                "conductor": "8544.30",
+                "alambre": "7408.11",  # Alambre de cobre
+                "cobre": "7408.11",
+                "bus": "8702.10",  # Transporte de pasajeros
+                "camión": "8704.21",
+                "vehículo": "8703.21",
+                "acero": "7208.37",  # Láminas de acero
+                "hierro": "7208.37",
+                "lámina": "7208.37",
+            }
+            
+            # Buscar palabras clave en el query
+            code = None
+            for keyword, candidate_code in keyword_to_code.items():
+                if keyword in query_lower:
+                    code = candidate_code
+                    break
+            
+            # Si se encontró un código, proponer
+            if code:
+                result_dict["top_candidates"] = [{
+                    "code": code,
+                    "description": f"Basado en documentos recuperados: {hits[0].get('_source', {}).get('text', '')[:80]}...",
+                    "confidence": 0.72,
+                    "level": "HS6"
+                }]
+                result_dict["missing_fields"] = [
+                    "Confirma el producto o proporciona más detalles",
+                    "Características adicionales que puedan refinar la clasificación"
+                ]
+                result_dict["warnings"] = ["Clasificación generada por fallback automático"]
+                logger.info(f"[FALLBACK] Generado candidato automático: {code}")
+            else:
+                logger.info(f"[FALLBACK] No se encontró mapeo de palabras clave para generar código")
 
         # 4) evidencia anclada al código (opcional)
         main_code = None

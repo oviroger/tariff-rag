@@ -31,6 +31,7 @@ def _flatten_metadata(src: Dict[str, Any]) -> Dict[str, Any]:
         "partida",
         "hs6",
         "codigo_producto",
+        "year",
     ):
         if key not in clean_src and key in meta:
             clean_src[key] = meta[key]
