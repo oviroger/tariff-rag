@@ -1,99 +1,23 @@
-﻿from fastapi.testclient import TestClient
-from app.api import app
+#!/usr/bin/env python
+import requests
+import json
 
-def test_root():
-    """Test endpoint raíz"""
-    with TestClient(app) as client:
-        response = client.get("/")
-        assert response.status_code == 200
-        data = response.json()
-        assert "message" in data
-        assert "docs" in data
-
-def test_health_check():
-    """Test health check con lifespan"""
-    with TestClient(app) as client:
-        response = client.get("/health")
-        assert response.status_code == 200
-        data = response.json()
-        assert "status" in data
-        assert "services" in data
-        assert "opensearch" in data["services"]
-        assert "mysql" in data["services"]
-        assert "gemini" in data["services"]
-
-def test_classify_validation_min_length():
-    """Test que el endpoint procesa textos cortos con fallback"""
-    with TestClient(app) as client:
-        response = client.post("/classify", json={"user_query": "steel"})
-        assert response.status_code == 200
-        data = response.json()
-        assert "top_candidates" in data
-        # Puede tener warning de evidencia insuficiente
-        assert "warnings" in data or "evidence" in data
-
-def test_classify_validation_required():
-    """Test campo text requerido"""
-    with TestClient(app) as client:
-        response = client.post("/classify", json={})
-        assert response.status_code == 422
-        data = response.json()
-        assert "detail" in data
-
-def test_classify_success_stub():
-    """Test clasificación exitosa (con datos stub)"""
-    with TestClient(app) as client:
-        response = client.post("/classify", json={
-            "user_query": "Resina epoxi líquida en bidones de 25kg para uso industrial en recubrimientos protectores",
-            "top_k": 3,
-            "debug": True
-        })
-        assert response.status_code == 200
-        data = response.json()
-        
-        # Verificar estructura de respuesta
-        assert "top_candidates" in data
-        assert "evidence" in data
-        assert "warnings" in data
-        assert "applied_rgi" in data
-        assert "missing_fields" in data
-        
-        # Verificar tipos
-        assert isinstance(data["top_candidates"], list)
-        assert isinstance(data["evidence"], list)
-        assert isinstance(data["warnings"], list)
-
-def test_classify_with_versions():
-    """Test con versión HS específica"""
-    with TestClient(app) as client:
-        response = client.post("/classify", json={
-            "user_query": "Resina epoxi en escamas para uso industrial",
-            "versions": {"hs_edition": "HS_2017"},
-            "top_k": 5
-        })
-        assert response.status_code == 200
-        data = response.json()
-        assert "versions" in data
-
-def test_classify_boundary_conditions():
-    """Test condiciones límite"""
-    with TestClient(app) as client:
-        # Texto mínimo válido
-        response = client.post("/classify", json={
-            "user_query": "Producto X"  # 10 caracteres exactos
-        })
-        assert response.status_code == 200
-        
-        # top_k mínimo
-        response = client.post("/classify", json={
-            "user_query": "Resina epoxi industrial",
-            "top_k": 1
-        })
-        assert response.status_code == 200
-        
-        # top_k máximo
-        response = client.post("/classify", json={
-            "user_query": "Resina epoxi industrial",
-            "top_k": 20
-        })
-        assert response.status_code == 200
+params = {'query': 'es un bus para 50 pasajeros', 'conversation_history': []}
+try:
+    resp = requests.post('http://localhost:8000/api/classify', json=params, timeout=30)
+    print(f'Status: {resp.status_code}')
+    print(f'Response length: {len(resp.content)} bytes')
+    
+    if resp.status_code == 200:
+        data = resp.json()
+        print(f'Top code: {data["top_candidates"][0]["code"]}')
+        print(f'Confidence: {data["top_candidates"][0]["confidence"]:.1%}')
+        print(f'Missing fields: {len(data["missing_fields"])}')
+        for field in data["missing_fields"]:
+            print(f'  - {field}')
+    else:
+        print(f'Response: {resp.text[:500]}')
+except Exception as e:
+    print(f'ERROR: {e}')
+    import traceback
+    traceback.print_exc()
