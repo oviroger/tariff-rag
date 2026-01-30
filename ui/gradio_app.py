@@ -7,18 +7,26 @@ import gradio as gr
 import requests
 from typing import Any, Tuple, Dict, Optional
 import json
+import json
 import re
 from uuid import uuid4
+from app.keywords import load_category_keywords, get_category_synonyms, normalize_text, get_vehicle_fields
 
-API_URL = "http://api:8000"
+# Load once for UI heuristics
+_CATEGORY_KEYWORDS = load_category_keywords() or {}
+
+# Base API URL for UI -> backend communication. Allow override via env `RAG_API_URL`.
+import os
+API_URL = os.environ.get("RAG_API_URL") or "http://api:8000"
 
 class ConversationState:
     """Manages conversation history and context."""
     def __init__(self):
-        self.last_classification: Optional[Dict[str, Any]] = None
-        self.last_query: str = ""
-        self.history: list[tuple[str, str]] = []  # NUEVO: historial completo (user, assistant)
-    
+        # Initialize commonly accessed attributes to avoid AttributeError
+        self.last_classification = None
+        self.last_query = ""
+        self.history = []
+
     def update(self, query: str, result: Dict[str, Any]):
         self.last_query = query
         self.last_classification = result
@@ -381,11 +389,11 @@ def format_classification_markdown(result: Dict[str, Any]) -> str:
         if cand.get("years"):
             years_found.update(cand.get("years"))
     
-    # Formatear años ordenados
-    years_str = ""
+    # Formatear años ordenados (para referencia general)
+    general_years_str = ""
     if years_found:
         sorted_years = sorted(years_found)
-        years_str = f" | 📅 Referencia: {', '.join(map(str, sorted_years))}"
+        general_years_str = f"📅 Vigencia general: {', '.join(map(str, sorted_years))}"
     
     if candidates:
         md += "## 🎯 Clasificación sugerida\n\n"
@@ -400,6 +408,13 @@ def format_classification_markdown(result: Dict[str, Any]) -> str:
                 or ''
             )
             level = cand.get('level', '')
+            
+            # Años específicos de este candidato
+            cand_years = cand.get('years', [])
+            cand_years_str = ""
+            if cand_years:
+                sorted_cand_years = sorted(cand_years)
+                cand_years_str = f" | 📅 Vigencia: {', '.join(map(str, sorted_cand_years))}"
 
             if confidence > 0.7:
                 conf_emoji = "🟢"
@@ -409,7 +424,7 @@ def format_classification_markdown(result: Dict[str, Any]) -> str:
                 conf_emoji = "🔴"
 
             inciso = incisos[idx] if idx < len(incisos) else str(idx + 1)
-            md += f"{conf_emoji} **{inciso}) {hs_code}**{years_str} (Confianza: {confidence:.1%})\n"
+            md += f"{conf_emoji} **{inciso}) {hs_code}** (Confianza: {confidence:.1%}){cand_years_str}\n"
             if description and description.strip():
                 md += f"   *{description}*\n"
             if level:
@@ -656,12 +671,15 @@ def chat_response(message: str, history: list, years: Optional[list] = None) -> 
 def _is_vehicle_query(text: str) -> bool:
     # Deprecated: kept for compatibility but no longer used for UI overrides.
     t = (text or "").lower()
-    vehicle_terms = [
-        "vehículo", "vehiculo", "vehículos", "vehiculos",
-        "auto", "autos", "automóvil", "automovil", "carro", "coche",
-        "camión", "camion", "camioneta", "pickup",
-        "motocicleta", "moto", "bus", "autobús", "autobus", "microbús", "microbus",
-    ]
+    vehicle_terms = [s.lower() for s in (_CATEGORY_KEYWORDS.get("vehicles", {}).get("synonyms", []) or [])]
+    # fallback small list
+    if not vehicle_terms:
+        vehicle_terms = [
+            "vehículo", "vehiculo", "vehículos", "vehiculos",
+            "auto", "autos", "automóvil", "automovil", "carro", "coche",
+            "camión", "camion", "camioneta", "pickup",
+            "motocicleta", "moto", "bus", "autobús", "autobus", "microbús", "microbus",
+        ]
     return any(term in t for term in vehicle_terms)
 
 
@@ -669,30 +687,20 @@ def _detect_category(text: str) -> Optional[str]:
     """Heurística simple para detectar la categoría del producto de la consulta."""
     t = (text or "").lower()
     # Vehículos
-    vehicle_terms = [
-        "vehículo", "vehiculo", "vehículos", "vehiculos",
-        "auto", "automóvil", "automovil", "coche", "carro",
-        "camión", "camion", "camioneta", "pickup",
-        "motocicleta", "moto", "bus", "autobús", "autobus", "microbús", "microbus",
-        "tranvía", "tranvia", "trolebús", "trolebus", "tren", "locomotora", "vagón", "vagon",
-    ]
+    vehicle_terms = [s.lower() for s in (_CATEGORY_KEYWORDS.get("vehicles", {}).get("synonyms", []) or [])]
+    vehicle_terms += ["tranvía", "tranvia", "trolebús", "trolebus", "tren", "locomotora", "vagón", "vagon"]
     if any(w in t for w in vehicle_terms):
         return "vehicle"
     # Metales / acero
-    metal_terms = [
-        "acero", "steel", "hierro", "aluminio", "cobre", "inox", "inoxidable",
-        "lámina", "lamina", "plancha", "chapa", "bobina", "galvanizado", "recubierto",
-        "titanio", "níquel", "niquel", "zinc", "estaño", "estano", "plomo", "plata", "oro",
-        "latón", "laton", "bronce", "magnesio", "molibdeno", "vanadio",
-    ]
+    metal_terms = [s.lower() for s in (_CATEGORY_KEYWORDS.get("metals", {}).get("synonyms", []) or [])]
+    metal_terms += ["titanio", "níquel", "niquel", "zinc", "estaño", "estano", "plomo", "plata",
+                    "latón", "laton", "bronce", "magnesio", "molibdeno", "vanadio"]
     if any(w in t for w in metal_terms):
         return "metal"
     # Textil
-    textile_terms = [
-        "textil", "tela", "tejido", "prenda", "ropa", "algodón", "algodon", "poliéster", "poliester", "lana", "seda",
-        "fibra", "hilo", "trama", "urdimbre", "tinta", "tinte", "teñido", "tenido", "acrílico", "acrilico",
-        "poliamida", "nylon", "spandex", "elástico", "elastico", "botón", "boton", "cremallera", "cierre",
-    ]
+    textile_terms = [s.lower() for s in (_CATEGORY_KEYWORDS.get("textiles", {}).get("synonyms", []) or [])]
+    textile_terms += ["fibra", "hilo", "trama", "urdimbre", "tinta", "tinte", "teñido", "tenido", "acrílico", "acrilico",
+                      "poliamida", "nylon", "spandex", "elástico", "elastico", "botón", "boton", "cremallera", "cierre"]
     if any(w in t for w in textile_terms):
         return "textile"
     # Electrónica
@@ -759,7 +767,13 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "", 
         "camión", "camion", "camioneta", "pickup", "bus", "autobús", "autobus",
         "microbús", "microbus", "moto", "motocicleta"
     ]
+    appliance_terms = [
+        "lavadora", "refrigerador", "microondas", "horno", "lavavajillas", "secadora",
+        "licuadora", "batidora", "plancha", "aspiradora", "lavaseca", "lava seca",
+        "electrodoméstico", "electrodomestico", "aparato", "equipo"
+    ]
     has_vehicle_type = any(t in uq for t in vehicle_terms)
+    has_appliance_type = any(t in uq for t in appliance_terms)
     has_motor_type = any(t in uq for t in ["diesel", "gasolina", "electrico", "electrica", "electric", "hibrido", "hibrida", "hev", "phev", "ev"])
     is_new_or_used = any(t in uq for t in ["nuevo", "nueva", "usado", "usada"]) 
 
@@ -773,6 +787,12 @@ def _format_classification_simple(result: Dict[str, Any], user_query: str = "", 
             filtered.append(m)
         clean_missing = filtered
 
+    # Si es un electrodoméstico, quitar campos de vehículos
+    if has_appliance_type:
+        _drop_if_matches(["tipo de motor", "motor (gasolina", "motor (diésel", "motor (diesel", 
+                          "cilindrada", "eléctrico", "híbrido", "hibrido", "numero de plazas",
+                          "pasajeros", "traccion", "eje", "suspension", "freno"]) 
+    
     if has_vehicle_type:
         _drop_if_matches(["tipo de vehículo", "tipo de vehiculo"]) 
     if has_motor_type:
@@ -937,14 +957,94 @@ def chat_minimal_validation(message: str, history: list, conv_id: str = "", year
 
     # Detectar saludos y mensajes de bienvenida
     greetings = ["hola", "hello", "hi", "buenos días", "buenas tardes", "buenas noches", "saludos", "hey"]
-    if any(g == msg_l or msg_l.startswith(g + " ") or msg_l.startswith(g + ",") for g in greetings):
+    
+    # CRÍTICO: Si el mensaje tiene saludo PERO también descripción sustancial, NO tratarlo como greeting
+    # Ejemplo: "Hola, tengo una laptop Dell XPS 13 para importar..." → Procesar como consulta completa
+    has_greeting = any(g == msg_l or msg_l.startswith(g + " ") or msg_l.startswith(g + ",") for g in greetings)
+    has_substantial_description = len(msg.split()) > 8  # Más de 8 palabras indica descripción sustancial
+    
+    # Solo tratar como greeting si:
+    # 1. Tiene saludo Y
+    # 2. NO tiene descripción sustancial (mensaje corto)
+    if has_greeting and not has_substantial_description:
+        # Extraer producto mencionado en el saludo (si lo hay)
+        product_mentioned = None
+        products_keywords = {
+            "laptop": "laptop, computadora portátil, notebook",
+            "café": "café, café premium",
+            "medicamento": "medicamento, medicamentos, fármaco",
+            "acero": "acero, láminas de acero, plancha",
+            "neumático": "neumático, neumáticos",
+            "vehiculo": "vehículo, automóvil, auto, bus, camión",
+        }
+        
+        for product_type, examples in products_keywords.items():
+            if product_type in msg_l:
+                product_mentioned = product_type
+                break
+        
+        # Respuesta contextualizada
+        if product_mentioned:
+            if product_mentioned == "laptop":
+                return (
+                    "👋 ¡Hola! Entendido que tienes una **laptop**.\n\n"
+                    "Para brindarte la clasificación más precisa, necesito detalles técnicos específicos:\n\n"
+                    "**Por favor proporciona:**\n"
+                    "- Procesador (modelo y generación)\n"
+                    "- Memoria RAM (cantidad)\n"
+                    "- Almacenamiento SSD (capacidad)\n"
+                    "- Tipo de pantalla y tamaño\n"
+                    "- Peso aproximado\n"
+                    "- País de origen\n\n"
+                    "**Ejemplo de buena descripción:**\n"
+                    "\"Dell XPS 13, Intel Core Ultra 7, RAM 16GB, SSD 512GB, pantalla OLED 13.4\\\", 1.2kg, origen USA\""
+                ), conv_id
+            elif product_mentioned == "café":
+                return (
+                    "👋 ¡Hola! Tienes **café** para importar.\n\n"
+                    "Para clasificar correctamente, necesito información específica:\n\n"
+                    "**Por favor proporciona:**\n"
+                    "- Tipo de café (grano, molido, instantáneo, etc.)\n"
+                    "- Estado (tostado, verde, sin tostar)\n"
+                    "- Presentación/empaques\n"
+                    "- Cantidad total\n"
+                    "- País de origen\n\n"
+                    "**Ejemplo:**\n"
+                    "\"Café tostado en grano, premium arábica, origen Colombia, 50 kg en sacos\""
+                ), conv_id
+            elif product_mentioned == "medicamento":
+                return (
+                    "👋 ¡Hola! Necesitas clasificar un **medicamento**.\n\n"
+                    "⚠️ **ATENCIÓN:** Los medicamentos tienen regulaciones especiales más allá del arancel.\n\n"
+                    "**Por favor proporciona:**\n"
+                    "- Principio activo (nombre genérico)\n"
+                    "- Forma farmacéutica (tableta, inyección, polvo, etc.)\n"
+                    "- Dosis/concentración\n"
+                    "- Tipo (genérico o referencia)\n"
+                    "- Presentación (cantidad/volumen)\n\n"
+                    "**Ejemplo:**\n"
+                    "\"Amoxicilina genérica para inyección IV, 250mg/5mL, vial de 60mL\""
+                ), conv_id
+            elif product_mentioned in ["acero", "neumático", "vehiculo"]:
+                # Para otros productos, respuesta genérica pero adaptada
+                return (
+                    f"👋 ¡Hola! Tienes un(a) **{product_mentioned}** para clasificar.\n\n"
+                    "Para proporcionarte la clasificación correcta, necesito más detalles específicos sobre el producto.\n\n"
+                    "¿Puedes describir de forma más detallada el producto? Incluye:\n"
+                    "- Características técnicas principales\n"
+                    "- Material o composición (si aplica)\n"
+                    "- Dimensiones o especificaciones clave\n"
+                    "- Condición (nuevo/usado si aplica)"
+                ), conv_id
+        
+        # Si no se menciona producto específico, respuesta genérica estándar
         return (
             "👋 ¡Hola! Soy tu asistente de clasificación arancelaria.\n\n"
             "Describe el producto que necesitas clasificar según el Sistema Armonizado (HS).\n\n"
-            "**Ejemplos:**\n"
-            "- Láminas de acero laminadas en caliente, 2mm de espesor\n"
-            "- Neumáticos radiales para automóvil 205/55R16\n"
-            "- Smartphones con pantalla OLED, 128GB de almacenamiento"
+            "**Ejemplos de consultas:**\n"
+            "- Laptop Dell XPS 13 con Intel Core Ultra 7, RAM 16GB, SSD 512GB\n"
+            "- Café tostado en grano, premium arábica, origen Colombia, 50kg\n"
+            "- Amoxicilina genérica para inyección IV, 250mg/5mL"
         ), conv_id
 
     # Reset conversacional
@@ -1068,9 +1168,9 @@ with gr.Blocks(
                 additional_inputs=[conv_id_state, years_selector_min],
                 additional_outputs=[conv_id_state],
                 examples=[
-                    ["¿Cuál es la partida arancelaria de los vehículos?", "", ["2025", "2026"]],
-                    ["Quiero clasificar láminas de acero", "", ["2025", "2026"]],
-                    ["Necesito el código HS de un ventilador", "", ["2025", "2026"]],
+                    ["¿Cuál es la partida arancelaria de los vehículos?"],
+                    ["Quiero importar tela"],
+                    ["Necesito importar tubos"],
                 ],
                 title=None,
                 description=None,
