@@ -95,4 +95,4 @@ def bulk_ingest_fragments(
         helpers.bulk(client, actions)
         total += len(actions)
 
-    print(f"✅ Ingestados {total} fragmentos en {index} (embed={'on' if embed_flag else 'off'})")
+    print(f"[OK] Ingestados {total} fragmentos en {index} (embed={'on' if embed_flag else 'off'})")

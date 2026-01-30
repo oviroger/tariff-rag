@@ -1,0 +1,30 @@
+{
+  "vehicles": {
+    "synonyms": [
+      "vehiculo", "vehículo", "auto", "automóvil", "automovil", "carro", "coche", "camion", "camión",
+      "camioneta", "bus", "autobus", "autobús", "microbus", "microbús", "moto", "motocicleta",
+      "vehículos", "vehiculos", "vehiculo comercial", "vehículo de carga", "vehículo de pasajeros", "vehiculo de pasajeros",
+      "furgoneta", "van", "pickup", "suv", "camion ligero", "camion pesado"
+    ]
+  },
+  "vehicle_fields": ["motor", "cilindrada", "gasolina", "diesel", "diésel", "eléctrico", "electrico", "híbrido", "hibrido", "plazas", "pasajeros", "asientos", "tracción", "traccion", "eje", "suspensión", "suspension", "frenos", "transmisión", "transmision"] ,
+  "laptops": {
+    "synonyms": ["laptop", "portatil", "portátil", "notebook", "ordenador portátil", "computadora portátil", "pc", "dell", "xps", "macbook", "surface", "chromebook"]
+  },
+  "appliances": {
+    "synonyms": ["lavadora", "refrigerador", "microondas", "microonda", "horno", "lavavajillas", "secadora", "aspiradora", "congelador", "nevera", "estufa"]
+  },
+  "textiles": {
+    "synonyms": ["textil", "tela", "tejido", "prenda", "ropa", "algodon", "algodón", "poliester", "poliéster", "lana",
+                  "microfibra", "denim", "jean", "sarga", "twill", "seda", "satén", "oxford", "jersey", "tricot"]
+  },
+  "metals": {
+    "synonyms": ["acero", "steel", "hierro", "metal", "chapa", "lamina", "bobina", "inoxidable", "aluminio", "cobre", "bronce", "latón", "laton"]
+  },
+  "microondas": {
+    "synonyms": ["microondas", "microonda", "horno microonda", "horno de microondas"]
+  },
+  "food": {
+    "synonyms": ["carne", "pescado", "cafe", "azucar", "fruta", "verdura", "alimento", "comida", "jugo"]
+  }
+}

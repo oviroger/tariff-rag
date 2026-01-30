@@ -1,0 +1,90 @@
+=== TEST CHATBOT CON RESPUESTAS PARCIALES - GRUPO 3: TEXTILES Y CALZADO ===
+
+=== Tela ===
+Turno 1 | Query: Tela
+API -> 5603.00 (46.75%) | Missing: 3
+Opciones sugeridas por el chatbot:
+ - de que material esta hecho algodon poliester lana mezcla sintetico
+ - es tejido punto o no tejido
+ - cual es el uso final prenda de vestir tela por metro articulos de hogar
+Respuesta parcial del usuario:
+ - Algodón 100%. Tejido plano
+Turno 2 | Query: Algodón 100%. Tejido plano
+API -> 5208.10 (46.75%) | Missing: 3
+Opciones sugeridas por el chatbot:
+ - de que material esta hecho algodon poliester lana mezcla sintetico
+ - es tejido punto o no tejido
+ - cual es el uso final prenda de vestir tela por metro articulos de hogar
+Respuesta parcial del usuario:
+ - Para vestimenta
+Turno 3 | Query: Para vestimenta
+API -> 5208.10 (95%) | Missing: 0
+UI Turno 1 -> 5603.14
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 5603.14** | 📅 Referencia: 2026 | 🎯 95%
+   Tela sin tejer, incluso impregnada, recubierta, revestida o estratifica...
+UI -> Código final: 5603.14
+
+=== Alfombra ===
+Turno 1 | Query: Alfombra
+API -> 5702.10 (95%) | Missing: 0
+UI Turno 1 -> 5701.10
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 5701.10** | 📅 Referencia: 2026 | 🎯 95%
+   Alfombras y demás revestimientos para el suelo de materia textil, tejid...
+UI -> Código final: 5701.10
+
+=== Botas ===
+Turno 1 | Query: Botas
+API -> 6403.99 (95%) | Missing: 0
+UI Turno 1 -> 6404.19
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 6404.19** | 📅 Referencia: 2026 | 🎯 95%
+   Botas de cuero (incluidas las de materia sintética) con suela de caucho...
+UI -> Código final: 6404.19
+
+=== Guantes ===
+Turno 1 | Query: Guantes
+API -> 6116.10 (45%) | Missing: 2
+Opciones sugeridas por el chatbot:
+ - de que material estan hechos los guantes esto ayuda a distinguir entre diferentes partidas textiles vs caucho
+ - para que uso especifico son los guantes puede cambiar la aplicacion arancelaria
+Respuesta parcial del usuario:
+ - Cuero. Trabajo industrial
+Turno 2 | Query: Cuero. Trabajo industrial
+API -> 4203.21 (95%) | Missing: 0
+UI Turno 1 -> 6116.10
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 6116.10** | 📅 Referencia: 2026 | 🎯 45%
+   Guantes, mitones y manoplas de tejido, de uso, sin incluir guantes para...
+UI opciones sugeridas:
+ - de que material estan hechos los guantes caucho tela etc esto ayuda a definir entre las partidas relacionadas
+ - cual es el uso previsto de los guantes de trabajo medicos deportivos etc esto podria cambiar la clasificacion
+UI respuesta parcial del usuario:
+ - Cuero. Trabajo industrial
+UI Turno 2 -> 4203.21
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 4203.21** | 📅 Referencia: 2026 | 🎯 95%
+   Guantes de cuero, utilizados para trabajo industrial
+
+---...
+UI -> Código final: 4203.21
+
+=== Bolso ===
+Turno 1 | Query: Bolso
+API -> 4202.21 (95%) | Missing: 0
+UI Turno 1 -> 4202.22
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 4202.22** | 📅 Referencia: 2026 | 🎯 95%
+   Bolsos de mano (carteras), incluso con bandolera o sin asas
+
+---...
+UI -> Código final: 4202.22
+
+✅ Test finalizado

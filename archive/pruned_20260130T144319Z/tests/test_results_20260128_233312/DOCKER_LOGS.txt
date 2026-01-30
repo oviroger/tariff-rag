@@ -1,0 +1,100 @@
+1. Lee informaci├│n: Es para 50 personas, de transporte p├║blico
+2. Extrae: tipo_veh├¡culo, plazas, motor, cilindrada
+3. Si tienes plazas ÔåÆ determina partida inmediatamente
+4. Si tienes motor ÔåÆ a├▒ade subdivisi├│n
+5. PROP├ôN C├ôDIGO SIEMPRE (incluso si no tienes todos los detalles)
+
+EJEMPLO CORRECTO DE RESPUESTA:
+Input: "Veh├¡culo para 50 personas, motor diesel, nuevo"
+Output JSON:
+{
+  "top_candidates": [
+    {
+      "code": "8702.32",
+      "description": "Autob├║s nuevo",
+      "confidence": 0.85,
+      "level": "HS6"
+    }
+  ],
+  "missing_fields": [],
+  "applied_rgi": ["RGI 1"],
+  "inclusions": [],
+  "exclusions": [],
+  "warnings": []
+}
+
+**INSTRUCCI├ôN CR├ìTICA SOBRE DESCRIPCIONES:**
+- NO incluyas detalles que NO hayan sido EXPL├ìCITAMENTE mencionados por el usuario
+- Si tienes duda sobre un detalle (ej: tipo de motor), NO lo escribas en la descripci├│n
+- La descripci├│n debe ser GEN├ëRICA cuando falten confirmaciones: "Autob├║s" (NO "Autob├║s con motor diesel")
+- Solo incluye en descripci├│n lo que el usuario confirm├│ DIRECTAMENTE
+
+NOTA IMPORTANTE:
+- El campo "code" DEBE contener SOLO el c├│digo arancelario (ej: "8702.32", "9999.00", "8703.21")
+- El campo "code" NUNCA debe contener "C├│digo:" o "Pregunt├│:" o descripci├│n
+- La descripci├│n completa va en el campo "description"
+
+FORMATO JSON (RESPUESTA OBLIGATORIA):
+{
+  "top_candidates": [{"code": "XXXX.XX", "description": "...", "confidence": 0.XX, "level": "HS6"}],
+  "missing_fields": ["Solo si falta info de plazas o tipo"],
+  "applied_rgi": ["RGI 1"],
+  "inclusions": [],
+  "exclusions": [],
+  "warnings": []
+}
+===FIN===
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:httpx:HTTP Request: POST https://kpofoundry.cognitiveservices.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO:app.generator_gemini:LOG_LLM_RESPONSE_FULL: {
+  "top_candidates": [
+    {
+INFO:     127.0.0.1:37440 - "GET /health HTTP/1.1" 200 OK
+      "code": "8702.20.90",
+      "description": "Autob├║s para 50 personas, de transporte p├║blico",
+      "confidence": 0.85,
+      "level": "HS10"
+    }
+  ],
+  "missing_fields": [],
+  "applied_rgi": ["RGI 1"],
+  "inclusions": [],
+  "exclusions": [],
+  "warnings": []
+}
+INFO:app.generator_gemini:LOG_LLM_PARSED: top_candidates=1 items, missing_fields=0 items
+INFO:app.generator_gemini:LOG_LLM_CANDIDATE_0: code=8702.20.90, confidence=0.85, desc=Autob├║s para 50 personas, de transporte p├║blico
+INFO:app.generator_gemini:LOG_TEXT_BLOB_RAW: ''
+INFO:app.generator_gemini:LOG_TEXT_BLOB_NORMALIZED: ''
+INFO:app.generator_gemini:LOG_FORCE_MOTOR: Vehicle code 8702.20.90 detected without motor type - FORCING motor question
+INFO:app.generator_gemini:LOG_AGGRESSIVE_CLEANUP_BEFORE: code=8702.20.90, confidence=85%, digits=8, missing_count=1, missing=['┬┐Qu├® tipo de motor? (gasolina, di├®sel, el├®ctrico, h├¡brido)']
+INFO:app.generator_gemini:LOG_AGGRESSIVE_CLEANUP: HS8 code with 85% confidence ÔåÆ removing non-critical missing_fields
+INFO:app.generator_gemini:LOG_AGGRESSIVE_CLEANUP: Keeping critical field: '┬┐Qu├® tipo de motor? (gasolina, di├®sel, el├®ctrico, h├¡brido)'
+INFO:app.generator_gemini:LOG_AGGRESSIVE_CLEANUP_AFTER: Removed 0 fields, kept 1 critical fields
+INFO:app.generator_gemini:LOG_TEXT_BLOB_RAW: 'es para 50 personas, de transporte p├║blico'
+INFO:app.generator_gemini:LOG_TEXT_BLOB_NORMALIZED: 'es para 50 personas de transporte publico'
+INFO:app.generator_gemini:LOG_PRUNE_START: text_blob_norm='es para 50 personas de transporte publico...', missing_fields_count=1
+INFO:app.generator_gemini:LOG_FIELD_CLEANUP: '┬┐Qu├® tipo de motor? (gasolina, di├®sel, el├®ctrico, ' ÔåÆ 'que tipo de motor gasolina diesel electrico hibrido'
+INFO:app.generator_gemini:LOG_PRUNE_CLEANUP: After cleanup, 1 fields remaining
+INFO:app.generator_gemini:LOG_PRUNE_END: cleaned=1 fields (from 1 after cleanup)
+INFO:app.generator_gemini:LOG_TEXT_BLOB_RAW: 'es para 50 personas, de transporte p├║blico'
+INFO:app.generator_gemini:LOG_TEXT_BLOB_NORMALIZED: 'es para 50 personas de transporte publico'
+INFO:app.generator_gemini:[CONFIDENCE_CALC] answered_details=2, fields_remaining=1 (critical=1, optional=0), confidence=0.62
+INFO:app.generator_gemini:LOG_CONFIDENCE_REFINED: 8702.20.90 ÔåÆ 62%
+INFO:app.generator_gemini:[REFINE_VEHICULO] code=8702.20.90, cilindrada=None, is_new=False, is_old=False
+INFO:app.generator_gemini:LOG_TEXT_BLOB_RAW: 'es para 50 personas, de transporte p├║blico'
+INFO:app.generator_gemini:LOG_TEXT_BLOB_NORMALIZED: 'es para 50 personas de transporte publico'
+INFO:app.generator_gemini:LOG_LLM_FINAL: top_candidates=1 items
+INFO:tariff_rag.api:[SANITIZER] contextual_query: Es para 50 personas, de transporte p├║blico
+INFO:tariff_rag.api:[SANITIZER] has_generic_fields=False
+INFO:tariff_rag.api:[SANITIZER] missing_fields from LLM: ['que tipo de motor gasolina diesel electrico hibrido']
+INFO:tariff_rag.api:[OVERRIDE_CHECK] candidates=1, current_mf_count=1, current_mf=['que tipo de motor gasolina diesel electrico hibrido']
+INFO:opensearch:POST http://opensearch:9200/tariff_fragments/_search [status:200 request:0.003s]
+INFO:httpx:HTTP Request: POST https://kpofoundry.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO:opensearch:POST http://opensearch:9200/tariff_fragments/_search [status:200 request:0.003s]
+INFO:tariff_rag.api:[REDIS_SAVE_DEBUG] top_cands count: 1
+INFO:tariff_rag.api:[REDIS_SAVE_DEBUG] First candidate RAW: {'code': '8702.20.90', 'description': 'Autob├║s para 50 personas, de transporte p├║blico', 'confidence': 0.6174999999999999, 'level': 'NANDINA8', 'years': [2025, 2026]}
+INFO:tariff_rag.api:[REDIS_SAVE_DEBUG] top_code='8702.20.90', top_desc='Autob├║s para 50 personas, de transporte p├║blico'
+INFO:tariff_rag.api:[REDIS_SAVE_DEBUG] assistant_summary='C├│digo: 8702.20.90 (Autob├║s para 50 personas, de transporte p├║blico)'
+INFO:tariff_rag.api:[YEARS_FOUND] A├▒os en evidencia: [2025, 2026]
+INFO:     172.18.0.1:54606 - "POST /classify HTTP/1.1" 200 OK

@@ -133,6 +133,7 @@ class ClassifyRequest(BaseModel):
     hs_code: Optional[str] = None
     conversation_history: Optional[list] = []
     conversation_id: Optional[str] = None
+    session_id: Optional[str] = None
     top_k: Optional[int] = 5
     years: Optional[List[int]] = None  # Filtrar por años: [2025], [2026], o [2025, 2026]
 
@@ -236,8 +237,8 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
         if os_client is None or index_name is None:
             raise HTTPException(status_code=503, detail="Search backend not ready")
         
-        # Asegurar conversation_id
-        conv_id = req.conversation_id or uuid4().hex
+        # Asegurar conversation_id (acepta session_id como alias)
+        conv_id = req.conversation_id or req.session_id or uuid4().hex
         
         # Cargar historial desde Redis
         history = []
@@ -301,7 +302,8 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
                 index_for_search, 
                 query_text, 
                 k=req.top_k or 5,
-                years=req.years
+                years=req.years,
+                conversation_history=history  # ✅ PASAR HISTORIAL PARA CONTEXTO DE BÚSQUEDA
             ) or []
         except Exception as e:
             logger.warning(f"Retrieval failed: {e}. Using empty hits.")
@@ -309,14 +311,19 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
 
         # 1.1) Si el mejor score es muy bajo, tratar como sin contexto para evitar ruido
         settings = get_settings()
-        min_score_for_display = getattr(settings, "min_score_for_display", 0.02)
+        # CRÍTICO: RRF produce scores entre 0 y ~0.33, no se puede usar threshold 0.02
+        # Score mínimo acceptable para RRF es ~0.01 (corresponde a resultado muy relevante)
+        min_score_for_display = getattr(settings, "min_score_for_display", 0.01)
         if hits:
             best_score = max((h.get("_score") or h.get("score") or 0) for h in hits)
+            logger.info(f"[RETRIEVAL SCORE CHECK] best_score={best_score:.4f}, threshold={min_score_for_display}")
             if best_score < min_score_for_display:
                 logger.info(
                     f"[RETRIEVAL FILTER] best_score={best_score:.4f} < threshold={min_score_for_display}; dropping context hits"
                 )
                 hits = []
+            else:
+                logger.info(f"[RETRIEVAL KEEP] best_score={best_score:.4f} >= threshold={min_score_for_display}; keeping {len(hits)} hits")
 
         # 2) generación (asegúrate dict)
         result_dict = generate_label(
@@ -431,15 +438,22 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
         candidates = result_dict.get("top_candidates", [])
         current_mf = result_dict.get("missing_fields", [])
         
+        logger.info(f"[OVERRIDE_CHECK] candidates={len(candidates)}, current_mf_count={len(current_mf)}, current_mf={current_mf[:2] if current_mf else []}")
+        
         if not candidates and len(current_mf) <= 3:
-            # Intentar generar campos específicos basados en la query
+            # Intentar generar campos específicos basados en la query CONTEXTUAL (incluye historial)
             from app.generator_gemini import _default_missing_fields
-            contextual_mf = _default_missing_fields(query_text)
+            # CRÍTICO: Usar contextual_query que incluye historial, NO query_text solo
+            contextual_mf = _default_missing_fields(contextual_query)
             
-            # Si los defaults son más específicos que los actuales, usarlos
-            if contextual_mf and contextual_mf != current_mf:
-                logger.info(f"[OVERRIDE] Using contextual missing_fields: {contextual_mf}")
+            logger.info(f"[OVERRIDE_CHECK] contextual_mf from '{contextual_query[:80]}': {contextual_mf}")
+            
+            # Si los defaults son DIFERENTES (incluso si es lista vacía = tiene toda la info), usarlos
+            if contextual_mf != current_mf:
+                logger.info(f"[OVERRIDE] Replacing current_mf with contextual_mf: {contextual_mf}")
                 result_dict["missing_fields"] = contextual_mf
+            else:
+                logger.info(f"[OVERRIDE] Contextual_mf == current_mf, no changes")
 
         # 3.6.1) Si el usuario ya especificó un electrodoméstico concreto, no repetir la pregunta genérica
         appliance_kws = [
@@ -549,10 +563,34 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
         # Actualizar y guardar historial en Redis
         if redis_client:
             try:
+                # Construir resumen del asistente: código propuesto + campos faltantes
+                assistant_summary = ""
+                top_cands = result_dict.get("top_candidates", [])
+                missing = result_dict.get("missing_fields", [])
+                
+                logger.info(f"[REDIS_SAVE_DEBUG] top_cands count: {len(top_cands)}")
+                if top_cands:
+                    logger.info(f"[REDIS_SAVE_DEBUG] First candidate RAW: {top_cands[0]}")
+                    top_code = top_cands[0].get("code", "N/A")
+                    top_desc = top_cands[0].get("description", "")
+                    logger.info(f"[REDIS_SAVE_DEBUG] top_code='{top_code}', top_desc='{top_desc}'")
+                    assistant_summary = f"Código: {top_code} ({top_desc})"
+                    logger.info(f"[REDIS_SAVE_DEBUG] assistant_summary='{assistant_summary}'")
+                
+                if missing:
+                    missing_str = ", ".join(missing[:3])  # Máximo 3 preguntas
+                    if assistant_summary:
+                        assistant_summary += f" | Preguntó: {missing_str}"
+                    else:
+                        assistant_summary = f"Preguntó: {missing_str}"
+                
+                if not assistant_summary:
+                    assistant_summary = "Sin clasificación"
+                
                 # Añadir nuevo turno al historial
                 history.append({
                     "user": query_text,
-                    "assistant": result_dict.get("top_candidates", [{}])[0].get("code", "N/A") if result_dict.get("top_candidates") else "N/A",
+                    "assistant": assistant_summary,
                     "timestamp": datetime.now().isoformat()
                 })
                 save_history(redis_client, conv_id, history)
@@ -627,6 +665,22 @@ def classify_endpoint(req: ClassifyRequest, fastapi_request: Request):
                     note = f"Para refinar a HS10 ({chapter}xx.xx.xx), se necesita: {', '.join(missing_for_hs10)}"
                     result_dict.setdefault("warnings", []).append(note)
                     logger.info(f"[HS10_TRACKING] {note}")
+
+        # Extraer años de los documentos encontrados
+        years_set = set()
+        evidence_list = result_dict.get("evidence") or []
+        for ev in evidence_list:
+            if isinstance(ev, dict) and ev.get("year"):
+                years_set.add(ev["year"])
+        
+        # Si hay evidencia, agregar los años encontrados
+        if years_set:
+            result_dict["years"] = sorted(list(years_set))
+            logger.info(f"[YEARS_FOUND] Años en evidencia: {sorted(list(years_set))}")
+        else:
+            # Si no hay evidencia (clasificación directa como laptop), usar años activos
+            result_dict["years"] = [2025, 2026]  # Años por defecto/actuales
+            logger.info(f"[YEARS_DEFAULT] Sin evidencia, usando años por defecto: {[2025, 2026]}")
 
         return ClassifyResponse(**result_dict)
 

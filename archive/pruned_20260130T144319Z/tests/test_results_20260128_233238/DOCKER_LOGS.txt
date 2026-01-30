@@ -1,0 +1,100 @@
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:48626 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:58340 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:36656 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:38952 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36426 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38482 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37210 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52904 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:51470 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.004s]
+INFO:     127.0.0.1:48150 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39254 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.003s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.003s]
+INFO:     127.0.0.1:60510 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34464 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:34866 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:55100 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59012 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:45980 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:55290 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48520 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48898 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45968 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38462 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57268 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:35022 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:56810 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43518 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:42782 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:48914 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:59754 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38956 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:39544 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:33010 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35104 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:47800 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:47104 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50878 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:40310 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.003s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:56310 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.003s]
+INFO:     127.0.0.1:43366 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60630 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:47620 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:57596 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:41614 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54266 - "GET /health HTTP/1.1" 200 OK
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:52228 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:41462 - "POST /api/classify HTTP/1.1" 404 Not Found
+INFO:     172.18.0.1:41478 - "POST /api/classify HTTP/1.1" 404 Not Found
+INFO:     172.18.0.1:41480 - "POST /api/classify HTTP/1.1" 404 Not Found
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:opensearch:GET http://opensearch:9200/_cluster/health [status:200 request:0.002s]
+INFO:     127.0.0.1:45486 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38140 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:54430 - "POST /classify HTTP/1.1" 422 Unprocessable Entity
+INFO:     172.18.0.1:54436 - "POST /classify HTTP/1.1" 422 Unprocessable Entity
+INFO:     172.18.0.1:54446 - "POST /classify HTTP/1.1" 422 Unprocessable Entity

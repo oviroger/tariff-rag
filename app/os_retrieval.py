@@ -35,8 +35,8 @@ def retrieve_fragments(query_text: str, top_k: int = 5, index: Optional[str] = N
         # Si se especifican años, mapear años a índices específicos
         if years:
             year_to_index = {
-                2025: "tariff_fragments_2025",
-                2026: "tariff_fragments_2026"
+                2025: "tariff_fragments_2025_v2",
+                2026: "tariff_fragments_2026_v2"
             }
             indices_to_search = [year_to_index[y] for y in years if y in year_to_index]
             if not indices_to_search:
@@ -255,17 +255,108 @@ def knn_semantic_search(os_client, index: str, query_text: str, k: int = 5) -> L
     return resp.get("hits", {}).get("hits", [])
 
 
-def _bm25_body(query_text: str, k: int = 5) -> Dict:
+def _bm25_body(query_text: str, k: int = 5, conversation_history: Optional[List] = None) -> Dict:
     """
     BM25 léxico con leves boosts a términos del dominio y variantes HS si aplica.
+    Ahora también detecta si el usuario pregunta sobre vehículos y busca en capítulo 87.
+    TAMBIÉN usa historial conversacional para mejorar contexto (✅ NUEVO)
     """
-    terms = ["neumático", "neumáticos", "llanta", "llantas", "caucho", "pneumatic", "tyre", "tyres", "tire", "tires"]
+    import re
+    
+    # Keywords para diferentes tipos de productos
+    tire_terms = ["neumático", "neumáticos", "llanta", "llantas", "caucho", "pneumatic", "tyre", "tyres", "tire", "tires"]
+    # Load category keywords from app/category_keywords.json to avoid hardcoded duplication
+    vehicle_keywords = []
+    try:
+        from pathlib import Path
+        import json
+        cat_path = Path(__file__).parent / "category_keywords.json"
+        if cat_path.exists():
+            with open(cat_path, "r", encoding="utf-8") as f:
+                cat = json.load(f)
+            vehicle_keywords = [s.lower() for s in (cat.get("vehicles", {}).get("synonyms", []) or [])]
+            # include vehicle field keywords if present
+            vehicle_keywords += [s.lower() for s in (cat.get("vehicle_fields", []) or [])]
+        else:
+            vehicle_keywords = ["vehículo", "vehículos", "coche", "auto", "automóvil", "automóviles", "carro", "carros", 
+                                "camión", "camiones", "bus", "autobús", "minibús", "tractor", "tráiler", "remolque",
+                                "motorcycl", "moto", "motocicleta", "bicicleta", "bici", "triclo",
+                                "autobus", "camion", "pickup", "suv", "jeep", "furgoneta", "furgón", "van",
+                                "ambulancia", "bomba", "basura", "recolector", "hormigonera", "excavadora",
+                                "transporte", "conductor", "pasajero", "personas", "plazas", "asientos",
+                                "motor", "diesel", "gasolina", "eléctrico", "híbrido", "lpg", "cng"]
+    except Exception:
+        vehicle_keywords = ["vehículo", "vehículos", "coche", "auto", "automóvil", "automóviles", "carro", "carros", 
+                            "camión", "camiones", "bus", "autobús", "minibús", "tractor", "tráiler", "remolque",
+                            "motorcycl", "moto", "motocicleta", "bicicleta", "bici", "triclo",
+                            "autobus", "camion", "pickup", "suv", "jeep", "furgoneta", "furgón", "van",
+                            "ambulancia", "bomba", "basura", "recolector", "hormigonera", "excavadora",
+                            "transporte", "conductor", "pasajero", "personas", "plazas", "asientos",
+                            "motor", "diesel", "gasolina", "eléctrico", "híbrido", "lpg", "cng"]
+    
     should = [
         {"match": {"text": {"query": query_text, "boost": 3.0}}},
-    ] + [{"match": {"text": {"query": t, "boost": 2.0}}} for t in terms]
+    ] + [{"match": {"text": {"query": t, "boost": 2.0}}} for t in tire_terms]
+
+    # Detectar si la pregunta es sobre vehículos
+    query_lower = query_text.lower()
+    
+    # ✅ NUEVA: Construir contexto COMPLETO incluyendo historial
+    full_context = query_lower
+    if conversation_history:
+        for turn in conversation_history:
+            if isinstance(turn, dict):
+                user_msg = turn.get("user", "")
+                if user_msg:
+                    full_context += " " + str(user_msg).lower()
+    
+    # ✅ NUEVA: Revisar historial para detectar categoría
+    has_vehicle_keyword = any(keyword in full_context for keyword in vehicle_keywords)
+    has_vehicle_keyword = any(keyword in query_lower for keyword in vehicle_keywords)
+    
+    # ✅ NUEVA: Computadoras/Laptops/Electrónica (Capítulo 84)
+    computer_keywords = [
+        "laptop", "portátil", "computadora", "computador", "ordenador",
+        "notebook", "netbook", "tablet", "ipad", "desktop", "pc", "cpu",
+        "procesador", "intel", "amd", "ryzen", "core", "i7", "i9",
+        "ram", "memoria", "ssd", "nvme", "almacenamiento",
+        "pantalla", "display", "monitor", "4k", "oled", "fhd",
+        "batería", "bateria", "carga", "horas",
+        "ddr5", "ddr4", "16gb", "8gb", "512gb", "1tb",
+        "máquinas automáticas", "máquinas datos", "procesamiento datos",
+        "unidad central proceso", "visualizador",
+        "máquinas de tratamiento de datos", "máquinas procesamiento",
+        "máquinas de calcular", "calculadora",
+        "teclado", "periféricos", "webcam", "cámara"
+    ]
+    # ✅ NUEVA: Detectar computadoras usando full_context (incluye historial)
+    has_computer_keyword = any(keyword in full_context for keyword in computer_keywords)
+    
+    if has_computer_keyword:
+        logger.info(f"[BM25 SMART] Detected COMPUTER query: {query_text}")
+        # Boost búsquedas relacionadas con computadoras/electrónica (Capítulo 84)
+        should.extend([
+            {"match": {"text": {"query": "máquinas automáticas procesamiento datos", "boost": 5.0}}},
+            {"match": {"text": {"query": "máquinas tratamiento datos portátiles", "boost": 5.0}}},
+            {"match": {"text": {"query": "unidad central proceso teclado visualizador", "boost": 5.0}}},
+            {"match": {"text": {"query": "capítulo 84 máquinas", "boost": 4.0}}},
+            {"match": {"text": {"query": "8471 8470 8472 máquinas", "boost": 4.0}}},
+            {"match": {"text": {"query": "computadora procesador memoria", "boost": 4.0}}},
+            {"match": {"text": {"query": "portátiles peso inferior", "boost": 3.0}}},
+        ])
+    
+    if has_vehicle_keyword:
+        logger.info(f"[BM25 SMART] Detected vehicle query: {query_text}")
+        # Boost búsquedas relacionadas con vehículos
+        should.extend([
+            {"match": {"text": {"query": "vehículo automóvil", "boost": 4.0}}},
+            {"match": {"text": {"query": "capítulo 87", "boost": 5.0}}},
+            {"match": {"text": {"query": "8702 8703 autobús", "boost": 5.0}}},
+            {"match": {"text": {"query": "motor diesel gasolina", "boost": 3.0}}},
+            {"match": {"text": {"query": "personas plazas asientos", "boost": 3.0}}},
+        ])
 
     # Si el usuario ya menciona un código tipo 4011.10, añade variantes y boost
-    import re
     m = re.search(r"\b(\d{4})(?:\.(\d{2}))?(?:\.(\d{2}))?\b", query_text)
     if m:
         code = ".".join([p for p in m.groups() if p]) if m.groups() else m.group(1)
@@ -280,12 +371,13 @@ def _bm25_body(query_text: str, k: int = 5) -> Dict:
     }
 
 
-def bm25_search(os_client, index: str, query_text: str, k: int = 5) -> List[Dict]:
+def bm25_search(os_client, index: str, query_text: str, k: int = 5, conversation_history: Optional[List] = None) -> List[Dict]:
     """
     BM25 léxico sobre uno o múltiples índices.
     Si index contiene múltiples índices (separados por coma), usa OpenSearch native cross-index search.
+    AHORA ACEPTA HISTORIAL para mejorar contexto (✅ NUEVO)
     """
-    body = _bm25_body(query_text, k=k)
+    body = _bm25_body(query_text, k=k, conversation_history=conversation_history)
     
     try:
         # OpenSearch soporta búsquedas cross-index directamente con coma
@@ -343,7 +435,7 @@ def ensure_index_exists(os_client, index_name: str):
     os_client.indices.create(index=index_name, body=mapping)
     logger.info(f"Created index: {index_name}")
 
-def hybrid_search_with_fallback(os_client, index: Optional[str], query_text: str, k: int = 5, years: Optional[List[int]] = None) -> List[Dict]:
+def hybrid_search_with_fallback(os_client, index: Optional[str], query_text: str, k: int = 5, years: Optional[List[int]] = None, conversation_history: Optional[List] = None) -> List[Dict]:
     """
     ESTRATEGIA MEJORADA:
     1) Ejecuta BM25 y kNN en paralelo
@@ -356,6 +448,7 @@ def hybrid_search_with_fallback(os_client, index: Optional[str], query_text: str
         query_text: Texto a buscar
         k: Número de resultados
         years: Lista de años para filtrar (ej: [2025, 2026])
+        conversation_history: Historial de conversación para contexto de búsqueda (✅ NUEVO)
     """
     # Asegurar que el índice existe (solo si no es None)
     if index and "," not in index:  # Si es un solo índice, verificar que existe
@@ -366,8 +459,8 @@ def hybrid_search_with_fallback(os_client, index: Optional[str], query_text: str
         settings = get_settings()
         if years:
             year_to_index = {
-                2025: "tariff_fragments_2025",
-                2026: "tariff_fragments_2026"
+                2025: "tariff_fragments_2025_v2",
+                2026: "tariff_fragments_2026_v2"
             }
             selected_indices = [year_to_index[y] for y in years if y in year_to_index]
             search_index = ",".join(selected_indices) if selected_indices else settings.opensearch_index
@@ -386,7 +479,7 @@ def hybrid_search_with_fallback(os_client, index: Optional[str], query_text: str
     
     # 1. BM25
     try:
-        bm25_hits = bm25_search(os_client, search_index, query_text, k=k_retrieval)
+        bm25_hits = bm25_search(os_client, search_index, query_text, k=k_retrieval, conversation_history=conversation_history)
         logger.info(f"BM25 returned {len(bm25_hits)} hits")
     except Exception as e:
         logger.warning(f"BM25 failed: {e}")
@@ -398,9 +491,43 @@ def hybrid_search_with_fallback(os_client, index: Optional[str], query_text: str
     except Exception as e:
         logger.warning(f"kNN failed: {e}")
     
-    # 3. Si ambos fallan, devolver lista vacía
+    # 3. Si ambos fallan, intentar fallback de emergencia para casos específicos
     if not bm25_hits and not knn_hits:
         logger.warning("Both BM25 and kNN failed to return results")
+        
+        # FALLBACK: Si parece ser pregunta sobre vehículos, intenta buscar capítulo 87
+        query_lower = query_text.lower()
+        # Use centralized keywords helper
+        try:
+            from app.keywords import get_vehicle_keywords
+            vehicle_keywords = get_vehicle_keywords()
+        except Exception:
+            vehicle_keywords = ["vehículo", "vehículos", "coche", "auto", "automóvil", "carro", "camión", "bus", "moto", "motocicleta", "tractor", "motor", "diesel", "gasolina"]
+        if any(kw in query_lower for kw in vehicle_keywords):
+            logger.info(f"[FALLBACK] Detected vehicle query, attempting chapter 87 search")
+            try:
+                # Búsqueda de emergencia en capítulo 87
+                body = {
+                    "size": k * 3,
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {"match": {"text": {"query": "capítulo 87", "boost": 5.0}}},
+                                {"match": {"text": {"query": "8702 8703 8704", "boost": 5.0}}},
+                                {"match": {"text": {"query": "automóvil autobús", "boost": 4.0}}}
+                            ],
+                            "minimum_should_match": 1
+                        }
+                    },
+                    "_source": ["fragment_id","text","bucket","unit","doc_id","chapter","heading","subheading","year"],
+                }
+                fallback_hits = os_client.search(index=search_index, body=body).get("hits", {}).get("hits", [])
+                if fallback_hits:
+                    logger.info(f"[FALLBACK SUCCESS] Chapter 87 search returned {len(fallback_hits)} results")
+                    return fallback_hits[:k]
+            except Exception as e:
+                logger.warning(f"Fallback chapter 87 search failed: {e}")
+        
         return []
     
     # 4. Reciprocal Rank Fusion (RRF)

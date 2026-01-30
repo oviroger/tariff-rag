@@ -1,0 +1,20 @@
+{
+  "test": "Ambiguous Device Keywords Debug",
+  "analysis": {
+    "resolved_in_turno2": false,
+    "had_vehicle_questions": false
+  },
+  "session_id": "0fc5b6df-bb9b-4042-87bb-1ff3b5f00f53",
+  "results": {
+    "turno2": {
+      "code": null,
+      "confidence": null
+    },
+    "turno1": {
+      "questions": null,
+      "confidence": null,
+      "code": null
+    }
+  },
+  "timestamp": "20260129_002114"
+}

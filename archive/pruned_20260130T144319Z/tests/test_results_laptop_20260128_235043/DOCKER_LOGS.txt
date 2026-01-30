@@ -1,0 +1,100 @@
+INSTRUCCIONES:
+1. Lee informaci├│n: Tiene SSD de 512GB y 16GB de RAM
+2. Extrae: tipo_veh├¡culo, plazas, motor, cilindrada
+3. Si tienes plazas ÔåÆ determina partida inmediatamente
+4. Si tienes motor ÔåÆ a├▒ade subdivisi├│n
+5. PROP├ôN C├ôDIGO SIEMPRE (incluso si no tienes todos los detalles)
+
+EJEMPLO CORRECTO DE RESPUESTA:
+Input: "Veh├¡culo para 50 personas, motor diesel, nuevo"
+Output JSON:
+{
+  "top_candidates": [
+    {
+      "code": "8702.32",
+      "description": "Autob├║s nuevo",
+      "confidence": 0.85,
+      "level": "HS6"
+    }
+  ],
+  "missing_fields": [],
+  "applied_rgi": ["RGI 1"],
+  "inclusions": [],
+  "exclusions": [],
+  "warnings": []
+}
+
+**INSTRUCCI├ôN CR├ìTICA SOBRE DESCRIPCIONES:**
+- NO incluyas detalles que NO hayan sido EXPL├ìCITAMENTE mencionados por el usuario
+- Si tienes duda sobre un detalle (ej: tipo de motor), NO lo escribas en la descripci├│n
+- La descripci├│n debe ser GEN├ëRICA cuando falten confirmaciones: "Autob├║s" (NO "Autob├║s con motor diesel")
+- Solo incluye en descripci├│n lo que el usuario confirm├│ DIRECTAMENTE
+
+NOTA IMPORTANTE:
+- El campo "code" DEBE contener SOLO el c├│digo arancelario (ej: "8702.32", "9999.00", "8703.21")
+- El campo "code" NUNCA debe contener "C├│digo:" o "Pregunt├│:" o descripci├│n
+- La descripci├│n completa va en el campo "description"
+
+FORMATO JSON (RESPUESTA OBLIGATORIA):
+{
+  "top_candidates": [{"code": "XXXX.XX", "description": "...", "confidence": 0.XX, "level": "HS6"}],
+  "missing_fields": ["Solo si falta info de plazas o tipo"],
+  "applied_rgi": ["RGI 1"],
+  "inclusions": [],
+  "exclusions": [],
+  "warnings": []
+}
+===FIN===
+INFO:httpx:HTTP Request: POST https://kpofoundry.cognitiveservices.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO:app.generator_gemini:LOG_LLM_RESPONSE_FULL: {
+  "top_candidates": [],
+  "missing_fields": [
+    "┬┐Qu├® tipo de veh├¡culo es? (bus, autom├│vil, cami├│n, etc.) ÔåÆ Define la partida correcta seg├║n el uso.",
+    "┬┐Cu├íntas personas puede transportar? ÔåÆ Esto determina si clasifica en 8702 (autob├║s - 10+ plazas) o 8703 (autom├│vil - Ôëñ9 plazas).",
+    "┬┐Qu├® tipo de motor tiene? (gasolina, di├®sel, el├®ctrico) ÔåÆ Define la subpartida espec├¡fica dentro del grupo elegido."
+  ],
+  "applied_rgi": [],
+  "inclusions": [],
+  "exclusions": [],
+  "warnings": ["La descripci├│n no es clara. Se necesita m├ís informaci├│n para clasificar correctamente."]
+}
+INFO:app.generator_gemini:LOG_LLM_PARSED: top_candidates=0 items, missing_fields=3 items
+WARNING:app.generator_gemini:LOG_LLM_NO_CANDIDATES_IN_RESPONSE: LLM returned no candidates!
+WARNING:app.generator_gemini:LOG_LLM_MISSING_FIELDS: ['┬┐Qu├® tipo de veh├¡culo es? (bus, autom├│vil, cami├│n, etc.) ÔåÆ Define la partida correcta seg├║n el uso.', '┬┐Cu├íntas personas puede transportar? ÔåÆ Esto determina si clasifica en 8702 (autob├║s - 10+ plazas) o 8703 (autom├│vil - Ôëñ9 plazas).', '┬┐Qu├® tipo de motor tiene? (gasolina, di├®sel, el├®ctrico) ÔåÆ Define la subpartida espec├¡fica dentro del grupo elegido.']
+WARNING:app.generator_gemini:LOG_LLM_WARNINGS: ['La descripci├│n no es clara. Se necesita m├ís informaci├│n para clasificar correctamente.']
+WARNING:app.generator_gemini:LOG_LLM_NO_CANDIDATES: LLM returned empty candidates list!
+INFO:app.generator_gemini:LOG_TEXT_BLOB_RAW: 'tiene ssd de 512gb y 16gb de ram'
+INFO:app.generator_gemini:LOG_TEXT_BLOB_NORMALIZED: 'tiene ssd de 512gb y 16gb de ram'
+ERROR:app.generator_gemini:LOG_EMERGENCY_FALLBACK: Creating emergency generic candidate
+INFO:app.generator_gemini:LOG_TEXT_BLOB_RAW: ''
+INFO:app.generator_gemini:LOG_TEXT_BLOB_NORMALIZED: ''
+INFO:app.generator_gemini:LOG_AGGRESSIVE_CLEANUP_BEFORE: code=9999.00, confidence=10%, digits=6, missing_count=3, missing=['┬┐Qu├® tipo de veh├¡culo es? (bus, autom├│vil, cami├│n, etc.) ÔåÆ Define la partida correcta seg├║n el uso.', '┬┐Cu├íntas personas puede transportar? ÔåÆ Esto determina si clasifica en 8702 (autob├║s - 10+ plazas) o 8703 (autom├│vil - Ôëñ9 plazas).', '┬┐Qu├® tipo de motor tiene? (gasolina, di├®sel, el├®ctrico) ÔåÆ Define la subpartida espec├¡fica dentro del grupo elegido.']
+INFO:app.generator_gemini:LOG_AGGRESSIVE_CLEANUP: Keeping missing_fields (code=9999.00, confidence=10%, digits=6)
+INFO:app.generator_gemini:LOG_TEXT_BLOB_RAW: 'tiene ssd de 512gb y 16gb de ram'
+INFO:app.generator_gemini:LOG_TEXT_BLOB_NORMALIZED: 'tiene ssd de 512gb y 16gb de ram'
+INFO:app.generator_gemini:LOG_PRUNE_START: text_blob_norm='tiene ssd de 512gb y 16gb de ram...', missing_fields_count=3
+INFO:app.generator_gemini:LOG_FIELD_CLEANUP: '┬┐Qu├® tipo de veh├¡culo es? (bus, autom├│vil, cami├│n,' ÔåÆ 'que tipo de vehiculo es bus automovil camion etc define la partida correcta segun el uso'
+INFO:app.generator_gemini:LOG_FIELD_CLEANUP: '┬┐Cu├íntas personas puede transportar? ÔåÆ Esto determ' ÔåÆ 'cuantas personas puede transportar esto determina si clasifica en 8702 autobus 10 plazas o 8703 automovil 9 plazas'
+INFO:app.generator_gemini:LOG_FIELD_CLEANUP: '┬┐Qu├® tipo de motor tiene? (gasolina, di├®sel, el├®ct' ÔåÆ 'que tipo de motor tiene gasolina diesel electrico define la subpartida especifica dentro del grupo elegido'
+INFO:app.generator_gemini:LOG_PRUNE_CLEANUP: After cleanup, 3 fields remaining
+INFO:app.generator_gemini:LOG_PRUNE_END: cleaned=3 fields (from 3 after cleanup)
+INFO:app.generator_gemini:LOG_TEXT_BLOB_RAW: 'tiene ssd de 512gb y 16gb de ram'
+INFO:app.generator_gemini:LOG_TEXT_BLOB_NORMALIZED: 'tiene ssd de 512gb y 16gb de ram'
+INFO:app.generator_gemini:[CONFIDENCE_CALC] answered_details=0, fields_remaining=3 (critical=3, optional=0), confidence=0.45
+INFO:app.generator_gemini:LOG_CONFIDENCE_REFINED: 9999.00 ÔåÆ 45%
+INFO:app.generator_gemini:LOG_TEXT_BLOB_RAW: 'tiene ssd de 512gb y 16gb de ram'
+INFO:app.generator_gemini:LOG_TEXT_BLOB_NORMALIZED: 'tiene ssd de 512gb y 16gb de ram'
+INFO:app.generator_gemini:LOG_LLM_FINAL: top_candidates=1 items
+INFO:tariff_rag.api:[SANITIZER] contextual_query: Tiene SSD de 512GB y 16GB de RAM
+INFO:tariff_rag.api:[SANITIZER] has_generic_fields=False
+INFO:tariff_rag.api:[SANITIZER] missing_fields from LLM: ['que tipo de vehiculo es bus automovil camion etc define la partida correcta segun el uso', 'cuantas personas puede transportar esto determina si clasifica en 8702 autobus 10 plazas o 8703 automovil 9 plazas', 'que tipo de motor tiene gasolina diesel electrico define la subpartida especifica dentro del grupo elegido']
+INFO:tariff_rag.api:[OVERRIDE_CHECK] candidates=1, current_mf_count=3, current_mf=['que tipo de vehiculo es bus automovil camion etc define la partida correcta segun el uso', 'cuantas personas puede transportar esto determina si clasifica en 8702 autobus 10 plazas o 8703 automovil 9 plazas']
+INFO:opensearch:POST http://opensearch:9200/tariff_fragments/_search [status:200 request:0.002s]
+INFO:httpx:HTTP Request: POST https://kpofoundry.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO:opensearch:POST http://opensearch:9200/tariff_fragments/_search [status:200 request:0.003s]
+INFO:tariff_rag.api:[REDIS_SAVE_DEBUG] top_cands count: 1
+INFO:tariff_rag.api:[REDIS_SAVE_DEBUG] First candidate RAW: {'code': '9999.00', 'description': 'Clasificaci├│n pendiente - Necesita m├ís informaci├│n', 'confidence': 0.45, 'level': 'HS6', 'years': [2025, 2026]}
+INFO:tariff_rag.api:[REDIS_SAVE_DEBUG] top_code='9999.00', top_desc='Clasificaci├│n pendiente - Necesita m├ís informaci├│n'
+INFO:tariff_rag.api:[REDIS_SAVE_DEBUG] assistant_summary='C├│digo: 9999.00 (Clasificaci├│n pendiente - Necesita m├ís informaci├│n)'
+INFO:tariff_rag.api:[YEARS_FOUND] A├▒os en evidencia: [2025, 2026]
+INFO:     172.18.0.1:48028 - "POST /classify HTTP/1.1" 200 OK

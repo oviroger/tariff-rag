@@ -1,0 +1,48 @@
+{
+  "materials": [
+    {
+      "id": "poliester",
+      "canonical": "poliester",
+      "synonyms": [
+        "poliester", "poliéster", "poliesterico", "polyester", "poliéster tejido", "poliéster reciclado",
+        "poliesterico tejido", "poliester microfibra", "microfibra", "polyester blend", "poliester pe",
+        "poliester pa", "poliester pet"
+      ],
+      "tags": ["textil"]
+    },
+    {
+      "id": "algodon",
+      "canonical": "algodon",
+      "synonyms": ["algodon", "algodón", "cotton"],
+      "tags": ["textil"]
+    },
+    {
+      "id": "seda",
+      "canonical": "seda",
+      "synonyms": ["seda", "silk"],
+      "tags": ["textil"]
+    },
+    {
+      "id": "acero",
+      "canonical": "acero",
+      "synonyms": ["acero", "steel", "inoxidable", "acero al carbono", "acero inoxidable", "inox", "stainless steel", "acero galvanizado", "acero recubierto", "galvanizado"],
+      "tags": ["metal"]
+    }
+  ],
+  "coatings": [
+    {
+      "id": "galvanizado",
+      "canonical": "galvanizado",
+      "synonyms": [
+        "galvanizado", "galvanizacion", "galvanización", "galvanizada", "zincado", "recubierto con zinc", "recubierto con cinc",
+        "galvanizado en caliente", "galvanizado en frio", "zincado electrolítico", "zincado electrolitico", "zinchado",
+        "zincado por inmersión", "galvannealed", "galvannealed coating", "aluzinc", "zincalume", "zinc-alu", "recubierto con Zn"
+      ]
+    },
+    {
+      "id": "pintado",
+      "canonical": "pintado",
+      "synonyms": ["pintado", "pintura", "pintura en polvo", "pintura electrostática", "recubierto pintado", "barnizado"]
+    }
+  ]
+}

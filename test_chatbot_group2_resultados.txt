@@ -1,0 +1,85 @@
+=== TEST CHATBOT CON RESPUESTAS PARCIALES - GRUPO 2: ALIMENTOS Y BEBIDAS ===
+
+=== Queso ===
+Turno 1 | Query: Queso
+API -> 0406.10 (95%) | Missing: 0
+UI Turno 1 -> 0406.90
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 0406.90** | 📅 Referencia: 2026 | 🎯 95%
+   Queso de cualquier tipo, no especificado en otras partidas
+
+---...
+UI -> Código final: 0406.90
+
+=== Vino ===
+Turno 1 | Query: Vino
+API -> 2204.21 (95%) | Missing: 0
+UI Turno 1 -> 2204.21
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 2204.21** | 📅 Referencia: 2026 | 🎯 95%
+   Vino de uvas frescas, incluso encabezado
+
+---...
+UI -> Código final: 2204.21
+
+=== Chocolate ===
+Turno 1 | Query: Chocolate
+API -> 1806.90 (95%) | Missing: 0
+UI Turno 1 -> 1806.90
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 1806.90** | 📅 Referencia: 2026 | 🎯 95%
+   Chocolate y demás preparaciones alimenticias que contengan cacao
+
+---...
+UI -> Código final: 1806.90
+
+=== Jugo ===
+Turno 1 | Query: Jugo de fruta
+API -> 2009.00 (45%) | Missing: 3
+Opciones sugeridas por el chatbot:
+ - es fresco refrigerado congelado o procesado
+ - esta entero o troceadofileteado
+ - es nuevo o importado afecta la partida
+UI Turno 1 -> 2009.00
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 2009.00** | 📅 Referencia: 2026 | 🎯 45%
+   Jugo de fruta, sin fermentar, obtenido por procedimientos mecánicos a p...
+UI -> Código final: 2009.00
+
+=== Pescado ===
+Turno 1 | Query: Pescado
+API -> 0304.10 (45%) | Missing: 2
+Opciones sugeridas por el chatbot:
+ - el pescado es fresco congelado o procesado define la partida especifica a aplicar
+ - esta entero o en trozos diferencia entre 030410 y 030420
+Respuesta parcial del usuario:
+ - Salmón. En filetes
+Turno 2 | Query: Salmón. En filetes
+API -> 0302.11 (95%) | Missing: 0
+UI Turno 1 -> 0304.10
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 0304.10** | 📅 Referencia: 2026 | 🎯 45%
+   Pescado entero o en trozos, excepto el pescado picado
+
+### 🔍 Informaci...
+UI opciones sugeridas:
+ - es fresco refrigerado congelado o procesado
+ - esta entero o troceadofileteado
+ - es nuevo o importado afecta la partida
+UI respuesta parcial del usuario:
+ - Congelado. En filetes
+UI Turno 2 -> 0304.20
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 0304.20** | 📅 Referencia: 2026 | 🎯 95%
+   Filetes de pescado congelados
+
+---...
+UI -> Código final: 0304.20
+
+✅ Test finalizado

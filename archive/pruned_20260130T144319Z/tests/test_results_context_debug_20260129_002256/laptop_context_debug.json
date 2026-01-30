@@ -1,0 +1,284 @@
+{
+  "test": "Laptop Context Loss Debug",
+  "analysis": {
+    "context_lost_in_turno3": false,
+    "turno1_ok": false,
+    "turno3_ok": false,
+    "turno2_ok": false
+  },
+  "session_id": "a4434922-5cd1-474d-8430-41ce8ff50f09",
+  "results": [
+    {
+      "questions": null,
+      "turno": 1,
+      "full_response": {
+        "top_candidates": [
+          {
+            "code": "9999.00",
+            "description": "Clasificación pendiente - Necesita más información",
+            "confidence": 0.85,
+            "level": "HS6",
+            "years": [
+              2025,
+              2026
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "fragment_id": "Arancel_2026_2_p17341",
+            "score": 0.01639344262295082,
+            "text": "Neumáticos (llantas neumáticas) nuevos de caucho.",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel_2026_2",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          },
+          {
+            "fragment_id": "Arancel_Boliviano_2025_Parte_5_p145",
+            "score": 0.01639344262295082,
+            "text": "b) las máquinas de videojuego con pantalla incorporada, incluso portátiles.",
+            "bucket": "afr_2025",
+            "unit": "paragraph",
+            "doc_id": "Arancel_Boliviano_2025_Parte_5",
+            "reason": "retrieved_by_search",
+            "year": 2025
+          },
+          {
+            "fragment_id": "Arancel_2026_2_p17469",
+            "score": 0.016129032258064516,
+            "text": "Neumáticos (llantas neumáticas) recauchutados o usados, de caucho; bandajes (llantas macizas o huecas), bandas de rodadura para neumáticos (llantas neumáticas) y protectores («flaps»), de caucho.",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel_2026_2",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          },
+          {
+            "fragment_id": "Arancel 2026_5.pdf_p547",
+            "score": 0.016129032258064516,
+            "text": "b) las máquinas de videojuego con pantalla incorporada, incluso portátiles.",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel 2026_5.pdf",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          },
+          {
+            "fragment_id": "Arancel_2026_2_p17545",
+            "score": 0.015873015873015872,
+            "text": "Cámaras de caucho para neumáticos (llantas neumáticas).",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel_2026_2",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          }
+        ],
+        "support_evidence": [],
+        "applied_rgi": [
+          "RGI 1"
+        ],
+        "inclusions": [],
+        "exclusions": [],
+        "missing_fields": [
+          "la laptop es nueva o usada define el ultimo digito del codigo"
+        ],
+        "warnings": [
+          "No se encontró información específica en el corpus. Por favor proporciona más detalles del producto.",
+          "No se pudo determinar clasificación automática"
+        ],
+        "versions": {},
+        "debug_info": null,
+        "conversation_id": "a4434922-5cd1-474d-8430-41ce8ff50f09",
+        "years": [
+          2025,
+          2026
+        ]
+      },
+      "confidence": null,
+      "code": null
+    },
+    {
+      "questions": null,
+      "turno": 2,
+      "full_response": {
+        "top_candidates": [
+          {
+            "code": "9999.00",
+            "description": "Clasificación pendiente - Necesita más información",
+            "confidence": 0.85,
+            "level": "HS6",
+            "years": [
+              2025,
+              2026
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "fragment_id": "Arancel_Boliviano_2025_Parte_5_p145",
+            "score": 0.030886196246139225,
+            "text": "b) las máquinas de videojuego con pantalla incorporada, incluso portátiles.",
+            "bucket": "afr_2025",
+            "unit": "paragraph",
+            "doc_id": "Arancel_Boliviano_2025_Parte_5",
+            "reason": "retrieved_by_search",
+            "year": 2025
+          },
+          {
+            "fragment_id": "Arancel_2026_5_p12497",
+            "score": 0.0304147465437788,
+            "text": "b) las máquinas de videojuego con pantalla incorporada, incluso portátiles.",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel_2026_5",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          },
+          {
+            "fragment_id": "Arancel 2026_5.pdf_p547",
+            "score": 0.029709507042253523,
+            "text": "b) las máquinas de videojuego con pantalla incorporada, incluso portátiles.",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel 2026_5.pdf",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          },
+          {
+            "fragment_id": "Arancel_2026_2_p17341",
+            "score": 0.01639344262295082,
+            "text": "Neumáticos (llantas neumáticas) nuevos de caucho.",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel_2026_2",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          },
+          {
+            "fragment_id": "Arancel_2026_2_p17469",
+            "score": 0.016129032258064516,
+            "text": "Neumáticos (llantas neumáticas) recauchutados o usados, de caucho; bandajes (llantas macizas o huecas), bandas de rodadura para neumáticos (llantas neumáticas) y protectores («flaps»), de caucho.",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel_2026_2",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          }
+        ],
+        "support_evidence": [],
+        "applied_rgi": [],
+        "inclusions": [],
+        "exclusions": [],
+        "missing_fields": [
+          "es nueva o usada define el estado del producto"
+        ],
+        "warnings": [
+          "No se encontró información directa sobre laptops en los documentos. Proporcione detalles específicos sobre el producto para clasificar correctamente.",
+          "No se pudo determinar clasificación automática"
+        ],
+        "versions": {},
+        "debug_info": null,
+        "conversation_id": "a4434922-5cd1-474d-8430-41ce8ff50f09",
+        "years": [
+          2025,
+          2026
+        ]
+      },
+      "confidence": null,
+      "code": null
+    },
+    {
+      "questions": null,
+      "turno": 3,
+      "full_response": {
+        "top_candidates": [
+          {
+            "code": "9999.00",
+            "description": "Clasificación pendiente - Necesita más información",
+            "confidence": 0.85,
+            "level": "HS6",
+            "years": [
+              2025,
+              2026
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "fragment_id": "Arancel_2026_2_p17341",
+            "score": 0.01639344262295082,
+            "text": "Neumáticos (llantas neumáticas) nuevos de caucho.",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel_2026_2",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          },
+          {
+            "fragment_id": "Arancel_2026_5_p12497",
+            "score": 0.01639344262295082,
+            "text": "b) las máquinas de videojuego con pantalla incorporada, incluso portátiles.",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel_2026_5",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          },
+          {
+            "fragment_id": "Arancel_2026_2_p17469",
+            "score": 0.016129032258064516,
+            "text": "Neumáticos (llantas neumáticas) recauchutados o usados, de caucho; bandajes (llantas macizas o huecas), bandas de rodadura para neumáticos (llantas neumáticas) y protectores («flaps»), de caucho.",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel_2026_2",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          },
+          {
+            "fragment_id": "Arancel 2026_5.pdf_p547",
+            "score": 0.016129032258064516,
+            "text": "b) las máquinas de videojuego con pantalla incorporada, incluso portátiles.",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel 2026_5.pdf",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          },
+          {
+            "fragment_id": "Arancel_2026_2_p17545",
+            "score": 0.015873015873015872,
+            "text": "Cámaras de caucho para neumáticos (llantas neumáticas).",
+            "bucket": "afr_2026",
+            "unit": "paragraph",
+            "doc_id": "Arancel_2026_2",
+            "reason": "retrieved_by_search",
+            "year": 2026
+          }
+        ],
+        "support_evidence": [],
+        "applied_rgi": [],
+        "inclusions": [],
+        "exclusions": [],
+        "missing_fields": [
+          "es nueva o usada"
+        ],
+        "warnings": [
+          "No se encontró información específica en el corpus. Por favor proporciona más detalles del producto.",
+          "No se pudo determinar clasificación automática"
+        ],
+        "versions": {},
+        "debug_info": null,
+        "conversation_id": "a4434922-5cd1-474d-8430-41ce8ff50f09",
+        "years": [
+          2026
+        ]
+      },
+      "confidence": null,
+      "code": null
+    }
+  ],
+  "timestamp": "20260129_002256"
+}

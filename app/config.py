@@ -8,8 +8,8 @@ class Settings(BaseSettings):
 
     # OpenSearch
     opensearch_host: str = "http://opensearch:9200"
-    opensearch_index: str = "tariff_fragments_2025"
-    opensearch_indices: str = "tariff_fragments_2025,tariff_fragments_2026"
+    opensearch_index: str = "tariff_fragments_2025_v2"
+    opensearch_indices: str = "tariff_fragments_2025_v2,tariff_fragments_2026_v2"
     opensearch_knn_space: str = "cosinesimil"
     opensearch_emb_dim: int = 1536
 
@@ -50,7 +50,8 @@ class Settings(BaseSettings):
     min_score: float = 0.35
     # Umbral para mostrar evidencia / alimentar el prompt.
     # RRF produce scores bajos (~0.0x). Usamos un valor bajo pero mayor que el ruido.
-    min_score_for_display: float = 0.02
+    # Para RRF: score mínimo ≈ 1/(60+1) ≈ 0.0164 para top-1, así que 0.008 es seguro
+    min_score_for_display: float = 0.008
     enable_retrieval_fallback: bool = False
 
     # Redis
