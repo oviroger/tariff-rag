@@ -36,7 +36,7 @@ jobs:
           MYSQL_PASSWORD: root
           GEMINI_API_KEY: fake-key-for-tests
         run: |
-          pytest -v --maxfail=1 --disable-warnings tests/
+          pytest -v --maxfail=1 --disable-warnings
 
   lint:
     runs-on: ubuntu-latest
