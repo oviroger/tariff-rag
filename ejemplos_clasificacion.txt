@@ -1,0 +1,167 @@
+
+================================================================================
+DEMOSTRACION COMPLETA DEL CHATBOT DE CLASIFICACION ARANCELARIA
+Sistema RAG con indices OpenSearch v2 (incluye datos de tablas)
+================================================================================
+
+[OK] API del chatbot esta activa
+
+================================================================================
+EJEMPLO: MICROONDAS
+================================================================================
+
+Descripcion del producto: "horno de microondas electrico para uso domestico"
+
+[PASO 1] Enviando consulta al clasificador...
+--------------------------------------------------------------------------------
+[PASO 2] Resultados de la Clasificacion
+--------------------------------------------------------------------------------
+Total de candidatos encontrados: 1
+
+CLASIFICACION PRINCIPAL:
+  Codigo HS: 8516
+  Descripcion: Hornos de microondas
+  Nivel: HS6
+  Confianza: 0.42749999999999994
+  Anos disponibles: [2025, 2026]
+
+[PASO 3] Evidencia del Sistema de Busqueda (RAG)
+--------------------------------------------------------------------------------
+Fragmentos recuperados: 5
+
+  - Fragmentos de TABLAS: 0
+  - Fragmentos de PARRAFOS: 5
+
+Top 3 fragmentos mas relevantes:
+  1. Score: 0.031514
+     Tipo: paragraph | Ano: 2026 | Fuente: Arancel_2026_5
+     Texto: - Hornos de microondas...
+
+  2. Score: 0.016393
+     Tipo: paragraph | Ano: 2026 | Fuente: Arancel_2026_2
+     Texto: Cámaras de caucho para neumáticos (llantas neumáticas)....
+
+  3. Score: 0.016393
+     Tipo: paragraph | Ano: 2025 | Fuente: Arancel_Boliviano_2025_Parte_4
+     Texto: - - De uso doméstico...
+
+[PASO 4] Informacion Adicional del Clasificador
+--------------------------------------------------------------------------------
+Reglas Generales aplicadas: RGI 1
+Inclusiones: Hornos de microondas eléctricos y para uso doméstico
+Exclusiones: Hornos de microondas industriales
+Campos faltantes para clasificacion mas precisa:
+  - cual es la capacidad en litros del horno de microondas
+  - es nuevo o usado
+
+[PASO 5] Verificacion y Resumen
+--------------------------------------------------------------------------------
+[OK] Clasificacion exitosa: 8516
+[OK] Confianza adecuada: 0.42749999999999994
+[INFO] Usa datos de tablas: No (0 fragmentos)
+[OK] Disponible en multiples anos: [2025, 2026]
+[OK] Suficiente evidencia: 5 fragmentos
+
+Verificaciones: 4/5 pasadas
+[EXITO] Clasificacion completa y confiable
+
+================================================================================
+
+================================================================================
+EJEMPLO: AUTOMOVIL
+================================================================================
+
+Descripcion del producto: "vehiculo automovil con motor de gasolina de 1500 cc para transporte de personas"
+
+[PASO 1] Enviando consulta al clasificador...
+--------------------------------------------------------------------------------
+[PASO 2] Resultados de la Clasificacion
+--------------------------------------------------------------------------------
+Total de candidatos encontrados: 2
+
+CLASIFICACION PRINCIPAL:
+  Codigo HS: 8703
+  Descripcion: Automóviles para transporte de personas (hasta 9 personas)
+  Nivel: HS6
+  Confianza: 0.85
+  Anos disponibles: [2025, 2026]
+
+CANDIDATOS ALTERNATIVOS:
+  2. 8703.10 - Automóviles de turismo, con motor de gasolina (Confianza: 0.75)
+
+[PASO 3] Evidencia del Sistema de Busqueda (RAG)
+--------------------------------------------------------------------------------
+Fragmentos recuperados: 5
+
+  - Fragmentos de TABLAS: 3
+  - Fragmentos de PARRAFOS: 2
+
+Top 3 fragmentos mas relevantes:
+  1. Score: 0.030798
+     Tipo: table | Ano: 2025 | Fuente: Arancel_Boliviano_2025_Parte_5
+     Texto: | CÓDIGO | DESCRIPCIÓN DE LA MERCANCÍA | ICE | NUEVOS | ANTIGÜEDAD (AÑOS) |  |  | | --- | --- | --- | --- | --- | --- | --- | |  |  |  |  | 1 | 2 | 3 ...
+
+  2. Score: 0.029727
+     Tipo: paragraph | Ano: 2025 | Fuente: Arancel_Boliviano_2025_Parte_5
+     Texto: Vehículos automóviles para usos especiales, excepto los diseñados principalmente para transporte de personas...
+
+  3. Score: 0.016393
+     Tipo: table | Ano: 2025 | Fuente: Arancel_Boliviano_2025_Parte_1
+     Texto: | Ejemplos: |  | | --- | --- | | 1500 g/m2 | mil quinientos gramos por metro cuadrado | | 15°C | quince grados Celsius |...
+
+[PASO 4] Informacion Adicional del Clasificador
+--------------------------------------------------------------------------------
+Reglas Generales aplicadas: RGI 1
+Inclusiones: Incluye automóviles de turismo con motor de gasolina
+Exclusiones: Excluye vehículos para transporte de más de 10 personas (8702)
+Campos faltantes para clasificacion mas precisa:
+  - es nuevo o usado define el codigo final
+
+[PASO 5] Verificacion y Resumen
+--------------------------------------------------------------------------------
+[OK] Clasificacion exitosa: 8703
+[OK] Confianza adecuada: 0.85
+[OK] Usa datos de tablas: Si (3 fragmentos)
+[OK] Disponible en multiples anos: [2025, 2026]
+[OK] Suficiente evidencia: 5 fragmentos
+
+Verificaciones: 5/5 pasadas
+[EXITO] Clasificacion completa y confiable
+
+================================================================================
+
+================================================================================
+EJEMPLO: CAMISETA
+================================================================================
+
+Descripcion del producto: "camiseta de algodon para hombre talla M manga corta"
+
+[PASO 1] Enviando consulta al clasificador...
+--------------------------------------------------------------------------------
+[PASO 2] Resultados de la Clasificacion
+--------------------------------------------------------------------------------
+[ATENCION] No se encontraron candidatos
+================================================================================
+RESUMEN DE LA DEMOSTRACION
+================================================================================
+
+Se han demostrado 3 clasificaciones arancelarias completas:
+1. Producto electronico (microondas) - Partida 8516
+2. Vehiculo automotor - Partida 8703
+3. Producto textil (camiseta) - Partida 6109
+
+Cada ejemplo muestra:
+  - Proceso de clasificacion automatica
+  - Codigo HS (Sistema Armonizado)
+  - Confianza del clasificador
+  - Evidencia RAG (fragmentos de documentos)
+  - Reglas de clasificacion aplicadas
+  - Verificaciones de calidad
+
+El sistema utiliza:
+  - Indices OpenSearch v2 (con tablas extraidas)
+  - Embeddings de Azure OpenAI
+  - Clasificador basado en LLM
+  - Datos de aranceles 2025 y 2026
+
+================================================================================

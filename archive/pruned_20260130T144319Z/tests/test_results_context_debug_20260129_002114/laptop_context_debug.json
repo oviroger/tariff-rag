@@ -1,0 +1,34 @@
+{
+  "test": "Laptop Context Loss Debug",
+  "analysis": {
+    "context_lost_in_turno3": false,
+    "turno1_ok": false,
+    "turno3_ok": false,
+    "turno2_ok": false
+  },
+  "session_id": "c0d3bf8a-ca89-4613-a1fe-8c61a7e53a99",
+  "results": [
+    {
+      "questions": null,
+      "turno": 1,
+      "full_response": null,
+      "confidence": null,
+      "code": null
+    },
+    {
+      "questions": null,
+      "turno": 2,
+      "full_response": null,
+      "confidence": null,
+      "code": null
+    },
+    {
+      "questions": null,
+      "turno": 3,
+      "full_response": null,
+      "confidence": null,
+      "code": null
+    }
+  ],
+  "timestamp": "20260129_002114"
+}

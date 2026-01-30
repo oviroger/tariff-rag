@@ -1,0 +1,57 @@
+=== TEST CHATBOT CON RESPUESTAS PARCIALES - GRUPO 4: QUÍMICOS Y FARMACÉUTICOS ===
+
+=== Pintura ===
+Turno 1 | Query: Pintura
+API -> 3208.10 (95%) | Missing: 0
+UI Turno 1 -> 3208.90
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 3208.90** | 📅 Referencia: 2026 | 🎯 95%
+   Pinturas y barnices (incluidos los de esmalte) y preparaciones a base d...
+UI -> Código final: 3208.90
+
+=== Medicamento ===
+Turno 1 | Query: Medicamento
+API -> 3004.90 (95%) | Missing: 0
+UI Turno 1 -> 3004.90
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 3004.90** | 📅 Referencia: 2026 | 🎯 95%
+   Medicamentos constituidos por productos mezclados o sin mezclar, prepar...
+UI -> Código final: 3004.90
+
+=== Fertilizante ===
+Turno 1 | Query: Fertilizante
+API -> 3105.90 (95%) | Missing: 0
+UI Turno 1 -> 3105.10
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 3105.10** | 📅 Referencia: 2026 | 🎯 95%
+   Abonos minerales o químicos con el elemento fertilizante nitrógeno
+
+---...
+UI -> Código final: 3105.10
+
+=== Detergente ===
+Turno 1 | Query: Detergente
+API -> 3402.11 (95%) | Missing: 0
+UI Turno 1 -> 3402.90
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 3402.90** | 📅 Referencia: 2026 | 🎯 95%
+   Detergentes y productos de limpieza, no clasificados en otra parte
+
+---...
+UI -> Código final: 3402.90
+
+=== Pegamento ===
+Turno 1 | Query: Pegamento
+API -> 3506.91 (95%) | Missing: 0
+UI Turno 1 -> 3506.91
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 3506.91** | 📅 Referencia: 2026 | 🎯 95%
+   Pegamentos y adhesivos, a base de polímeros, en forma de pastas o masas...
+UI -> Código final: 3506.91
+
+✅ Test finalizado

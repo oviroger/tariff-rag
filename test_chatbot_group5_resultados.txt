@@ -1,0 +1,61 @@
+=== TEST CHATBOT CON RESPUESTAS PARCIALES - GRUPO 5: ELECTRÓNICA Y ELECTRODOMÉSTICOS ===
+
+=== Televisor ===
+Turno 1 | Query: Televisor
+API -> 8528.72 (95%) | Missing: 0
+UI Turno 1 -> 8528.72
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 8528.72** | 📅 Referencia: 2026 | 🎯 95%
+   Aparatos receptores de televisión, incluso con aparato receptor de radi...
+UI -> Código final: 8528.72
+
+=== Parlante ===
+Turno 1 | Query: Parlante
+API -> 8518.29 (95%) | Missing: 0
+UI Turno 1 -> 8518.29
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 8518.29** | 📅 Referencia: 2026 | 🎯 95%
+   Parlantes eléctricos
+
+---...
+UI -> Código final: 8518.29
+
+=== Impresora ===
+Turno 1 | Query: Impresora
+API -> 8443.31 (95%) | Missing: 0
+UI Turno 1 -> 8443.32
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 8443.32** | 📅 Referencia: 2026 | 🎯 95%
+   Impresoras de inyección, de tinta
+
+---...
+UI -> Código final: 8443.32
+
+=== Ventilador ===
+Turno 1 | Query: Ventilador
+API -> 8414.59 (95%) | Missing: 0
+UI Turno 1 -> 8414.59
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 8414.59** | 📅 Referencia: 2026 | 🎯 95%
+   Ventiladores y similares, los demás
+
+---...
+UI -> Código final: 8414.59
+
+=== Calefactor ===
+Turno 1 | Query: Calefactor
+API -> 8516.42 (95%) | Missing: 0
+UI Turno 1 -> 8516.79
+UI respuesta: ## 🎯 Clasificación sugerida
+
+**a) 8516.79** | 📅 Referencia: 2026 | 🎯 95%
+   Aparatos eléctricos para calefacción de espacios o suelos
+
+---...
+UI -> Código final: 8516.79
+
+✅ Test finalizado

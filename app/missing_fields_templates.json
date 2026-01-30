@@ -1,0 +1,34 @@
+{
+  "vehicles": [
+    "¿Qué tipo de vehículo específico? (automóvil, camioneta, camión, bus, motocicleta)",
+    "¿Cuántas personas puede transportar? → Esto determina si es autobús ≥10 plazas o automóvil <10 plazas",
+    "¿Qué tipo de motor? (gasolina, diésel, eléctrico, híbrido)",
+    "¿Cilindrada del motor en cm³?",
+    "¿Es nuevo o usado?"
+  ],
+  "textiles": [
+    "¿De qué material está hecho? (algodón, poliéster, lana, mezcla, sintético)",
+    "¿Es tejido, punto, o no tejido?",
+    "¿Cuál es el uso final? (prenda de vestir, tela por metro, artículos de hogar)"
+  ],
+  "appliances": [
+    "¿Qué tipo específico de electrodoméstico es? (lavadora, refrigerador, microondas, horno, etc.)",
+    "¿Cuál es la capacidad o potencia? (kg, litros, watts)",
+    "¿Es nuevo o usado?"
+  ],
+  "metals_72": [
+    "¿Cuál es el espesor de la lámina en mm? → Define si es lámina fina (<3mm), plancha (3-4mm) o chapa gruesa (>4mm)",
+    "¿Está galvanizado, pintado, o sin recubrimiento? → Puede cambiar la partida",
+    "¿Cuál es el acabado? (laminado en caliente, laminado en frío, pulido, etc.)"
+  ],
+  "microondas": [
+    "¿Cuál es la capacidad en litros?",
+    "¿Tiene funciones adicionales como convección o grill?",
+    "¿Es nuevo o usado?"
+  ],
+  "food": [
+    "¿Es fresco, refrigerado, congelado, o procesado?",
+    "¿Está entero o troceado/fileteado?",
+    "¿Es nuevo o importado?"
+  ]
+}

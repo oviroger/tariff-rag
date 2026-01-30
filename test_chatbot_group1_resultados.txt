@@ -1,0 +1,89 @@
+=== TEST CHATBOT CON RESPUESTAS PARCIALES - GRUPO 1: PRODUCTOS INDUSTRIALES ===
+
+=== Válvula ===
+Turno 1 | Query: Válvula                                                                                                
+API -> 8484.10 (95%) | Missing: 0
+UI Turno 1 -> 8484.10
+UI respuesta: ## 🎯 Clasificación sugerida  **a) 8484.10** | 📅 Referencia: 2026 | 🎯 95%    Válvulas para sistemas de pipe o fluidos  ---
+UI -> Código final: 8484.10
+
+=== Tubo ===
+Turno 1 | Query: Tubo                                                                                                   
+API -> 7306.90 (45%) | Missing: 2
+Opciones sugeridas por el chatbot:
+ - que material es el tubo acero plastico cobre etc define la subpartida correcta dentro del capitulo
+ - cual es el diametro y la longitud del tubo esto puede afectar la clasificacion
+Respuesta parcial del usuario:
+ - Acero inoxidable. Diámetro 50 mm
+Turno 2 | Query: Acero inoxidable. Diámetro 50 mm                                                                       
+API -> 7304.41 (95%) | Missing: 0
+UI Turno 1 -> 9999.00                                                                                                   
+UI respuesta: ## 🎯 Clasificación sugerida  **a) 9999.00** | 📅 Referencia: 2026 | 🎯 45%    Clasificación pendiente - Necesita más información  ### 🔍 Información adicional ...
+UI opciones sugeridas:
+ - de que material esta hecho el tubo define la clasificacion dentro de los metales acero aluminio o plasticos
+ - cual es el tipo de tubo recto flexible rigido etc esto influye en la subpartida especifica
+ - cual es el diametro y longitud del tubo informacion critica para determinar la clasificacion correcta
+UI respuesta parcial del usuario:
+ - Acero inoxidable. Diámetro 50 mm
+UI Turno 2 -> 7304.41                                                                                                   
+UI respuesta: ## 🎯 Clasificación sugerida  **a) 7304.41** | 📅 Referencia: 2026 | 🎯 95%    Tuberías de acero inoxidable, con diámetro de 50 mm  ---
+UI -> Código final: 7304.41
+
+=== Bomba ===
+Turno 1 | Query: Bomba                                                                                                  
+API -> 9999.00 (45%) | Missing: 3
+Opciones sugeridas por el chatbot:
+ - que tipo de bomba es manual electrica hidraulica etc define la subpartida especifica
+ - cual es el uso de la bomba agua combustible neumatica etc puede cambiar la clasificacion
+ - es nueva o usada
+Respuesta parcial del usuario:
+ - Bomba centrífuga. Para agua
+Turno 2 | Query: Bomba centrífuga. Para agua                                                                            
+API -> 8413.70 (95%) | Missing: 0
+UI Turno 1 -> 8413.19                                                                                                   
+UI respuesta: ## 🎯 Clasificación sugerida  **a) 8413.19** | 📅 Referencia: 2026 | 🎯 95%    Bombas, manuales, excepto las de las subpartidas 8413.11 u 8413.19  ---
+UI -> Código final: 8413.19
+
+=== Motor ===
+Turno 1 | Query: Motor eléctrico                                                                                        
+API -> 8702.40 (85%) | Missing: 1
+Opciones sugeridas por el chatbot:
+ - cilindrada del motor en cm³
+UI Turno 1 -> 8501.10                                                                                                   
+UI respuesta: ## 🎯 Clasificación sugerida  **a) 8501.10** | 📅 Referencia: 2026 | 🎯 52%    Motores eléctricos de corriente alterna, con potencia inferior o igual a 75 W  **...
+UI opciones sugeridas:
+ - que potencia tiene el motor electrico esto ayuda a determinar si clasifica en 850110 75 w o 850120 75 w
+UI respuesta parcial del usuario:
+ - Potencia 2 HP
+UI Turno 2 -> 8501.10                                                                                                   
+UI respuesta: ## 🎯 Clasificación sugerida  **a) 8501.10** | 📅 Referencia: 2026 | 🎯 95%    Motores eléctricos de potencia inferior o igual a 5.5 HP  ---
+UI -> Código final: 8501.10
+
+=== Aceite ===
+Turno 1 | Query: Aceite                                                                                                 
+API -> 9999.00 (45%) | Missing: 2
+Opciones sugeridas por el chatbot:
+ - que tipo de aceite es oliva girasol soja etc esto determinara la clasificacion especifica
+ - es aceite refinado o en bruto afecta la partida arancelaria
+Respuesta parcial del usuario:
+ - Aceite mineral
+Turno 2 | Query: Aceite mineral                                                                                         
+API -> 2710.19 (95%) | Missing: 0
+UI Turno 1 -> 1509.10                                                                                                   
+UI respuesta: ## 🎯 Clasificación sugerida  **a) 1509.10** | 📅 Referencia: 2026 | 🎯 45%    Aceites vegetales, otros que los de girasol o cártamo, en bruto  ### 🔍 Informaci...
+UI opciones sugeridas:
+ - que tipo de aceite se trata ej oliva girasol canola etc esto determinara la subpartida correcta
+UI respuesta parcial del usuario:
+ - Aceite mineral
+UI Turno 2 -> 2710.19                                                                                                   
+UI respuesta: ## 🎯 Clasificación sugerida  **a) 2710.19** | 📅 Referencia: 2026 | 🎯 95%    Aceites minerales, otros aceites, en bruto o refinados, pero no deshidrogenados n...
+UI -> Código final: 2710.19
+
+✅ Test finalizado
+
+ANÁLISIS:
+- Válvula: Clasificación inmediata (sin refinamiento necesario)
+- Tubo: 2 turnos, API/UI convergieron correctamente a 7304.41
+- Bomba: 2 turnos, divergencia API (8413.70) vs UI (8413.19)
+- Motor: PROBLEMA - API confundió "motor eléctrico" con vehículo (8702.40)
+- Aceite: 2 turnos, UI inicialmente confundió con aceite vegetal
