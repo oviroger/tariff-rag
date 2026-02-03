@@ -1,0 +1,1967 @@
+[
+  {
+    "query_id": "1",
+    "query": "JSC MATERIAL DE REFERENCIA VIRUTA CRM 107542016 AG2 20 G VIRUTA PLATA FINA PARA USO EN LABORATORIO",
+    "request": {
+      "user_query": "JSC MATERIAL DE REFERENCIA VIRUTA CRM 107542016 AG2 20 G VIRUTA PLATA FINA PARA USO EN LABORATORIO",
+      "conversation_id": "log_1"
+    },
+    "start_ts": 1770142696.0456822,
+    "end_ts": 1770142700.9781723,
+    "latency_s": 4.932490110397339,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "3822.00",
+          "description": "Materiales de referencia certificados para uso en laboratorio",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_2_p597",
+          "score": 0.03149801587301587,
+          "text": "Reactivos de diagnóstico o de laboratorio sobre cualquier soporte y reactivos de diagnóstico o de laboratorio preparados, incluso sobre soporte, incluso presentados en kits, excepto los de la partida 30.06; materiales de referencia certificados.",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_2",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_2_p539",
+          "score": 0.03076923076923077,
+          "text": "2. A) En la partida 38.22, se entiende por material de referencia certificado el material de referencia que está acompañado por un certificado que indica los valores de las propiedades certificadas y los métodos utilizados para determinar estos valores, así como el grado de certeza asociado a cada valor, el cual es apto para ser utilizado con fines de análisis, calibración o referencia.",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_2",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p14284",
+          "score": 0.028790389395194696,
+          "text": "Reactivos de diagnóstico o de laboratorio sobre cualquier soporte y reactivos de diagnóstico o de laboratorio preparados, incluso sobre soporte, incluso presentados en kits, excepto los de la partida 30.06; materiales de referencia certificados.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p13091",
+          "score": 0.028381642512077296,
+          "text": "2. A) En la partida 38.22, se entiende por material de referencia certificado el material de referencia que está acompañado por un certificado que indica los valores de las propiedades certificadas y los métodos utilizados para determinar estos valores, así como el grado de certeza asociado a cada valor, el cual es apto para ser utilizado con fines de análisis, calibración o referencia.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel 2026_2.pdf_p654",
+          "score": 0.02817460317460317,
+          "text": "Reactivos de diagnóstico o de laboratorio sobre cualquier soporte y reactivos de diagnóstico o de laboratorio preparados, incluso sobre soporte, incluso presentados en kits, excepto los de la partida 30.06; materiales de referencia certificados.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel 2026_2.pdf",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Materiales de referencia certificados"
+      ],
+      "exclusions": [
+        "Reactivos de laboratorio de la partida 30.06"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_1",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "2",
+    "query": "REMINGTON CAJAS X 200 UNIDADES",
+    "request": {
+      "user_query": "REMINGTON CAJAS X 200 UNIDADES",
+      "conversation_id": "log_2"
+    },
+    "start_ts": 1770142700.9781723,
+    "end_ts": 1770142705.1284754,
+    "latency_s": 4.15030312538147,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "4819.10",
+          "description": "Cajas y envolturas similares de papel o cartón, presentadas en envases acondicionados para la venta al por menor",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_2_p17341",
+          "score": 0.01639344262295082,
+          "text": "Neumáticos (llantas neumáticas) nuevos de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_5_p10661",
+          "score": 0.01639344262295082,
+          "text": "- Cajas y envolturas similares",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17469",
+          "score": 0.016129032258064516,
+          "text": "Neumáticos (llantas neumáticas) recauchutados o usados, de caucho; bandajes (llantas macizas o huecas), bandas de rodadura para neumáticos (llantas neumáticas) y protectores («flaps»), de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_1_p14502",
+          "score": 0.016129032258064516,
+          "text": "--- Presentadas en envases acondicionados para la venta al por menor",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_1",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17545",
+          "score": 0.015873015873015872,
+          "text": "Cámaras de caucho para neumáticos (llantas neumáticas).",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [],
+      "exclusions": [],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_2",
+      "years": [
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "3",
+    "query": "RELAY TOYOTA RELAY DE VEHICULO 9008087024 PIEZA METAL COMBINADO CON OTROS MATERIALES REPUESTOS PARA VEHICULO",
+    "request": {
+      "user_query": "RELAY TOYOTA RELAY DE VEHICULO 9008087024 PIEZA METAL COMBINADO CON OTROS MATERIALES REPUESTOS PARA VEHICULO",
+      "conversation_id": "log_3"
+    },
+    "start_ts": 1770142705.1290598,
+    "end_ts": 1770142709.4388163,
+    "latency_s": 4.309756517410278,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "8708.99",
+          "description": "Las demás guarniciones, herrajes y artículos similares para vehículos automóviles",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_5_p3807",
+          "score": 0.01639344262295082,
+          "text": "- - - Para vehículos del Capítulo 87",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_4_p124",
+          "score": 0.01639344262295082,
+          "text": "- Las demás guarniciones, herrajes y artículos similares, para vehículos automóviles",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_4",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_5_p10451",
+          "score": 0.016129032258064516,
+          "text": "- Para vehículos del Capítulo 87",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel 2026_4.pdf_p507",
+          "score": 0.016129032258064516,
+          "text": "- Las demás guarniciones, herrajes y artículos similares, para vehículos automóviles",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel 2026_4.pdf",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_5_p3685",
+          "score": 0.015873015873015872,
+          "text": "- - Fusibles para vehículos del Capítulo 87",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [],
+      "exclusions": [],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_3",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "4",
+    "query": "MONROX CEMENTO PARA HORMIGON AZS SIN REFFERENCIA BOLSAS DE 55 LIBRAS CEMENTO CALCIUM ALUMINATE PARA USO EN HORNO DE REFINERIA",
+    "request": {
+      "user_query": "MONROX CEMENTO PARA HORMIGON AZS SIN REFFERENCIA BOLSAS DE 55 LIBRAS CEMENTO CALCIUM ALUMINATE PARA USO EN HORNO DE REFINERIA",
+      "conversation_id": "log_4"
+    },
+    "start_ts": 1770142709.4388163,
+    "end_ts": 1770142714.2363276,
+    "latency_s": 4.797511339187622,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "3824.50",
+          "description": "Cementos aluminosos, para uso en horno de refinería",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_2_p17701",
+          "score": 0.01639344262295082,
+          "text": "- - - Bolsas para máquinas vulcanizadoras y reencauchadoras de neumáticos (llantas neumáticas)",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_1_p16266",
+          "score": 0.01639344262295082,
+          "text": "- Cementos aluminosos",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_1",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_4_p14042",
+          "score": 0.016129032258064516,
+          "text": "- - Para moldear elementos prefabricados de cemento u hormigón",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_4",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p14212",
+          "score": 0.016129032258064516,
+          "text": "Cementos, morteros, hormigones y preparaciones similares, refractarios, incluido el aglomerado de dolomita, excepto los productos de la partida 38.01.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_1_p16176",
+          "score": 0.015873015873015872,
+          "text": "Castinas; piedras para la fabricación de cal o de cemento.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_1",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Cementos para aplicaciones industriales en refinerías"
+      ],
+      "exclusions": [
+        "Cementos para construcción general",
+        "Cementos no refractarios"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_4",
+      "years": [
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "5",
+    "query": "BOLSA DE ALUMINIO THE CHURCH OF JESUS CHRIST OF LATTERDAY SAINTS ENVASE DE ALIMENTOS 14713000 27.94 cm x 33.02 cm BOLSA CON 75 UNIDADES ALUMINIO BOLSA PARA ALMACENAR ALIMENTOS",
+    "request": {
+      "user_query": "BOLSA DE ALUMINIO THE CHURCH OF JESUS CHRIST OF LATTERDAY SAINTS ENVASE DE ALIMENTOS 14713000 27.94 cm x 33.02 cm BOLSA CON 75 UNIDADES ALUMINIO BOLSA PARA ALMACENAR ALIMENTOS",
+      "conversation_id": "log_5"
+    },
+    "start_ts": 1770142714.2363276,
+    "end_ts": 1770142718.7572336,
+    "latency_s": 4.5209059715271,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "7612.90",
+          "description": "Bolsas de aluminio para el almacenamiento de alimentos",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_5_p1874",
+          "score": 0.01639344262295082,
+          "text": "- - De potencia inferior o igual a 1.500 W y de capacidad del depósito o bolsa para el polvo inferior o igual a 20 l",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_4_p6558",
+          "score": 0.01639344262295082,
+          "text": "Depósitos, barriles, tambores, bidones, botes, cajas y recipientes similares, de aluminio (incluidos los envases tubulares rígidos o flexibles), para cualquier materia (excepto gas comprimido o licuado), de capacidad inferior o igual a 300 l, sin dispositivos mecánicos ni térmicos, incluso con revestimiento interior o calorífugo.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_4",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17445",
+          "score": 0.016129032258064516,
+          "text": "- - Para llantas de diámetro superior a 61 cm, con altos relieves en forma de taco, ángulo o similares",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel 2026_4.pdf_p437",
+          "score": 0.016129032258064516,
+          "text": "Depósitos, barriles, tambores, bidones, botes, cajas y recipientes similares, de aluminio (incluidos los envases tubulares rígidos o flexibles), para cualquier materia (excepto gas comprimido o licuado), de capacidad inferior o igual a 300 l, sin dispositivos mecánicos ni térmicos, incluso con revestimiento interior o calorífugo.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel 2026_4.pdf",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_3_p409",
+          "score": 0.015873015873015872,
+          "text": "4. Las partidas 61.05 y 61.06 no comprenden las prendas de vestir con bolsillos por debajo de la cintura o con acanalado elástico u otro medio para ceñir el bajo de la prenda, ni las prendas que tengan una media inferior a 10 puntos por centímetro lineal en cada dirección, contados en una superficie mínima de 10 cm x 10 cm. La partida 61.05 no comprende las prendas sin mangas.",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_3",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Envases de aluminio para alimentos",
+        "Bolsas de almacenar alimentos"
+      ],
+      "exclusions": [
+        "Envases para gas comprimido",
+        "Envases de capacidad superior a 300 litros"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_5",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "6",
+    "query": "YARA PERLADA FERTILIZANTE SACOS UREA PARA USO AGRICOLA",
+    "request": {
+      "user_query": "YARA PERLADA FERTILIZANTE SACOS UREA PARA USO AGRICOLA",
+      "conversation_id": "log_6"
+    },
+    "start_ts": 1770142718.7572336,
+    "end_ts": 1770142723.6821558,
+    "latency_s": 4.924922227859497,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "3102.10",
+          "description": "Fertilizantes minerales o químicos nitrogenados, en forma sólida, sulfurados, como la urea, utilizados en la agricultura",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_2_p17545",
+          "score": 0.01639344262295082,
+          "text": "Cámaras de caucho para neumáticos (llantas neumáticas).",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_2_p295",
+          "score": 0.01639344262295082,
+          "text": "- - - Para uso veterinario, uso agrícola o en la industria alimenticia",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_2",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17469",
+          "score": 0.016129032258064516,
+          "text": "Neumáticos (llantas neumáticas) recauchutados o usados, de caucho; bandajes (llantas macizas o huecas), bandas de rodadura para neumáticos (llantas neumáticas) y protectores («flaps»), de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p9603",
+          "score": 0.016129032258064516,
+          "text": "-- - Para uso veterinario, uso agrícola o en la industria alimenticia",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17341",
+          "score": 0.015873015873015872,
+          "text": "Neumáticos (llantas neumáticas) nuevos de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Urea para uso agrícola"
+      ],
+      "exclusions": [
+        "Fertilizantes líquidos",
+        "Mezclas de fertilizantes",
+        "Otros productos químicos no fertilizantes"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_6",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "7",
+    "query": "BOLA DE PLAYA NIVEA PLEGADA INFLABLE UNIDADES BOLA DE PLAYA INFLABLE PELOTA DE PLAYA PARA JUEGO AL AIRE",
+    "request": {
+      "user_query": "BOLA DE PLAYA NIVEA PLEGADA INFLABLE UNIDADES BOLA DE PLAYA INFLABLE PELOTA DE PLAYA PARA JUEGO AL AIRE",
+      "conversation_id": "log_7"
+    },
+    "start_ts": 1770142723.6821558,
+    "end_ts": 1770142727.8388164,
+    "latency_s": 4.156660556793213,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "9506.99",
+          "description": "Pelotas de playa inflables para juego al aire",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_5_p13306",
+          "score": 0.01639344262295082,
+          "text": "- - - - Puntas de bolígrafo, incluso sin bola",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_4_p691",
+          "score": 0.01639344262295082,
+          "text": "- Barcos de vela, distintos de los inflables, incluso con motor auxiliar:",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_4",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel 2026_5.pdf_p612",
+          "score": 0.016129032258064516,
+          "text": "- - - - Puntas de bolígrafo, incluso sin bola",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel 2026_5.pdf",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_5_p12802",
+          "score": 0.016129032258064516,
+          "text": "- Balones y pelotas, excepto las de golf o tenis de mesa:",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_5_p207",
+          "score": 0.015873015873015872,
+          "text": "- - - - Puntas de bolígrafo, incluso sin bola",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_5",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Pelotas y bolas de playa inflables"
+      ],
+      "exclusions": [
+        "Pelotas utilizadas en deportes específicos como golf o tenis de mesa"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_7",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "8",
+    "query": "CUADRO SIN MARCO CUADRO SIN MARCO PARA TEMPLO EN CBBA. FDM127888 50X105 UNIDAD PARA TEMPLO RELIGIOSO",
+    "request": {
+      "user_query": "CUADRO SIN MARCO CUADRO SIN MARCO PARA TEMPLO EN CBBA. FDM127888 50X105 UNIDAD PARA TEMPLO RELIGIOSO",
+      "conversation_id": "log_8"
+    },
+    "start_ts": 1770142727.8388164,
+    "end_ts": 1770142732.5249665,
+    "latency_s": 4.686150074005127,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "9405.49",
+          "description": "Cuadros sin marco para templos religiosos, unidad de medida 50x105 cm",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_4_p5533",
+          "score": 0.01639344262295082,
+          "text": "CUADRO - Otros elementos",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_4",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_3_p2303",
+          "score": 0.01639344262295082,
+          "text": "Marcos de madera para cuadros, fotografías, espejos u objetos similares.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_3",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_4_p6053",
+          "score": 0.016129032258064516,
+          "text": "CUADRO - Otros elementos",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_4",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel 2026_5.pdf_t71",
+          "score": 0.016129032258064516,
+          "text": "| CÓDIGO | DESCRIPCIÓN DE LA MERCANCÍA | GA % | ICE - IEHD | Unidad de Medida | Despacho en Frontera | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n|  |  |  |  |  |  | Tipo de Doc | Entidad que emite | Disp. Legal | CAN ACE 36 ACE 47 VEN | ACE\nChi | 22\nProt | ACE 66 MÉXICO |\n| 9405.49 | - - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n|  | - - - De los tipos utilizados para el alumbrado de espacios o vías públicas: |  |  |  |  |  |  |  |  |  |  |  |\n| 9405.49.11.00 | -- - - Proyectores de luz | 15 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 9405.49.19.00 | - - - - Los demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 9405.49.90.00 | - - Los demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 9405.50 | - Luminarias y aparatos de alumbrado, no eléctricos: |  |  |  |  |  |  |  |  |  |  |  |\n| 9405.50.10.00 | - - De combustible líquido a presión | 20 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 9405.50.90.00 | - - Los demás | 20 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - Anuncios, letreros y placas indicadoras, luminosos y artículos similares: |  |  |  |  |  |  |  |  |  |  |  |\n| 9405.61.00.00 | - - Diseñados para ser utilizados únicamente con fuentes luminosas de diodos emisores de luz (LED) | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 9405.69.00.00 | - - Los demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - Partes: |  |  |  |  |  |  |  |  |  |  |  |\n| 9405.91.00.00 | - - De vidrio | 15 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 9405.92.00.00 | - - De plástico | 15 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 9405.99.00.00 | - - Las demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 94.06 | Construcciones prefabricadas. |  |  |  |  |  |  |  |  |  |  |  |\n| 9406.10.00.00 | - De madera | 10 |  | u |  | C | MDPRyA (SENASAG) | Ley 830 | 100 |  |  | 100 |\n| 9406.20.00.00 | - Unidades de construcción modular, de acero | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 9406.90.00.00 | - Las demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |",
+          "bucket": "afr_2026",
+          "unit": "table",
+          "doc_id": "Arancel 2026_5.pdf",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_4_p6238",
+          "score": 0.015873015873015872,
+          "text": "CUADRO - Otros elementos",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_4",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Cuadros sin marco",
+        "Espejos",
+        "Elementos decorativos para templos"
+      ],
+      "exclusions": [
+        "Cuadros enmarcados",
+        "Elementos no decorativos"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_8",
+      "years": [
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "9",
+    "query": "CASAL DEL REY CIA S.R.L. ACELERADOR DE SECADO 12% TAMBORES DE 250KG COBALTO PARA USO EN PINTURAS AL ACEITE",
+    "request": {
+      "user_query": "CASAL DEL REY CIA S.R.L. ACELERADOR DE SECADO 12% TAMBORES DE 250KG COBALTO PARA USO EN PINTURAS AL ACEITE",
+      "conversation_id": "log_9"
+    },
+    "start_ts": 1770142732.5254939,
+    "end_ts": 1770142736.6178908,
+    "latency_s": 4.092396974563599,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "3811.90",
+          "description": "Aceleradores de secado, preparados, utilizados en pinturas al aceite, en tambores de 250 kg",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_2_p398",
+          "score": 0.01639344262295082,
+          "text": "5. En este Capítulo, la expresión materias colorantes no comprende los productos de los tipos utilizados como carga en las pinturas al aceite, incluso si se utilizan también como pigmentos colorantes en las pinturas al agua.",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_2",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p14031",
+          "score": 0.01639344262295082,
+          "text": "- Aceleradores de vulcanización preparados",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17545",
+          "score": 0.016129032258064516,
+          "text": "Cámaras de caucho para neumáticos (llantas neumáticas).",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel 2026_2.pdf_t66",
+          "score": 0.016129032258064516,
+          "text": "| CÓDIGO | DESCRIPCIÓN DE LA MERCANCÍA | GA % | ICE - IEHD | Unidad de Medida | Despacho en Frontera | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n|  |  |  |  |  |  | Tipo de Doc | Entidad que emite | Disp. Legal | CAN ACE 36 ACE 47 VEN | ACE\nChi | 22\nProt | ACE 66 MÉXICO |\n| 38.01 | Grafito artificial; grafito coloidal o semicoloidal; preparaciones a base de grafito u otros carbonos, en pasta, bloques, plaquitas u otras semimanufacturas. |  |  |  |  |  |  |  |  |  |  |  |\n| 3801.10.00.00 | - Grafito artificial | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 3801.20.00.00 | - Grafito coloidal o semicoloidal | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 3801.30.00.00 | - Pastas carbonosas para electrodos y pastas similares para el revestimiento interior de hornos | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 3801.90.00.00 | - Las demás | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 38.02 | Carbón activado; materias minerales naturales activadas; negro de origen animal, incluido el agotado. |  |  |  |  |  |  |  |  |  |  |  |\n| 3802.10.00.00 | - Carbón activado | 10 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 3802.90 | - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 3802.90.10 | - - Harinas silíceas fósiles (por ejemplo: «Kieselguhr», tripolita, diatomita) activadas: |  |  |  |  |  |  |  |  |  |  |  |\n| 3802.90.10.10 | - - - Kieselguhr | 5 |  | kg | RM 016 |  |  |  | 100 | 100 | II | 100 |\n| 3802.90.10.90 | - - - Los demás | 5 |  | kg | RM 016 |  |  |  | 100 |  |  | 100 |\n| 3802.90.20.00 | - - Negro de origen animal, incluido el agotado | 5 |  | kg | RM 016 |  |  |  | 100 |  |  | 100 |\n| 3802.90.90.00 | - - Los demás | 5 |  | kg | RM 016 |  |  |  | 100 |  |  | 100 |\n| 3803.00.00.00 | «Tall oil», incluso refinado. | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |\n|  |  |  |  |  |  |  |  |  |  |  |  |  |\n| 3804.00 | Lejías residuales de la fabricación de pastas de celulosa, aunque estén concentradas, desazucaradas o tratadas químicamente, incluidos los lignosulfonatos, excepto el «tall oil» de la partida 38.03. |  |  |  |  |  |  |  |  |  |  |  |\n| 3804.00.10.00 | - Lignosulfitos, incluidos los lignosulfonatos | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 3804.00.90.00 | - Los demás | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 38.05 | Esencias de trementina, de madera de pino o de pasta celulósica al sulfato (sulfato de trementina) y demás esencias terpénicas procedentes de la destilación o de otros tratamientos de la madera de coníferas; dipenteno en bruto; esencia de pasta celulósica al bisulfito (bisulfito de trementina) y demás paracimenos en bruto; aceite de pino con alfa-terpineol como componente principal. |  |  |  |  |  |  |  |  |  |  |  |\n| 3805.10.00.00 | - Esencias de trementina, de madera de pino o de pasta celulósica al sulfato (sulfato de trementina) | 5 |  | kg |  | AP | M. GOBIERNO (DGSC) | D.S. 3434 | 100 |  |  | 100 |\n| 3805.90 | - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 3805.90.10.00 | - - Aceite de pino | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 3805.90.90.00 | - - Los demás | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 38.06 | Colofonias y ácidos resínicos, y sus derivados; esencia y aceites de colofonia; gomas fundidas. |  |  |  |  |  |  |  |  |  |  |  |\n| 3806.10.00.00 | - Colofonias y ácidos resínicos | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |",
+          "bucket": "afr_2026",
+          "unit": "table",
+          "doc_id": "Arancel 2026_2.pdf",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17469",
+          "score": 0.015873015873015872,
+          "text": "Neumáticos (llantas neumáticas) recauchutados o usados, de caucho; bandajes (llantas macizas o huecas), bandas de rodadura para neumáticos (llantas neumáticas) y protectores («flaps»), de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [],
+      "exclusions": [],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_9",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "10",
+    "query": "ECUACOFFEE KIBBLED ECL028 25KG. CADA UNO SACOS CACAO PARA LA FABRICACION DE CHOCOLATES",
+    "request": {
+      "user_query": "ECUACOFFEE KIBBLED ECL028 25KG. CADA UNO SACOS CACAO PARA LA FABRICACION DE CHOCOLATES",
+      "conversation_id": "log_10"
+    },
+    "start_ts": 1770142736.6184044,
+    "end_ts": 1770142741.2630324,
+    "latency_s": 4.644628047943115,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "1804.00",
+          "description": "Cacao (cacao en grano, sin elaborar), en cualquier forma, incluso para la fabricación de chocolate",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_2_p17545",
+          "score": 0.01639344262295082,
+          "text": "Cámaras de caucho para neumáticos (llantas neumáticas).",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_1_t77",
+          "score": 0.01639344262295082,
+          "text": "| CÓDIGO | DESCRIPCIÓN DE LA MERCANCÍA | GA % | ICE - IEHD | Unidad de Medida | Despacho en Frontera | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n|  |  |  |  |  |  | Tipo de Doc | Entidad que emite | Disp. Legal | CAN ACE 36 ACE 47 VEN | ACE\nChi | 22\nProt | ACE 66 MÉXICO |\n|  | Manteca de cacao: |  |  |  |  |  |  |  |  |  |  |  |\n| 1804.00.11.00 | - - Con un índice de acidez expresado en ácido oleico inferior o igual a 1 % | 15 |  | kq |  | C | MDRyT (SENASAG) | Ley 830 | 100 |  |  | 100 |\n| 1804.00.12.00 | - - Con un índice de acidez expresado en ácido oleico superior a 1 % pero inferior o igual a 1,65 % | 15 |  | kg |  | C | MDRyT (SENASAG) | Ley 830 | 100 |  |  | 100 |\n| 1804.00.13.00 | - - Con un índice de acidez expresado en ácido oleico superior a 1,65 % | 15 |  | kg |  | C | MDRyT (SENASAG) | Ley 830 | 100 |  |  | 100 |\n| 1804.00.20.00 | Grasa y aceite de cacao | 15 |  | kg |  | C | MDRyT (SENASAG) | Ley 830 | 100 |  |  | 100 |\n| 1805.00.00.00 | Cacao en polvo sin adición de azúcar ni otro edulcorante. | 10 |  | kg |  | C | MDRyT (SENASAG) | Ley 830 | 100 |  |  | 100 |\n|  |  |  |  |  |  |  |  |  |  |  |  |  |\n| 18.06 | Chocolate y demás preparaciones alimenticias que contengan cacao. |  |  |  |  |  |  |  |  |  |  |  |\n| 1806.10.00.00 | - Cacao en polvo con adición de azúcar u otro edulcorante | 10 |  | kg |  | C | MDRyT (SENASAG) | Ley 830 | 100 |  |  | 0 |\n| 1806.20 | - Las demás preparaciones, en bloques, tabletas o barras con peso superior a 2 kg, o en forma líquida, pastosa o en polvo, gránulos o formas similares, en recipientes o envases inmediatos con un contenido superior a 2 kg: |  |  |  |  |  |  |  |  |  |  |  |\n| 1806.20.10.00 | - - Sin adición de azúcar, ni otros edulcorantes | 20 |  | kg |  | C | MDRyT (SENASAG) | Ley 830 | 100 |  |  | 0 |\n| 1806.20.90.00 | - - Los demás | 20 |  | kg |  | C | MDRyT (SENASAG) | Ley 830 | 100 |  |  | 0 |\n|  | - Los demás, en bloques, tabletas o barras: |  |  |  |  |  |  |  |  |  |  |  |\n| 1806.31.00.00 | - - Rellenos | 10 |  | kg |  | C | MDRyT (SENASAG) | Ley 830 | 100 |  |  | 0 |\n| 1806.32.00.00 | - - Sin rellenar | 10 |  | kg |  | C | MDRyT (SENASAG) | Ley 830 | 100 |  |  | 0 |\n| 1806.90.00 | Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 1806.90.00.10 | - - Preparaciones para la alimentación infantil, con un contenido de cacao superior o igual al 40% en peso e inferior al 50 % en peso | 20 |  | kg |  | C | MDRyT (SENASAG) | Ley 830 | 100 | 100 | II | 0 |\n| 1806.90.00.90 | - - Los demás | 20 |  | kg |  | C | MDRyT (SENASAG) | Ley 830 | 100 |  |  | 0 |",
+          "bucket": "afr_2025",
+          "unit": "table",
+          "doc_id": "Arancel_Boliviano_2025_Parte_1",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17469",
+          "score": 0.016129032258064516,
+          "text": "Neumáticos (llantas neumáticas) recauchutados o usados, de caucho; bandajes (llantas macizas o huecas), bandas de rodadura para neumáticos (llantas neumáticas) y protectores («flaps»), de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_4_p11808",
+          "score": 0.016129032258064516,
+          "text": "- - Para la elaboración del cacao o fabricación de chocolate",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_4",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17341",
+          "score": 0.015873015873015872,
+          "text": "Neumáticos (llantas neumáticas) nuevos de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Cacao para la fabricación de chocolate"
+      ],
+      "exclusions": [
+        "Cacao en barra",
+        "Cacao en polvo"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_10",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "11",
+    "query": "MOCHILA REBEL PINK OTRO HEELYS MOCHILA OTRO REBEL PINK COD:1610010107 OTRO SIN REFERENCIA OTRO PIEZAS OTRO POLIESTER MOCHILAS PARA NIÑAS",
+    "request": {
+      "user_query": "MOCHILA REBEL PINK OTRO HEELYS MOCHILA OTRO REBEL PINK COD:1610010107 OTRO SIN REFERENCIA OTRO PIEZAS OTRO POLIESTER MOCHILAS PARA NIÑAS",
+      "conversation_id": "log_11"
+    },
+    "start_ts": 1770142741.2630324,
+    "end_ts": 1770142745.9421766,
+    "latency_s": 4.6791441440582275,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "4202.92",
+          "description": "Mochilas y artículos similares para el transporte de objetos, de materia textil, principalmente de poliéster, para niñas",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_1_p4724",
+          "score": 0.01639344262295082,
+          "text": "- - Sin adición de azúcar ni otro edulcorante:",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_1",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_2_t85",
+          "score": 0.01639344262295082,
+          "text": "| CÓDIGO | DESCRIPCIÓN DE LA MERCANCÍA | GA % | ICE - IEHD | Unidad de Medida | Despacho en Frontera | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n|  |  |  |  |  |  | Tipo de Doc | Entidad que emile | Disp. Legal | CAN ACE 36 ACE 47 VEN | ACE\nChi | 22\nProt | ACE 66 MÉXICO |\n| 4201.00.00.00 | Artículos de talabartería o guarnicionería para todos los animales (incluidos los tiros, traíllas, rodilleras, bozales, sudaderos, alforjas, abrigos para perros y artículos similares), de cualquier materia. | 20 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  |  |  |  |  |  |  |  |  |  |  |  |  |\n|  | Baúles, maletas (valijas), maletines, incluidos los de aseo y los portadocumentos, portafolios (carteras de mano), cartapacios, fundas y estuches para gafas (anteojos), binoculares, cámaras fotográficas o cinematográficas, instrumentos musicales o armas y continentes similares; sacos de viaje, sacos (bolsas) aislantes para alimentos y bebidas, bolsas de aseo, mochilas, |  |  |  |  |  |  |  |  |  |  |  |\n|  |  |  |  |  |  |  |  |  |  |  |  |  |\n| 42.02 | bolsos de mano (carteras), bolsas para la compra, billeteras, portamonedas, |  |  |  |  |  |  |  |  |  |  |  |\n|  | portamapas, petacas, pitilleras y bolsas para tabaco, bolsas para herramientas y para artículos de deporte, estuches para frascos y botellas, estuches para joyas, |  |  |  |  |  |  |  |  |  |  |  |\n|  |  |  |  |  |  |  |  |  |  |  |  |  |\n|  | polveras, estuches para orfebrería y continentes similares, de cuero natural o regenerado, hojas de plástico, materia textil, fibra vulcanizada o cartón, o recubiertos totalmente o en su mayor parte con esas materias o papel. |  |  |  |  |  |  |  |  |  |  |  |\n|  |  |  |  |  |  |  |  |  |  |  |  |  |\n|  | - Baúles, maletas (valijas) y maletines, incluidos los de aseo y los portadocumentos, portafolios (carteras de mano), cartapacios y continentes similares: |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.11 | - - Con la superficie exterior de cuero natural o cuero regenerado: |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.11.10 | - - - Baúles, maletas (valijas) y maletines, incluidos los de aseo, y continentes similares: |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.11.10.10 | - - - - Baules, maletas (valijas) y maletines | 20 |  | u |  | DJ | IBMETRO | D.S. 4615 | 100 | 50 | VII | 100 |\n| 4202.11.10.90 | - - - - Los demás | 20 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 4202.11.90.00 | - - - Los demás | 20 |  | u |  | DJ | IBMETRO | D.S. 4615 | 100 |  |  | 100 |\n| 4202.12 | - - Con la superficie exterior de plástico o materia textil: |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.12.10 | - - - Baúles, maletas (valijas) y maletines, incluidos los de aseo, y continentes similares: |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.12.10.10 | - - - - Baúles, maletas (valijas) y maletines, incluidos los de asco | 40 |  | u |  | DJ | IBMETRO | D.S. 4615 | 100 |  |  | 100 |\n| 4202.12.10.90 | - - - - Los demás | 40 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 4202.12.90.00 | - - - Los demas | 40 |  | u |  | DJ | IBMETRO | D.S. 4615 | 100 |  |  | 100 |\n| 4202.19.00 | - - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.19.00.10 | - - - Baúles, maletas (valijas) y maletines, incluidos los de aseo, y continentes similares | 40 |  | u |  | DJ | IBMETRO | D.S. 4615 | 100 |  |  | 100 |\n| 4202.19.00.90 | - - - Los demás | 40 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - Bolsos de mano (carteras), incluso con bandolera o sin asas: |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.21.00 | - - Con la superficie exterior de cuero natural o cuero regenerado: |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.21.00.10 | - - - De reptil- | 20 |  | u |  | CITES DJ | MMAyA (VMABCCGDF) - IBMETRO | D.S. 3048 - D.S 4615 | 100 |  |  | 100 |\n| 4202.21.00.90 | - - - Los demás | 20 |  | u |  | DJ | IBMETRO | D.S. 4615 | 100 |  |  | 100 |\n| 4202.22.00.00 | - - Con la superficie exterior de hojas de plástico o materia textil | 40 |  | u |  | DJ | IBMETRO | D.S. 4615 | 100 | 50 | VII | 100 |\n| 4202.29.00.00 | - - Los demás | 40 |  | u |  | DJ | IBMETRO | D.S. 4615 | 100 | 50 | VII | 100 |\n|  | - Articulos de bolsillo o de bolso de mano (cartera): |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.31.00 | - - Con la superficie exterior de cuero natural o cuero regenerado: |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.31.00.10 | - - - De reptil | 20 |  | u |  | CITES | MMAyA (VMABCCGDF) | D.S. 3048 | 100 |  |  | 100 |\n| 4202.31.00.90 | - - - Los demás | 20 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 4202.32.00.00 | - - Con la superficie exterior de hojas de plástico o materia textil | 40 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 4202.39.00.00 | - - Los demás | 40 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.91 | - - Con la superficie exterior de cuero natural o cuero regenerado: |  |  |  |  |  |  |  |  |  |  |  |\n| 4202.91.10.00 | - - - Sacos de viaje y mochilas | 20 |  | u |  | DJ | IBMETRO | D.S. 4615 | 100 | 50 | VII | 100 |\n| 4202.91.90.00 | - - - Los demás | 20 |  | u |  |  |  |  | 100 | 50 | VII | 100 |",
+          "bucket": "afr_2025",
+          "unit": "table",
+          "doc_id": "Arancel_Boliviano_2025_Parte_2",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_1_p4809",
+          "score": 0.016129032258064516,
+          "text": "- - Sin adición de azúcar ni otro edulcorante:",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_1",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_3_p13057",
+          "score": 0.016129032258064516,
+          "text": "- Las demás prendas de vestir para mujeres o niñas",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_3",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_4_p2033",
+          "score": 0.015873015873015872,
+          "text": "- Trabajadas de otro modo:",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_4",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Mochilas para niñas de poliéster"
+      ],
+      "exclusions": [
+        "Artículos de talabartería"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_11",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "12",
+    "query": "UNIKA VAEV PARA TAPIZAR 55%ALGODON 45%POLIESTER 4.5´´X3.75´´H 54´´ ROLLO 55% ALGODON45%POLIESTER PARA TAPIZADO DE MUEBLES",
+    "request": {
+      "user_query": "UNIKA VAEV PARA TAPIZAR 55%ALGODON 45%POLIESTER 4.5´´X3.75´´H 54´´ ROLLO 55% ALGODON45%POLIESTER PARA TAPIZADO DE MUEBLES",
+      "conversation_id": "log_12"
+    },
+    "start_ts": 1770142745.9427083,
+    "end_ts": 1770142750.787042,
+    "latency_s": 4.844333648681641,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "5903.90",
+          "description": "Textiles de composición de fibras de algodón y poliéster para tapizado de muebles, presentados en rollos",
+          "confidence": 0.5225,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_2_p17545",
+          "score": 0.01639344262295082,
+          "text": "Cámaras de caucho para neumáticos (llantas neumáticas).",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_3_t35",
+          "score": 0.01639344262295082,
+          "text": "|  |  |  |  | Unidad de Medida |  | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| CÓDIGO | DESCRIPCIÓN | GA % | ICE - IEHD |  | Despacho en Frontera | Tipo de Doc |  |  | CAN ACE 36 ACE 47 VEN | ACE 22 |  | ACE 66 MÉXICO |\n|  | DE LA MERCANCÍA |  |  |  |  |  | Entidad que emite | Disp. Legal |  | Chi | Prot |  |\n| 56.01 | Guata de materia textil y artículos de esta guata; fibras textiles de longitud inferior o igual a 5 mm (tundizno), nudos y molas de materia textil. |  |  |  |  |  |  |  |  |  |  |  |\n|  | - Guata de materia textil y artículos de esta guata: |  |  |  |  |  |  |  |  |  |  |  |\n| 5601.21.00.00 | - - De algodón | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5601.22.00.00 | - - De fibras sintéticas o artificiales | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5601.29.00.00 | - - Los demás | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5601.30.00.00 | - Tundizno, nudos y motas de materia textil | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 56.02 | Fieltro, incluso impregnado, recubierto, revestido o estratificado. |  |  |  |  |  |  |  |  |  |  |  |\n| 5602.10.00.00 | - Fieltro punzonado y productos obtenidos mediante costura por cadeneta | 15 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n|  | - Los demás fieltros sin impregnar, recubrir, revestir ni estratificar. |  |  |  |  |  |  |  |  |  |  |  |\n| 5602.21.00.00 | - - De lana o pelo fino | 15 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 5602.29.00.00 | - - De las demás materias textiles | 15 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 5602.90.00.00 | - Los demás | 15 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 56.03 | Tela sin tejer, incluso impregnada, recubierta, revestida o estratificada. |  |  |  |  |  |  |  |  |  |  |  |\n|  | - De filamentos sintéticos o artificiales: |  |  |  |  |  |  |  |  |  |  |  |\n| 5603.11.00.00 | - - De peso inferior o igual a 25 g/m2 | 15 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 5603.12 | - - De peso superior a 25 g/m2 pero inferior o igual a 70 g/m2: |  |  |  |  |  |  |  |  |  |  |  |\n| 5603.12.10.00 | - - - De poliéster, impregnada con caucho estireno-butadieno de peso superior o igual a 43 g/m2, precortados con ancho inferior o igual a 75 mm | 10 |  | m2 |  |  |  |  | 100 |  |  | 100 |",
+          "bucket": "afr_2025",
+          "unit": "table",
+          "doc_id": "Arancel_Boliviano_2025_Parte_3",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17469",
+          "score": 0.016129032258064516,
+          "text": "Neumáticos (llantas neumáticas) recauchutados o usados, de caucho; bandajes (llantas macizas o huecas), bandas de rodadura para neumáticos (llantas neumáticas) y protectores («flaps»), de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_3_p9034",
+          "score": 0.016129032258064516,
+          "text": "CAPÍTULO 57 ALFOMBRAS Y DEMÁS REVESTIMIENTOS PARA EL SUELO, DE MATERIA TEXTIL",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_3",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_3_p4865",
+          "score": 0.015873015873015872,
+          "text": "c) cuando los Capítulos 54 y 55 entren en juego con otro Capítulo, estos dos Capítulos se consideran como uno solo;",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_3",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Textiles para tapizado",
+        "Textiles de composición de algodón y poliéster"
+      ],
+      "exclusions": [],
+      "missing_fields": [
+        "es tejido punto o no tejido"
+      ],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_12",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "13",
+    "query": "MICACL CLARA WELD WELL® MICA CLARA PARA PROTECTOR FACIAL WW2011C CAJA DE 200 PZS. POLICARBONATO PROTEGE LA CABEZA Y CERVICALES DE PELIGROS Y GOLPES",
+    "request": {
+      "user_query": "MICACL CLARA WELD WELL® MICA CLARA PARA PROTECTOR FACIAL WW2011C CAJA DE 200 PZS. POLICARBONATO PROTEGE LA CABEZA Y CERVICALES DE PELIGROS Y GOLPES",
+      "conversation_id": "log_13"
+    },
+    "start_ts": 1770142750.7875662,
+    "end_ts": 1770142755.532688,
+    "latency_s": 4.745121717453003,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "8424.20",
+          "description": "Equipos de protección personal y sus partes, como protectores faciales de poliestireno o policarbonato",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_2_p17469",
+          "score": 0.01639344262295082,
+          "text": "Neumáticos (llantas neumáticas) recauchutados o usados, de caucho; bandajes (llantas macizas o huecas), bandas de rodadura para neumáticos (llantas neumáticas) y protectores («flaps»), de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_5_p196",
+          "score": 0.01639344262295082,
+          "text": "- - Cabezas preparadas para artículos de cepillería",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_5",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17545",
+          "score": 0.016129032258064516,
+          "text": "Cámaras de caucho para neumáticos (llantas neumáticas).",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p16692",
+          "score": 0.016129032258064516,
+          "text": "- - Máscaras especiales para la protección de trabajadores",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17341",
+          "score": 0.015873015873015872,
+          "text": "Neumáticos (llantas neumáticas) nuevos de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Protectores faciales y sus partes"
+      ],
+      "exclusions": [
+        "Artículos de cepillería",
+        "Neumáticos"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_13",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "14",
+    "query": "FOX INDUSTRIES 2.83.0MM BALDES X 25KG. INDUSTRIAL",
+    "request": {
+      "user_query": "FOX INDUSTRIES 2.83.0MM BALDES X 25KG. INDUSTRIAL",
+      "conversation_id": "log_14"
+    },
+    "start_ts": 1770142755.53322,
+    "end_ts": 1770142760.4200664,
+    "latency_s": 4.886846303939819,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "9999.00",
+          "description": "Clasificación pendiente - Necesita más información",
+          "confidence": 0.5525,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_2_p17341",
+          "score": 0.01639344262295082,
+          "text": "Neumáticos (llantas neumáticas) nuevos de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_3_p77",
+          "score": 0.01639344262295082,
+          "text": "- - Barnizados, con peso específico superior a 1, incluso gofrados",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_3",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17469",
+          "score": 0.016129032258064516,
+          "text": "Neumáticos (llantas neumáticas) recauchutados o usados, de caucho; bandajes (llantas macizas o huecas), bandas de rodadura para neumáticos (llantas neumáticas) y protectores («flaps»), de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_4_p10604",
+          "score": 0.016129032258064516,
+          "text": "- Básculas y balanzas para pesada continua sobre transportador",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_4",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17545",
+          "score": 0.015873015873015872,
+          "text": "Cámaras de caucho para neumáticos (llantas neumáticas).",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [],
+      "inclusions": [],
+      "exclusions": [],
+      "missing_fields": [
+        "de que material estan hechos los baldes esto ayuda a determinar la clasificacion correcta",
+        "son baldes vacios llenos o contienen algun tipo de producto dentro"
+      ],
+      "warnings": [
+        "La descripción del producto es muy general. Se necesita más información para clasificar correctamente.",
+        "No se pudo determinar clasificación automática"
+      ],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_14",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "15",
+    "query": "SPOT NEGRO TOTTO REFLECTORES PARA SOBRE PONER DE DESCARGA QUALITAS LED COB DE 35W 3000°K CRI80 80% metal 20% vidrio UNIDAD METAL PARA EQUIPAMIENTO DE TIENDA",
+    "request": {
+      "user_query": "SPOT NEGRO TOTTO REFLECTORES PARA SOBRE PONER DE DESCARGA QUALITAS LED COB DE 35W 3000°K CRI80 80% metal 20% vidrio UNIDAD METAL PARA EQUIPAMIENTO DE TIENDA",
+      "conversation_id": "log_15"
+    },
+    "start_ts": 1770142760.4207213,
+    "end_ts": 1770142765.4209974,
+    "latency_s": 5.0002760887146,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "9405.40",
+          "description": "Lámparas y aparatos de alumbrado, incluidos los reflectores, para uso doméstico o comercial",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_4_p13733",
+          "score": 0.01639344262295082,
+          "text": "- Máquinas automáticas para tratamiento o procesamiento de datos, portátiles, de peso inferior o igual a 10 kg, que estén constituidas, al menos, por una unidad central de proceso, un teclado y un visualizador:",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_4",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_5_p3991",
+          "score": 0.01639344262295082,
+          "text": "- - - Para aparatos de alumbrado de carretera o señalización visual de la partida 85.12, excepto las de interior de velocípedos y vehículos automóviles",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_4_p208",
+          "score": 0.016129032258064516,
+          "text": "2. En la subpartida 8471.49, se entiende por sistemas las máquinas automáticas para tratamiento o procesamiento de datos cuyas unidades cumplan con todas las condiciones establecidas en la Nota 6 C) del Capítulo 84 y constituidas, al menos, por una unidad central de proceso, una unidad de entrada (por ejemplo: un teclado o un escáner) y una unidad de salida (por ejemplo: un visualizador o una impresora).",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_4",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel 2026_5.pdf_p157",
+          "score": 0.016129032258064516,
+          "text": "- - - Para aparatos de alumbrado de carretera o señalización visual de la partida 85.12, excepto las de interior de velocípedos y vehículos automóviles",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel 2026_5.pdf",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_4_t50",
+          "score": 0.015873015873015872,
+          "text": "| CÓDIGO | DESCRIPCIÓN DE LA MERCANCÍA | GA % | ICE - IEHD | Unidad de Medida | Despacho en Frontera | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n|  |  |  |  |  |  | Tipo de Doc | Entidad que emite | Disp. Legal | CAN ACE 36 ACE 47 VEN | ACE 22 |  | ACE 66 MÉXICO |\n|  |  |  |  |  |  |  |  |  |  | Chi | Prot |  |\n| 84.71 | Máquinas automáticas para tratamiento o procesamiento de datos y sus unidades; lectores magnéticos u ópticos, máquinas para registro de datos sobre soporte en forma codificada y máquinas para tratamiento o procesamiento de estos datos, no expresados ni comprendidos en otra parte. |  |  |  |  |  |  |  |  |  |  |  |\n| 8471.30.00 | - Máquinas automáticas para tratamiento o procesamiento de datos, portátiles, de peso inferior o igual a 10 kg, que estén constituidas, al menos, por una unidad central de proceso, un teclado y un visualizador. |  |  |  |  |  |  |  |  |  |  |  |\n| 8471.30.00.10 | - - Tablet que incluya número IMEI | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8471.30.00.90 | - - Las demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - Las demás máquinas automáticas para tratamiento o procesamiento de datos: |  |  |  |  |  |  |  |  |  |  |  |\n| 8471.41.00.00 | - - Que incluyan en la misma envoltura, al menos, una unidad central de proceso y, aunque estén combinadas, una unidad de entrada y una de salida | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8471.49.00.00 | - - Las demás presentadas en forma de sistemas | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8471.50.00.00 | - Unidades de proceso, excepto las de las subpartidas 8471.41 u 8471.49, aunque incluyan en la misma envoltura uno o dos de los tipos siguientes de unidades: unidad de memoria, unidad de entrada y unidad de salida | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8471.60 | - Unidades de entrada o salida, aunque incluyan unidades de memoria en la misma envoltura: |  |  |  |  |  |  |  |  |  |  |  |\n| 8471.60.20.00 | - - Teclados, dispositivos por coordenadas x-y | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8471.60.90.00 | - - Las demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8471.70.00.00 | - Unidades de memoria | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8471.80.00.00 | - Las demás unidades de máquinas automáticas para tratamiento o procesamiento de datos | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8471.90.00.00 | - Los demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 84.72 | Las demás máquinas y aparatos de oficina (por ejemplo: copiadoras hectográficas, mimeógrafos, máquinas de imprimir direcciones, distribuidores automáticos de billetes de banco, máquinas de clasificar, contar o encartuchar monedas, sacapuntas, perforadoras, grapadoras). |  |  |  |  |  |  |  |  |  |  |  |\n| 8472.10.00.00 | - Copiadoras, incluidos los mimeógrafos | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8472.30.00.00 | - Máquinas de clasificar, plegar, meter en sobres o colocar en fajas, correspondencia, máquinas de abrir, cerrar o precintar correspondencia y máquinas de colocar u obliterar sellos (estampillas) | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8472.90 | - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 8472.90.10.00 | - - Máquinas de clasificar o contar monedas o billetes de banco | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8472.90.20.00 | - - Distribuidores automáticos de billetes de banco | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8472.90.30.00 | - - Aparatos para autenticar cheques | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8472.90.40.00 | - - Perforadoras o grapadoras | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8472.90.50.00 | - - Cajeros automáticos | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8472.90.90 | - - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 8472.90.90.10 | - - - Máquinas de imprimir direcciones o estampar placas de direcciones | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8472.90.90.90 | - - - Los demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 84.73 | Partes y accesorios (excepto los estuches, fundas y similares) identificables como destinados, exclusiva o principalmente, a las máquinas o aparatos de las partidas 84.70 a 84.72. |  |  |  |  |  |  |  |  |  |  |  |\n|  | - Partes y accesorios de máquinas de la partida 84.70: |  |  |  |  |  |  |  |  |  |  |  |\n| 8473.21.00.00 | - - De máquinas de calcular electrónicas de las subpartidas 8470.10, 8470.21 u 8470.29 | 5 |  | u |  |  |  |  | 100 |  |  | 100 |",
+          "bucket": "afr_2025",
+          "unit": "table",
+          "doc_id": "Arancel_Boliviano_2025_Parte_4",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Reflectores LED",
+        "Equipamiento de tienda"
+      ],
+      "exclusions": [
+        "Aparatos de alumbrado de carretera"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_15",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "16",
+    "query": "TELA Dormeuil Tejido Plano forro 72 899 476 385 120 grms/mt 52% viscosa 48% acetato rollo de 9 mts viscosa/acetato confección ternos",
+    "request": {
+      "user_query": "TELA Dormeuil Tejido Plano forro 72 899 476 385 120 grms/mt 52% viscosa 48% acetato rollo de 9 mts viscosa/acetato confección ternos",
+      "conversation_id": "log_16"
+    },
+    "start_ts": 1770142765.4209974,
+    "end_ts": 1770142769.7779229,
+    "latency_s": 4.3569254875183105,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "5407.99",
+          "description": "Tejidos de fibras sintéticas o artificiales, no clasificados en otra parte",
+          "confidence": 0.5525,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_3_t28",
+          "score": 0.030798389007344232,
+          "text": "| CÓDIGO | DESCRIPCIÓN DE LA MERCANCÍA | GA % | ICE - IEHD | Unidad de Medida | Despacho en Frontera | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n|  |  |  |  |  |  | Tipo de Doc | Entidad que emite | Disp. Legal | CAN ACE 36 ACE 47 VEN | ACE\nChi | 22\nProt | ACE 66 MÉXICO |\n| 5403.10.00.00 | - Hilados de alta tenacidad de rayón viscosa | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n|  | - Los demás hilados sencillos: |  |  |  |  |  |  |  |  |  |  |  |\n| 5403.31.00.00 | - - De rayón viscosa, sin torsión o con una torsión inferior o igual a 120 vueltas por metro | 10 |  | kg | RM 016 |  |  |  | 100 |  |  | 100 |\n| 5403.32.00.00 | - - De rayón viscosa, con una torsión superior a 120 vueltas por metro | 15 |  | kg | RM 016 |  |  |  | 100 |  |  | 100 |\n| 5403.33.00.00 | - - De acetato de celulosa | 10 |  | kg | RM 016 |  |  |  | 100 |  |  | 100 |\n| 5403.39.00.00 | - - Los demás | 15 |  | kg | RM 016 |  |  |  | 100 |  |  | 100 |\n|  | - Los demás hilados retorcidos o cableados: |  |  |  |  |  |  |  |  |  |  |  |\n| 5403.41.00.00 | - - De rayón viscosa | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5403.42.00.00 | - - De acetato de celulosa | 10 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5403.49.00.00 | - - Los demás | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 54.04 | Monofilamentos sintéticos de título superior o igual a 67 decitex y cuya mayor dimensión de la sección transversal sea inferior o igual a 1 mm; tiras y formas similares (por ejemplo, paja artificial) de materia textil sintética, de anchura aparente inferior o igual a 5 mm. |  |  |  |  |  |  |  |  |  |  |  |\n|  | Monofilamentos: |  |  |  |  |  |  |  |  |  |  |  |\n| 5404.11 | - - De elastómeros: |  |  |  |  |  |  |  |  |  |  |  |\n| 5404.11.10.00 | - - - De poliuretano | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5404.11.90.00 | - - - Los demás | 10 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5404.12.00.00 | - - Los demás, de polipropileno | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5404.19 | - - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 5404.19.10.00 | - - - De poliuretano | 5 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5404.19.90.00 | - - - Los demás | 10 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5404.90.00.00 | - Las demás | 10 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5405.00.00.00 | Monofilamentos artificiales de título superior o igual a 67 decitex y cuya mayor dimensión de la sección transversal sea inferior o igual a 1 mm; tiras y formas similares (por ejemplo, paja artificial) de materia textil artificial, de anchura aparente inferior o igual a 5 mm. | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n|  |  |  |  |  |  |  |  |  |  |  |  |  |\n| 5406.00 | Hilados de filamentos sintéticos o artificiales (excepto el hilo de coser), acondicionados para la venta al por menor. |  |  |  |  |  |  |  |  |  |  |  |\n| 5406.00.10.00 | - Hilados de filamentos sintéticos | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5406.00.90.00 | - Hilados de filamentos artificiales | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 54.07 | Tejidos de hilados de filamentos sintéticos, incluidos los tejidos fabricados con los productos de la partida 54.04. |  |  |  |  |  |  |  |  |  |  |  |\n| 5407.10 | - Tejidos fabricados con hilados de alta tenacidad de nailon o demás poliamidas o de poliésteres: |  |  |  |  |  |  |  |  |  |  |  |\n| 5407.10.10.00 | - - Para la fabricación de neumáticos | 20 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 5407.10.90.00 | - - Los demás | 20 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 5407.20.00.00 | - Tejidos fabricados con tiras o formas similares | 20 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 5407.30.00.00 | - Productos citados en la Nota 9 de la Sección XI | 10 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n|  | - Los demás tejidos con un contenido de filamentos de nailon o demás poliamidas superior o igual al 85 % en peso: |  |  |  |  |  |  |  |  |  |  |  |\n| 5407.41.00.00 | - - Crudos o blanqueados | 20 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 5407.42.00.00 | - - Teñidos | 10 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 5407.43.00.00 | - - Con hilados de distintos colores | 20 |  | m2 |  |  |  |  | 100 |  |  | 100 |",
+          "bucket": "afr_2025",
+          "unit": "table",
+          "doc_id": "Arancel_Boliviano_2025_Parte_3",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_3_p7388",
+          "score": 0.01639344262295082,
+          "text": "- - De rayón viscosa, con una torsión superior a 120 vueltas por metro",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_3",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_3_t35",
+          "score": 0.01639344262295082,
+          "text": "|  |  |  |  | Unidad de Medida |  | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| CÓDIGO | DESCRIPCIÓN | GA % | ICE - IEHD |  | Despacho en Frontera | Tipo de Doc |  |  | CAN ACE 36 ACE 47 VEN | ACE 22 |  | ACE 66 MÉXICO |\n|  | DE LA MERCANCÍA |  |  |  |  |  | Entidad que emite | Disp. Legal |  | Chi | Prot |  |\n| 56.01 | Guata de materia textil y artículos de esta guata; fibras textiles de longitud inferior o igual a 5 mm (tundizno), nudos y molas de materia textil. |  |  |  |  |  |  |  |  |  |  |  |\n|  | - Guata de materia textil y artículos de esta guata: |  |  |  |  |  |  |  |  |  |  |  |\n| 5601.21.00.00 | - - De algodón | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5601.22.00.00 | - - De fibras sintéticas o artificiales | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5601.29.00.00 | - - Los demás | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 5601.30.00.00 | - Tundizno, nudos y motas de materia textil | 15 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 56.02 | Fieltro, incluso impregnado, recubierto, revestido o estratificado. |  |  |  |  |  |  |  |  |  |  |  |\n| 5602.10.00.00 | - Fieltro punzonado y productos obtenidos mediante costura por cadeneta | 15 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n|  | - Los demás fieltros sin impregnar, recubrir, revestir ni estratificar. |  |  |  |  |  |  |  |  |  |  |  |\n| 5602.21.00.00 | - - De lana o pelo fino | 15 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 5602.29.00.00 | - - De las demás materias textiles | 15 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 5602.90.00.00 | - Los demás | 15 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 56.03 | Tela sin tejer, incluso impregnada, recubierta, revestida o estratificada. |  |  |  |  |  |  |  |  |  |  |  |\n|  | - De filamentos sintéticos o artificiales: |  |  |  |  |  |  |  |  |  |  |  |\n| 5603.11.00.00 | - - De peso inferior o igual a 25 g/m2 | 15 |  | m2 |  |  |  |  | 100 |  |  | 100 |\n| 5603.12 | - - De peso superior a 25 g/m2 pero inferior o igual a 70 g/m2: |  |  |  |  |  |  |  |  |  |  |  |\n| 5603.12.10.00 | - - - De poliéster, impregnada con caucho estireno-butadieno de peso superior o igual a 43 g/m2, precortados con ancho inferior o igual a 75 mm | 10 |  | m2 |  |  |  |  | 100 |  |  | 100 |",
+          "bucket": "afr_2025",
+          "unit": "table",
+          "doc_id": "Arancel_Boliviano_2025_Parte_3",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_3_p7381",
+          "score": 0.016129032258064516,
+          "text": "-- De rayón viscosa, sin torsión o con una torsión inferior o igual a 120 vueltas por metro",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_3",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_3_p7707",
+          "score": 0.016129032258064516,
+          "text": "- Tejidos fabricados con hilados de alta tenacidad de rayón viscosa",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_3",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [],
+      "exclusions": [],
+      "missing_fields": [
+        "de que material esta hecho algodon poliester lana mezcla sintetico",
+        "cual es el uso final prenda de vestir tela por metro articulos de hogar"
+      ],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_16",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "17",
+    "query": "CIGARRILLOS L&M FORWARD RUBIO CON CAPSULA MENTOL FA051108.01 CAJA DE CARTON CON 100 PAQUETESX10 CAJETILLASX10 CIGARRILLOS TABACO RUBIO COMERCIALIZACION",
+    "request": {
+      "user_query": "CIGARRILLOS L&M FORWARD RUBIO CON CAPSULA MENTOL FA051108.01 CAJA DE CARTON CON 100 PAQUETESX10 CAJETILLASX10 CIGARRILLOS TABACO RUBIO COMERCIALIZACION",
+      "conversation_id": "log_17"
+    },
+    "start_ts": 1770142769.778487,
+    "end_ts": 1770142775.142014,
+    "latency_s": 5.363527059555054,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "2402.20",
+          "description": "Cigarrillos que contienen tabaco, incluyendo cigarrillos rubios con sabor a mentol, presentados en empaques comerciales",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_5_p15780",
+          "score": 0.03252247488101534,
+          "text": "* Cigarros puros. * Tabaco Nero y Rubio.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel 2026_1.pdf_t87",
+          "score": 0.03177805800756621,
+          "text": "| CÓDIGO | DESCRIPCIÓN DE LA MERCANCÍA | GA % | ICE - IEHD | Unidad de Medida | Despacho en Frontera | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n|  |  |  |  |  |  | Tipo de Doc | Entidad que emite | Disp. Legal | CAN ACE 36 ACE 47 VEN | ACE 22 |  | ACE 66 MÉXICO |\n|  |  |  |  |  |  |  |  |  |  | Chi | Prot |  |\n| 24.01 | Tabaco en rama o sin elaborar; desperdicios de tabaco. |  |  |  |  |  |  |  |  |  |  |  |\n| 2401.10 | - Tabaco sin desvenar o desnervar: |  |  |  |  |  |  |  |  |  |  |  |\n| 2401.10.10.00 | - - Tabaco negro | 10 |  | kg |  | C* | MDPRyA (SENASAG) | Ley 830 - Dec. 515 | 100 |  |  | 100 |\n| 2401.10.20.00 | - - Tabaco rubio | 10 |  | kg |  | C* | MDPRyA (SENASAG) | Ley 830 - Dec. 515 | 100 |  |  | 100 |\n| 2401.20 | - Tabaco total o parcialmente desvenado o desnervado: |  |  |  |  |  |  |  |  |  |  |  |\n| 2401.20.10.00 | - - Tabaco negro | 10 |  | kg |  | C* | MDPRyA (SENASAG) | Ley 830 - Dec. 515 | 100 |  |  | 100 |\n| 2401.20.20.00 | - - Tabaco rubio | 10 |  | kg |  | C* | MDPRyA (SENASAG) | Ley 830 - Dec. 515 | 100 |  |  | 100 |\n| 2401.30.00.00 | - Desperdicios de tabaco | 10 |  | kg |  | C* | MDPRyA (SENASAG) | Ley 830 - Dec. 515 | 100 |  |  | 100 |\n| 24.02 | Cigarros (puros) (incluso despuntados), cigarritos (puritos) y cigarrillos, de tabaco o de sucedáneos del tabaco. |  |  |  |  |  |  |  |  |  |  |  |\n| 2402.10.00.00 | - Cigarros (puros) (incluso despuntados) y cigarritos (puritos), que contengan tabaco | 40 | ICE | u |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 100 |\n| 2402.20 | - Cigarrillos que contengan tabaco: |  |  |  |  |  |  |  |  |  |  |  |\n| 2402.20.10.00 | - - De tabaco negro | 40 | ICE | u |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 0 |\n| 2402.20.20.00 | - - De tabaco rubio | 40 | ICE | u |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 0 |\n| 2402.90.00.00 | - Los demás | 40 |  | u |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 100 |\n| 24.03 | Los demás tabacos y sucedáneos del tabaco, elaborados; tabaco «homogeneizado» o «reconstituido»; extractos y jugos de tabaco. |  |  |  |  |  |  |  |  |  |  |  |\n|  | - Tabaco para fumar, incluso con sucedáneos de tabaco en cualquier proporción: |  |  |  |  |  |  |  |  |  |  |  |\n| 2403.11.00.00 | - - Tabaco para pipa de agua mencionado en la Nota 1 de subpartida de este Capítulo | 10 | ICE | kg |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 100 |\n| 2403.19.00.00 | - - Los demás | 10 | ICE | kg |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 100 |",
+          "bucket": "afr_2026",
+          "unit": "table",
+          "doc_id": "Arancel 2026_1.pdf",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_1_t89",
+          "score": 0.016129032258064516,
+          "text": "| CÓDIGO | DESCRIPCIÓN DE LA MERCANCÍA | GA % | ICE - IEHD | Unidad de Medida | Despacho en Frontera | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n|  |  |  |  |  |  | Tipo de Doc | Entidad que emite | Disp. Legal | CAN ACE 36 ACE 47 VEN | ACE\nChi | 22\nProt | ACE 66 MÉXICO |\n| 24.01 | Tabaco en rama o sin elaborar; desperdicios de tabaco. |  |  |  |  |  |  |  |  |  |  |  |\n| 2401.10 | - Tabaco sin desvenar o desnervar. |  |  |  |  |  |  |  |  |  |  |  |\n| 2401.10.10.00 | - - Tabaco negro | 10 |  | kg |  | C* | MDRyT (SENASAG) | Ley 830 - Dec. 515 | 100 |  |  | 100 |\n| 2401.10.20.00 | - - Tabaco rubio | 10 |  | kg |  | C: | MDRyT (SENASAG) | Ley 830 - Dec. 515 | 100 |  |  | 100 |\n| 2401.20 | - Tabaco total o parcialmente desvenado o desnervado: |  |  |  |  |  |  |  |  |  |  |  |\n| 2401.20.10.00 | - - Tabaco negro | 10 |  | kg |  | C* | MDRyT (SENASAG) | Ley 830 - Dec. 515 | 100 |  |  | 100 |\n| 2401.20.20.00 | - - Tabaco rubio | 10 |  | kg |  | C' | MDRyT (SENASAG) | Ley 830 - Dec. 515 | 100 |  |  | 100 |\n| 2401.30.00.00 | Desperdicios de tabaco | 10 |  | kg |  | C. | MDRyT (SENASAG) | Ley 830 - Dec. 515 | 100 |  |  | 100 |\n| 24.02 | Cigarros (puros) (incluso despuntados), cigarritos (puritos) y cigarrillos, de tabaco o de sucedáneos del tabaco. |  |  |  |  |  |  |  |  |  |  |  |\n| 2402.10.00.00 | - Cigarros (puros) (incluso despuntados) y cigarritos (puritos), que contengan tabaco | 40 | ICE | u |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 100 |\n| 2402.20 | - Cigarrillos que contengan tabaco: |  |  |  |  |  |  |  |  |  |  |  |\n| 2402.20.10.00 | - - De tabaco negro | 40 | ICE | u |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 0 |\n| 2402.20.20.00 | - De tabaco rubio | 40 | ICE | u |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 0 |\n| 2402.90.00.00 | - Los demás | 40 |  | u |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 100 |\n| 24.03 | Los demás tabacos y sucedáneos del tabaco, elaborados; tabaco «homogeneizado» o «reconstituido»; extractos y jugos de tabaco. |  |  |  |  |  |  |  |  |  |  |  |\n|  | - Tabaco para fumar, incluso con sucedáneos de tabaco en cualquier proporción: |  |  |  |  |  |  |  |  |  |  |  |\n| 2403.11.00.00 | - - Tabaco para pipa de agua mencionado en la Nota 1 de subpartida de este Capítulo | 10 | ICE | kg |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 100 |\n| 2403.19.00.00 | - - Los demás | 10 | ICE | kg |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 100 |\n|  | - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 2403.91.00.00 | - - Tabaco «homogeneizado» o «reconstituido» | 10 | ICE | kg |  | C | IBNORCA | D.S. 29376 | 100 |  |  | 100 |\n| 2403.99.00.00 | - - Los demás | 10 | ICE | kg |  |  |  |  | 100 |  |  | 100 |\n| 24.04 | Productos que contengan tabaco, tabaco reconstituido, nicotina o sucedáneos del tabaco o de nicotina, destinados para la inhalación sin combustión; otros productos que contengan nicotina destinados para la absorción de nicotina en el cuerpo humano. |  |  |  |  |  |  |  |  |  |  |  |\n|  | - Productos destinados para la inhalación sin combustión: |  |  |  |  |  |  |  |  |  |  |  |\n| 2404.11.00.00 | - - Que contengan tabaco o tabaco reconstituido | 40 | ICE | kg |  |  |  |  | 100 |  |  | 100 |\n| 2404.12.00.00 | - - Los demás, que contengan nicotina | 40 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 2404.19.00.00 | - - Los demás | 40 | ICE | kg |  |  |  |  | 100 |  |  | 100 |\n|  | - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 2404.91.00.00 | - - Para administrarse por vía oral | 10 |  | kg |  |  |  |  | 100 |  |  | 0 |\n| 2404.92.00.00 | - - Para administrarse por vía transdérmica | 10 |  | kg |  |  |  |  | 100 |  |  | 100 |\n| 2404.99.00.00 | - - Los demás | 10 |  | kg |  |  |  |  | 100 |  |  | 100 |",
+          "bucket": "afr_2025",
+          "unit": "table",
+          "doc_id": "Arancel_Boliviano_2025_Parte_1",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_1_p15605",
+          "score": 0.015873015873015872,
+          "text": "- Cigarrillos que contengan tabaco:",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_1",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_3_p4183",
+          "score": 0.015873015873015872,
+          "text": "Papel de fumar, incluso cortado al tamaño adecuado, en librillos o en tubos.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_3",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Cigarrillos de tabaco rubio",
+        "Cigarrillos con cápsula de mentol"
+      ],
+      "exclusions": [
+        "Tabaco en rama",
+        "Cigarrillos sin tabaco"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_17",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "18",
+    "query": "ARANDELA DEL REGULADOR DE BANDEJA TOYOTA ARANDELA DEL REGULADOR DE BANDEJA REPUESTOS 481980K010 PIEZA METAL REPUESTOS PARA VEHICULOS",
+    "request": {
+      "user_query": "ARANDELA DEL REGULADOR DE BANDEJA TOYOTA ARANDELA DEL REGULADOR DE BANDEJA REPUESTOS 481980K010 PIEZA METAL REPUESTOS PARA VEHICULOS",
+      "conversation_id": "log_18"
+    },
+    "start_ts": 1770142775.142014,
+    "end_ts": 1770142779.8638635,
+    "latency_s": 4.72184944152832,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "8708.40.90.90",
+          "description": "Piezas y accesorios para vehículos",
+          "confidence": 0.95,
+          "level": "NATIONAL10",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_5_p3807",
+          "score": 0.01639344262295082,
+          "text": "- - - Para vehículos del Capítulo 87",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_4_p658",
+          "score": 0.01639344262295082,
+          "text": "Partes y accesorios de vehículos de las partidas 87.11 a 87.13.",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_4",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_5_p10451",
+          "score": 0.016129032258064516,
+          "text": "- Para vehículos del Capítulo 87",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel 2026_5.pdf_t40",
+          "score": 0.016129032258064516,
+          "text": "| CÓDIGO | DESCRIPCIÓN DE LA MERCANCÍA | GA % | ICE - IEHD | Unidad de Medida | Despacho en Frontera | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n|  |  |  |  |  |  | Tipo de Doc | Entidad que emite | Disp. Legal | CAN ACE 36 ACE 47 VEN | ACE 22 |  | ACE 66 MÉXICO |\n|  |  |  |  |  |  |  |  |  |  | Chi | Prot |  |\n| 8708.40.90.90 | - - - Las demás | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.50 | - Ejes con diferencial, incluso provistos con otros órganos de transmisión, y ejes portadores; sus partes: |  |  |  |  |  |  |  |  |  |  |  |\n|  | - - Ejes con diferencial, incluso provistos con otros órganos de transmisión, y sus partes: |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.50.11.00 | - - - Ejes con diferencial | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.50.19.00 | - - - Partes | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - - Ejes portadores y sus partes: |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.50.21.00 | - - - Ejes portadores | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.50.29.00 | - - - Partes | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.70 | - Ruedas, sus partes y accesorios: |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.70.10 | - - Ruedas y sus partes: |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.70.10.10 | - - - Usadas | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.70.10.90 | - - - Los demás | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.70.20.00 | - - Embellecedores de ruedas (tapacubos, copas, vasos) y demás accesorios | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.80 | - Sistemas de suspensión y sus partes (incluidos los amortiguadores): |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.80.10.00 | - - Rótulas y sus partes | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.80.20.00 | - - Amortiguadores y sus partes | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.80.90.00 | - - Los demás | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - Las demás partes y accesorios: |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.91.00.00 | - - Radiadores y sus partes | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.92.00.00 | - - Silenciadores y tubos (caños) de escape; sus partes | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.93 | - - Embragues y sus partes: |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.93.10.00 | - - - Embragues | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - - - Partes: |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.93.91.00 | - - - - Platos (prensas) y discos | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.93.99.00 | - - - Las demás - | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.94.00.00 | - - Volantes, columnas y cajas de dirección; sus partes | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.95.00.00 | - - Bolsas inflables de seguridad con sistema de inflado (airbag); sus partes | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.99 | - - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n|  | - - - Bastidores de chasis y sus partes: |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.99.11.00 | - - - - Bastidores de chasis | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.99.19.00 | - - - - Partes | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - - - Transmisiones cardánicas y sus partes: |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.99.21.00 | - - Transmisiones cardánicas - - | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.99.29.00 | Partes - - - | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | -- - Sistemas de dirección y sus partes: |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.99.31.00 | - - - Sistemas mecánicos - | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.99.32.00 | Sistemas hidráulicos - - - | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.99.33.00 | Terminales - - - | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.99.39.00 | - - - - Las demás partes | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.99.40.00 | - - - Trenes de rodamiento de oruga y sus partes | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.99.50.00 | - - - Tanques para carburante | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - - - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 8708.99.96.00 | Cargador y sensor de bloqueo para cinturones de seguridad - - - | 0 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8708.99.99.00 | - Los demás - - | 0 |  | u |  |  |  |  | 100 |  |  | 100 |",
+          "bucket": "afr_2026",
+          "unit": "table",
+          "doc_id": "Arancel 2026_5.pdf",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_5_p3685",
+          "score": 0.015873015873015872,
+          "text": "- - Fusibles para vehículos del Capítulo 87",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_5",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Partes para vehículos",
+        "Accesorios de vehículos"
+      ],
+      "exclusions": [
+        "Piezas de vehículos de categorías distintas"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_18",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "19",
+    "query": "SOLVAY DE GAS BOTELLA ACERO GAS INTERRUPTORES DE ALTA TENSION",
+    "request": {
+      "user_query": "SOLVAY DE GAS BOTELLA ACERO GAS INTERRUPTORES DE ALTA TENSION",
+      "conversation_id": "log_19"
+    },
+    "start_ts": 1770142779.8638635,
+    "end_ts": 1770142785.6800246,
+    "latency_s": 5.816161155700684,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "8484.10",
+          "description": "Interruptores de alta tensión, utilizados para corte y seccionamiento de circuitos eléctricos",
+          "confidence": 0.95,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        },
+        {
+          "code": "7311.00",
+          "description": "Recipientes de metal para gas comprimido",
+          "confidence": 0.7,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_4_p212",
+          "score": 0.029850746268656716,
+          "text": "2. A los efectos de la subpartida NANDINA 8409.99.93, se entiende por Equipo para la conversión del sistema de alimentación de combustible para vehículos automóviles a uso dual (diésel/gas o semi-diésel/gas), al equipo constituido principalmente por los siguientes elementos: mezclador de gas, válvula de potencia, tren de gas (incluye regulador de cero presión, filtro de gas, válvula solenoide, un par de bridas y hardware), panel de control, termo cuplés con adaptadores, transductores de presión, interruptor de presión, sensor de vibración, sistema de control dinámico de gas, con o sin depósito de gas, conexiones y cables indispensables para su instalación.",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_4",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_4_p211",
+          "score": 0.029236022193768675,
+          "text": "1. A los efectos de la subpartida NANDINA 8409.91.91, se entiende por Equipo para la conversión del sistema de alimentación de combustible para vehículos automóviles a uso dual (gas/gasolina) al equipo (kit) constituido principalmente por los siguientes elementos: reductor de la presión del gas, mezclador de aire-gas, electroválvulas de gasolina y gas, módulo electrónico de control de chispa, selector de combustible de gas/gasolina, indicador electrónico del gas, manómetro de llenado, válvula manual de cierre y alivio, con o sin depósito de gas, conexiones y cables indispensables para su instalación.",
+          "bucket": "afr_2025",
+          "unit": "paragraph",
+          "doc_id": "Arancel_Boliviano_2025_Parte_4",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_4_p4804",
+          "score": 0.01639344262295082,
+          "text": "Recipientes para gas comprimido o licuado, de fundición, hierro o acero.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_4",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_Boliviano_2025_Parte_4_t71",
+          "score": 0.01639344262295082,
+          "text": "| CÓDIGO | DESCRIPCIÓN DE LA MERCANCÍA | GA % | ICE - IEHD | Unidad de Medida | Despacho en Frontera | Documento Adicional para el Despacho Aduanero |  |  | Preferencias Arancelarias |  |  |  |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n|  |  |  |  |  |  | Tipo de Doc | Entidad que emite | Disp. Legal | CAN ACE 36 ACE 47 VEN | ACE 22 |  | ACE 66 MÉXICO |\n|  |  |  |  |  |  |  |  |  |  | Chi | Prot |  |\n| 85.35 | Aparatos para corte, seccionamiento, protección, derivación, empalme o conexión de circuitos eléctricos (por ejemplo: interruptores, conmutadores, cortacircuitos, pararrayos, limitadores de tensión, supresores de sobretensión transitoria, tomas de corriente y demás conectores, cajas de empalme), para una tensión superior a 1.000 voltios. |  |  |  |  |  |  |  |  |  |  |  |\n| 8535.10.00.00 | - Fusibles y cortacircuitos de fusible | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - Disyuntores: |  |  |  |  |  |  |  |  |  |  |  |\n| 8535.21.00.00 | - - Para una tensión inferior a 72,5 kV | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8535.29.00.00 | - - Los demás | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8535.30.00.00 | - Seccionadores e interruptores | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8535.40 | - Pararrayos, limitadores de tensión y supresores de sobretensión transitoria: |  |  |  |  |  |  |  |  |  |  |  |\n| 8535.40.10.00 | - - Pararrayos y limitadores de tensión | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8535.40.20.00 | - - Supresores de sobretensión transitoria («Amortiguadores de onda») | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8535.90 | - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 8535.90.10.00 | - - Conmutadores | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8535.90.90.00 | - - Los demás | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 85.36 | Aparatos para corte, seccionamiento, protección, derivación, empalme o conexión de circuitos eléctricos (por ejemplo: interruptores, conmutadores, relés, cortacircuitos, supresores de sobretensión transitoria, clavijas y tomas de corriente (enchufes), portalámparas y demás conectores, cajas de empalme), para una tensión inferior o igual a 1.000 voltios; conectores de fibras ópticas, haces o cables de fibras ópticas. |  |  |  |  |  |  |  |  |  |  |  |\n| 8536.10 | - Fusibles y cortacircuitos de fusible: |  |  |  |  |  |  |  |  |  |  |  |\n| 8536.10.10.00 | - - Fusibles para vehículos del Capítulo 87 | 5 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8536.10.20.00 | - - Los demás para una tensión inferior o igual a 260 V e intensidad inferior o igual a 30 A | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8536.10.90.00 | - - Los demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8536.20 | - Disyuntores: |  |  |  |  |  |  |  |  |  |  |  |\n| 8536.20.20.00 | - - Para una tensión inferior o igual a 260 V e intensidad inferior o igual a 100 A | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8536.20.90.00 | - - Los demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8536.30 | - Los demás aparatos para protección de circuitos eléctricos: |  |  |  |  |  |  |  |  |  |  |  |\n|  | - - Supresores de sobretensión transitoria («Amortiguadores de onda»): |  |  |  |  |  |  |  |  |  |  |  |\n| 8536.30.11.00 | - - - Descargadores con electrodos en atmósfera gaseosa, para proteger líneas telefónicas | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8536.30.19.00 | - - - Los demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8536.30.90 | - - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n| 8536.30.90.10 | - - - Llaves magnéticas para guardamotor | 10 |  | u |  |  |  |  | 100 | 100 | II | 100 |\n| 8536.30.90.90 | - - - Los demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n|  | - Relés: |  |  |  |  |  |  |  |  |  |  |  |\n| 8536.41 | - - Para una tensión inferior o igual a 60 V: |  |  |  |  |  |  |  |  |  |  |  |\n| 8536.41.10.00 | - - - Para corriente nominal inferior o igual a 30 A | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8536.41.90.00 | - - - Los demás | 10 |  | u |  |  |  |  | 100 |  |  | 100 |\n| 8536.49 | - - Los demás: |  |  |  |  |  |  |  |  |  |  |  |\n|  | - - - Para una tensión superior a 60 V pero inferior o igual a 260 V e intensidad inferior o igual a 30 A: |  |  |  |  |  |  |  |  |  |  |  |",
+          "bucket": "afr_2025",
+          "unit": "table",
+          "doc_id": "Arancel_Boliviano_2025_Parte_4",
+          "reason": "retrieved_by_search",
+          "year": 2025
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17341",
+          "score": 0.016129032258064516,
+          "text": "Neumáticos (llantas neumáticas) nuevos de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [
+        "RGI 1"
+      ],
+      "inclusions": [
+        "Interruptores eléctricos para alta tensión",
+        "Recipientes para gas comprimido de acero"
+      ],
+      "exclusions": [
+        "Equipos para conversión de combustible en vehículos"
+      ],
+      "missing_fields": [],
+      "warnings": [],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_19",
+      "years": [
+        2025,
+        2026
+      ]
+    },
+    "error": null
+  },
+  {
+    "query_id": "20",
+    "query": "STYLO DEVIDEAL PERALHAYANOGALGRIS 16MM MELAMINA BOLSAS MELAMINA INDUSTRIAL",
+    "request": {
+      "user_query": "STYLO DEVIDEAL PERALHAYANOGALGRIS 16MM MELAMINA BOLSAS MELAMINA INDUSTRIAL",
+      "conversation_id": "log_20"
+    },
+    "start_ts": 1770142785.6800246,
+    "end_ts": 1770142789.909635,
+    "latency_s": 4.229610443115234,
+    "status_code": 200,
+    "response_body": {
+      "top_candidates": [
+        {
+          "code": "9999.00",
+          "description": "Clasificación pendiente - Necesita más información",
+          "confidence": 0.6174999999999999,
+          "level": "HS6",
+          "years": [
+            2025,
+            2026
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "fragment_id": "Arancel_2026_2_p17701",
+          "score": 0.03252247488101534,
+          "text": "- - - Bolsas para máquinas vulcanizadoras y reencauchadoras de neumáticos (llantas neumáticas)",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p15690",
+          "score": 0.032266458495966696,
+          "text": "- - Melamina formaldehído",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p16453",
+          "score": 0.016129032258064516,
+          "text": "- - - Bolsas para el envasado de soluciones parenterales",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17341",
+          "score": 0.015873015873015872,
+          "text": "Neumáticos (llantas neumáticas) nuevos de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        },
+        {
+          "fragment_id": "Arancel_2026_2_p17469",
+          "score": 0.015625,
+          "text": "Neumáticos (llantas neumáticas) recauchutados o usados, de caucho; bandajes (llantas macizas o huecas), bandas de rodadura para neumáticos (llantas neumáticas) y protectores («flaps»), de caucho.",
+          "bucket": "afr_2026",
+          "unit": "paragraph",
+          "doc_id": "Arancel_2026_2",
+          "reason": "retrieved_by_search",
+          "year": 2026
+        }
+      ],
+      "support_evidence": [],
+      "applied_rgi": [],
+      "inclusions": [],
+      "exclusions": [],
+      "missing_fields": [
+        "de que material esta hecho el stylo necesario para identificar la clasificacion adecuada"
+      ],
+      "warnings": [
+        "No se encontró información específica en el corpus. Por favor proporciona más detalles del producto.",
+        "No se pudo determinar clasificación automática"
+      ],
+      "versions": {},
+      "debug_info": null,
+      "conversation_id": "log_20",
+      "years": [
+        2026
+      ]
+    },
+    "error": null
+  }
+]

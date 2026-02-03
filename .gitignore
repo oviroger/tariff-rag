@@ -45,3 +45,18 @@ runs/
 #data
 *.sql
 *.zip
+
+# Local experiments and notes (do NOT push)
+AGREGAR_NUEVAS_CATEGORIAS.md
+CAMBIOS_IMPLEMENTADOS.txt
+EJEMPLOS_FLUJO_PROGRESIVO.md
+FIX_TEXTILES_PROGRESION.md
+GUIA_PRUEBAS_UI.md
+VALIDACION_FIX_RESUMEN.md
+evaluation/eval_integral.py
+evaluation/eval_resultados.csv
+evaluation/generate_detailed_logs.py
+evaluation/repro_algodon_results.json
+evaluation/reproduce_algodon_flow.py
+test_*.py
+test_*.txt
