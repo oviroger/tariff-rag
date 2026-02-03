@@ -27,8 +27,45 @@
     "¿Es nuevo o usado?"
   ],
   "food": [
+    "¿Cuál es el tipo específico del producto alimentario? (fruta, carne, pescado, etc.)",
     "¿Es fresco, refrigerado, congelado, o procesado?",
-    "¿Está entero o troceado/fileteado?",
-    "¿Es nuevo o importado?"
-  ]
+    "¿Está entero o ha sido troceado/fileteado/procesado?"
+  ],
+  "food_frutas": [
+    "¿Qué tipo específico de fruta? (manzana, naranja, plátano, piña, limón, etc.) → Define el código base (0801-0809)",
+    "¿Está fresco/refrigerado, seco, o procesado? → Define si va en 08XX.10 (fresco) u 08XX.30 (seco)",
+    "¿Está entero o ha sido procesado/pelado?"
+  ],
+  "food_carnes": [
+    "¿Qué tipo de carne? (res, pollo, cerdo, cordero, etc.) → Determina el capítulo (0201-0207)",
+    "¿Está entera, en trozos grandes, o deshuesada? → Discrimina entre partidas (0201 vs 0202 vs 0203)",
+    "¿Fresca, refrigerada, congelada, o salada? → Puede cambiar significativamente el código"
+  ],
+  "food_pescado": [
+    "¿Qué especie o tipo de pescado específico? (atún, tilapia, salmón, etc.) → Discrimina dentro de capítulo 03",
+    "¿Está entero, fileteado, en filetes congelados, o en conserva? → Define la subpartida",
+    "¿Fresco, congelado, seco-salado, ahumado, o en conserva? → Cambia el nivel de clasificación"
+  ],
+  "critical_fields": {
+    "vehicles": {
+      "code_patterns": ["8702", "8703", "8704"],
+      "critical_keywords": ["motor", "tipo de motor", "cilindrada", "nuevo", "usado", "condicion"]
+    },
+    "textiles": {
+      "code_patterns": ["50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63"],
+      "critical_keywords": ["material", "algodon", "poliester", "lana", "seda", "textil", "tipo de tela", "tejido", "punto", "no tejido", "uso final", "prenda", "ropa", "decoracion", "industrial"]
+    },
+    "metals": {
+      "code_patterns": ["72"],
+      "critical_keywords": ["espesor", "lamina", "laminas", "acabado", "laminado", "galvanizado", "recubrimiento"]
+    },
+    "appliances": {
+      "code_patterns": ["84"],
+      "critical_keywords": ["capacidad", "potencia", "nuevo", "usado", "condicion", "tipo"]
+    },
+    "electronics": {
+      "code_patterns": ["84", "85"],
+      "critical_keywords": ["capacidad", "memoria", "almacenamiento", "procesador", "nuevo", "usado"]
+    }
+  }
 }
