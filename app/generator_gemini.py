@@ -563,12 +563,34 @@ def _ensure_missing_fields(res: Dict[str, Any], blob: str, conversation_history:
                 "¿Cuál es la composición? (acero al carbono, inoxidable, etc.) → Podría cambiar de capítulo",
             ]
         elif is_electrodomestico and str(code).startswith("84") and (is_generic_code or confidence <= 0.85):
-            auto_missing = [
-                "¿Qué tipo específico de electrodoméstico es? (lavadora, refrigerador, microondas, etc.)",
-                "¿Cuál es la capacidad? (kg para lavadora, litros para refrigerador, watts para microondas)",
-                "¿Es de carga frontal o superior? (si aplica para lavadora)",
-                "¿Es nuevo o usado?"
-            ]
+            # Detectar tipo específico de electrodoméstico para preguntas relevantes
+            is_lavadora = any(kw in combined_context for kw in ["lavadora", "lavaseca", "secadora"])
+            is_refrigerador = any(kw in combined_context for kw in ["refrigerador", "refrigeradora", "nevera", "heladera", "congelador"])
+            is_microondas = any(kw in combined_context for kw in ["microondas", "microonda", "horno microonda"])
+            
+            auto_missing = []
+            if not (is_lavadora or is_refrigerador or is_microondas):
+                # Si es genérico, pedir tipo específico
+                auto_missing.append("¿Qué tipo específico de electrodoméstico es? (lavadora, refrigerador, microondas, etc.)")
+            
+            # Preguntas específicas por tipo
+            if is_lavadora or not (is_refrigerador or is_microondas):
+                if "capacidad" not in combined_context and "kg" not in combined_context:
+                    auto_missing.append("¿Cuál es la capacidad en kg? (si es lavadora)")
+                if "carga" not in combined_context:
+                    auto_missing.append("¿Es de carga frontal o superior? (si es lavadora)")
+            
+            if is_refrigerador or not (is_lavadora or is_microondas):
+                if "capacidad" not in combined_context and "litro" not in combined_context:
+                    auto_missing.append("¿Cuál es la capacidad en litros? (si es refrigerador)")
+            
+            if is_microondas or not (is_lavadora or is_refrigerador):
+                if "watts" not in combined_context and "w" not in combined_context:
+                    auto_missing.append("¿Cuál es la potencia en watts? (si es microondas)")
+            
+            # Pregunta común para todos
+            if "nuevo" not in combined_context and "usado" not in combined_context:
+                auto_missing.append("¿Es nuevo o usado?")
         elif is_textile and (is_generic_code or confidence <= 0.85):
             # Textiles: Chapters 50-63
             # Always ask for critical fields if not high confidence
@@ -1066,25 +1088,22 @@ def _prune_missing_fields(res: Dict[str, Any], query_text: str, conversation_his
     if not res.get("missing_fields"):
         return res
     
-    # CRÍTICO: Si es categoría de alto impacto (textil, vehículo, metal) con baja confianza, 
-    # NO ELIMINAR missing_fields - son críticos para clasificación
+    # Store category info for later selective pruning
+    is_critical_category = False
+    confidence = 0.0
+    code_str = ""
     candidates = res.get("top_candidates") or []
     if candidates:
         top = candidates[0]
         code = top.get("code", "")
         confidence = float(top.get("confidence", 0))
-        
         code_str = str(code).replace(".", "").replace(" ", "")
         is_critical_category = (
             code_str.startswith(("50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63")) or  # Textiles
             code_str.startswith(("8702", "8703", "8704")) or  # Vehicles
             code_str.startswith("72")  # Metals
         )
-        
-        if is_critical_category and confidence <= 0.85:
-            # Si es categoría crítica con baja confianza, PRESERVAR todos los missing_fields
-            logger.info(f"LOG_PRUNE_SKIP_CRITICAL: Skipping prune for critical category {code} (conf={confidence:.0%}) - preserve all fields")
-            return res
+        logger.info(f"LOG_PRUNE_CATEGORY_CHECK: code={code}, confidence={confidence:.0%}, is_critical={is_critical_category}")
     
     # EARLY PRUNE: Remove motor question if it was already asked in the previous turn
     # This prevents repetitive/inconsistent questions (user already saw it and chose not to answer)
@@ -1134,7 +1153,7 @@ def _prune_missing_fields(res: Dict[str, Any], query_text: str, conversation_his
         ("material", "madera", "metal", "plastico", "aluminio", "acero", "vidrio"): ["madera", "metal", "plastico", "plastica", "aluminio", "acero", "vidrio"],
         # Textiles: aceptar variantes sin tilde y sinónimos
         ("material", "algodon", "poliester", "seda", "mezcla", "textil", "tela"): [
-            "algodon", "poliester", "seda", "mezcla", "sintetico", "sintetico", "fibra", "synthetic"
+            "algodon", "algodón", "poliester", "poliéster", "seda", "mezcla", "sintetico", "sintético", "fibra", "synthetic", "cotton", "polyester", "silk"
         ],
         # Tipo de tejido (tejido plano / punto / no tejido)
         ("tejido", "punto", "no tejido", "tejido plano"): ["tejido", "punto", "notejido", "no tejido", "plano"],
@@ -1254,7 +1273,60 @@ def _prune_missing_fields(res: Dict[str, Any], query_text: str, conversation_his
             logger.info(f"LOG_PRUNE_FIELD_REMOVED: '{field_norm}' - was satisfied")
     
     logger.info(f"LOG_PRUNE_END: cleaned={len(cleaned)} fields (from {len(cleaned_missing_fields)} after cleanup)")
-    res["missing_fields"] = cleaned
+    
+    # SELECTIVE PRUNING para categorías críticas: si es textil/vehículo/metal con baja confianza,
+    # hacer un pruning más selectivo solo de campos que CLARAMENTE fueron respondidos
+    if is_critical_category and confidence <= 0.85 and cleaned:
+        logger.info(f"LOG_PRUNE_SELECTIVE: Critical category {code_str} with low conf {confidence:.0%} - doing selective prune")
+        final_cleaned = []
+        for field in cleaned:
+            field_lower = field.lower()
+            # Solo eliminar si hay evidencia MUY clara en el texto del usuario
+            clearly_answered = False
+            
+            # Material textil: solo eliminar si menciona material específico
+            if "material" in field_lower and any(mat in text_blob_norm.lower() for mat in ["algodon", "algodón", "poliester", "poliéster", "lana", "seda", "sintetico", "sintético"]):
+                clearly_answered = True
+                logger.info(f"LOG_PRUNE_SELECTIVE_REMOVE: Material question clearly answered: '{field[:80]}'")
+            
+            # Tejido: solo eliminar si menciona tipo de tejido
+            elif "tejido" in field_lower or "punto" in field_lower:
+                if any(kw in text_blob_norm.lower() for kw in ["tejido", "punto", "plano", "knit", "woven", "no tejido", "notejido"]):
+                    clearly_answered = True
+                    logger.info(f"LOG_PRUNE_SELECTIVE_REMOVE: Tejido question clearly answered: '{field[:80]}'")
+            
+            # Uso final: solo eliminar si menciona uso específico
+            elif "uso" in field_lower and any(uso in text_blob_norm.lower() for uso in ["prenda", "ropa", "vestir", "cortina", "hogar", "tapizado", "mueble"]):
+                clearly_answered = True
+                logger.info(f"LOG_PRUNE_SELECTIVE_REMOVE: Uso question clearly answered: '{field[:80]}'")
+            
+            # Motor/combustible para vehículos: solo eliminar si menciona tipo específico
+            elif ("motor" in field_lower or "combustible" in field_lower) and any(fuel in text_blob_norm.lower() for fuel in ["gasolina", "diesel", "electrico", "eléctrico", "hibrido", "híbrido"]):
+                clearly_answered = True
+                logger.info(f"LOG_PRUNE_SELECTIVE_REMOVE: Motor/fuel question clearly answered: '{field[:80]}'")
+            
+            if not clearly_answered:
+                final_cleaned.append(field)
+        
+        logger.info(f"LOG_PRUNE_SELECTIVE_END: {len(cleaned)} → {len(final_cleaned)} fields after selective prune")
+        cleaned = final_cleaned
+    
+    # Deduplicar missing_fields: mantener solo la primera ocurrencia de cada pregunta
+    # Esto evita duplicados causados por múltiples generaciones o agregaciones
+    seen = set()
+    deduplicated = []
+    for field in cleaned:
+        field_normalized = _normalize_text(field).lower().strip()
+        if field_normalized not in seen:
+            seen.add(field_normalized)
+            deduplicated.append(field)
+        else:
+            logger.info(f"LOG_PRUNE_DEDUP: Removing duplicate field: '{field[:80]}'")
+    
+    if len(deduplicated) < len(cleaned):
+        logger.info(f"LOG_PRUNE_DEDUP_END: Removed {len(cleaned) - len(deduplicated)} duplicate fields")
+    
+    res["missing_fields"] = deduplicated
     return res
 
 
