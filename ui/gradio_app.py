@@ -1170,7 +1170,7 @@ with gr.Blocks(
                 examples=[
                     ["¿Cuál es la partida arancelaria de los vehículos?"],
                     ["Quiero importar tela"],
-                    ["Necesito importar tubos"],
+                    ["Necesito importar electrodomésticos"],
                 ],
                 title=None,
                 description=None,
